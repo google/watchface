@@ -1,0 +1,73 @@
+/*
+ * Copyright 2023 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+plugins {
+    id 'java'
+}
+
+dependencies {
+    implementation 'com.twelvemonkeys.imageio:imageio-webp:3.9.4'
+    implementation 'com.twelvemonkeys.imageio:imageio-core:3.9.4'
+    implementation 'com.google.code.gson:gson:2.10.1'
+    implementation 'com.google.guava:guava:32.0.1-jre'
+    implementation 'com.google.mug:mug-guava:6.6'
+    implementation 'commons-cli:commons-cli:1.5.0'
+}
+
+compileJava {
+    sourceCompatibility = '1.8'
+    targetCompatibility = '1.8'
+}
+
+configurations {
+    executableJar {
+        canBeConsumed = true
+        canBeResolved = false
+        attributes {
+            attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, objects.named(LibraryElements, 'executableJar'))
+        }
+    }
+}
+
+jar {
+    duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
+
+    manifest {
+        attributes "Main-Class": "com.google.wear.watchface.dfx.memory.ResourceMemoryEvaluator"
+    }
+
+    from {
+        configurations.runtimeClasspath.collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }
+}
+
+artifacts {
+    executableJar(jar)
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+test {
+    testLogging {
+        outputs.upToDateWhen {false}
+        showStandardStreams = true
+        exceptionFormat = "full"
+    }
+}
