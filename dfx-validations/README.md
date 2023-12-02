@@ -1,6 +1,6 @@
 # Memory Footprint Evaluator
 
-A program that evaluates the memory footprint of the assets in a [Watch FaceFormat][wff]
+A program that evaluates the memory footprint of the assets in a [Watch Face Format][wff]
 (WFF) package.
 
 ## Purpose
