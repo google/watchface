@@ -186,7 +186,7 @@ class AmbientMemoryFootprintCalculator {
                     long imageBytes = details.getBiggestFrameFootprintBytes();
 
                     // If this image can be downsampled then the size is halved.
-                    if (details.canUseARGB4444()) {
+                    if (details.canUseRGB565()) {
                         imageBytes /= 2;
                     }
 
@@ -198,7 +198,7 @@ class AmbientMemoryFootprintCalculator {
                                 ((double) imageBytes) / 1024 / 1024,
                                 details.getWidth(),
                                 details.getHeight(),
-                                details.canUseARGB4444() ? "ARGB4444" : "ARGB8888" );
+                                details.canUseRGB565() ? "RGB565" : "ARGB8888" );
                     }
                     total += imageBytes;
                     if (maxResourceSize < imageBytes) {
