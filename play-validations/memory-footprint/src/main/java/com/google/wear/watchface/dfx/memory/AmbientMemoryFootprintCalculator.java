@@ -214,8 +214,9 @@ class AmbientMemoryFootprintCalculator {
             }
 
             if (evaluationSettings.isVerbose()) {
+                long average = (numResources > 0) ? (maxTotal / numResources) : 0;
                 System.out.printf("Resource count %s average size %s max size %s\n", numResources,
-                        maxTotal / numResources, maxResourceSize);
+                        average, maxResourceSize);
             }
 
             return maxTotal;
