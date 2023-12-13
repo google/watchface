@@ -48,10 +48,17 @@ class DrawableResourceDetails {
 
     /**
      * A lookup table used for computing the loss of precision whern an 8bit value is qualtized to a
-     * 4bit value.
+     * 5bit value.
      */
-    private static final int QUANTZATION_ERROR_LUT[] =
-            create8bppTo4bppQualtizationErrorLookUpTable();
+    private static final int QUANTZATION_ERROR_LUT5[] =
+            create8bppToNbppQualtizationErrorLookUpTable(5);
+
+    /**
+     * A lookup table used for computing the loss of precision whern an 8bit value is qualtized to a
+     * 6bit value.
+     */
+    private static final int QUANTZATION_ERROR_LUT6[] =
+            create8bppToNbppQualtizationErrorLookUpTable(6);
 
     /** This corresponds to an average difference in luminosity of 5/10th of an 8bit value. */
     private static final double MAX_ACCEPTIABLE_QUANTIZATION_ERROR = 0.5f;
@@ -182,10 +189,12 @@ class DrawableResourceDetails {
                 BufferedImage image = reader.read(i);
                 Bounds bounds = computeBounds(image);
 
-                if (accumulatedBounds == null) {
-                    accumulatedBounds = bounds;
-                } else {
-                    accumulatedBounds = accumulatedBounds.computeUnion(bounds);
+                if (bounds != null) {
+                    if (accumulatedBounds == null) {
+                        accumulatedBounds = bounds;
+                    } else {
+                        accumulatedBounds = accumulatedBounds.computeUnion(bounds);
+                    }
                 }
 
                 QualtizationStats stats = computeQualtizationStats(image);
@@ -202,7 +211,7 @@ class DrawableResourceDetails {
                             .setWidth(maxWidth)
                             .setHeight(maxHeight)
                             .setSha1(sha1)
-                            .setCanUseARGB4444(canBeQuantized)
+                            .setCanUseRGB565(canBeQuantized)
                             .build());
         } catch (IOException e) {
             throw new IllegalArgumentException(
@@ -226,7 +235,7 @@ class DrawableResourceDetails {
     private int width;
     private int height;
     private final String sha1;
-    private final boolean canUseARGB4444;
+    private final boolean canUseRGB565;
 
     private DrawableResourceDetails(
             String name,
@@ -236,7 +245,7 @@ class DrawableResourceDetails {
             int width,
             int height,
             String sha1,
-            boolean canUseARGB4444) {
+            boolean canUseRGB565) {
         this.name = name;
         this.numberOfImages = numberOfImages;
         this.biggestFrameFootprintBytes = biggestFrameFootprintBytes;
@@ -244,7 +253,7 @@ class DrawableResourceDetails {
         this.width = width;
         this.height = height;
         this.sha1 = sha1;
-        this.canUseARGB4444 = canUseARGB4444;
+        this.canUseRGB565 = canUseRGB565;
     }
 
     String getName() {
@@ -257,11 +266,11 @@ class DrawableResourceDetails {
     }
 
     /**
-     * Whether this image can be quantised into an ARGB4444 image with out loosing too much
+     * Whether this image can be quantised into an RGB565 image with out loosing too much
      * visual fidelity.
      */
-    boolean canUseARGB4444() {
-        return canUseARGB4444;
+    boolean canUseRGB565() {
+        return canUseRGB565;
     }
 
     /**
@@ -344,8 +353,8 @@ class DrawableResourceDetails {
                 + height
                 + ", sha1='"
                 + sha1
-                + "', canUseARGB4444="
-                + canUseARGB4444
+                + "', canUseRGB565="
+                + canUseRGB565
                 + '}';
     }
 
@@ -361,14 +370,14 @@ class DrawableResourceDetails {
                 && Objects.equals(name, that.name)
                 && Objects.equals(bounds, that.bounds)
                 && Objects.equals(sha1, that.sha1)
-                && canUseARGB4444 == that.canUseARGB4444;
+                && canUseRGB565 == that.canUseRGB565;
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(
                 name, numberOfImages, biggestFrameFootprintBytes, bounds, width, height, sha1,
-                canUseARGB4444);
+                canUseRGB565);
     }
 
     static Builder builder() {
@@ -384,7 +393,7 @@ class DrawableResourceDetails {
         private int width;
         private int height;
         private String sha1;
-        private boolean canUseARGB4444;
+        private boolean canUseRGB565;
 
         public Builder setName(String name) {
             this.name = name;
@@ -421,15 +430,15 @@ class DrawableResourceDetails {
             return this;
         }
 
-        public Builder setCanUseARGB4444(boolean canUseARGB4444) {
-            this.canUseARGB4444 = canUseARGB4444;
+        public Builder setCanUseRGB565(boolean canUseRGB565) {
+            this.canUseRGB565 = canUseRGB565;
             return this;
         }
 
         public DrawableResourceDetails build() {
             return new DrawableResourceDetails(
                     name, numberOfImages, biggestFrameFootprintBytes, bounds, width, height, sha1,
-                    canUseARGB4444);
+                    canUseRGB565);
         }
     }
 
@@ -529,7 +538,7 @@ class DrawableResourceDetails {
             for (int x = 0; x < width; x++) {
                 int argb = image.getRGB(x, y);
                 int a = (argb >> 24) & 0xff;
-                if (a == 0) {
+                if (a < 255) {
                     continue;
                 }
 
@@ -539,24 +548,27 @@ class DrawableResourceDetails {
                 int g = (argb >> 8) & 0xff;
                 int b = argb & 0xff;
 
-                qualtizationStats.visiblePixelQuantizationErrorSum += QUANTZATION_ERROR_LUT[r];
-                qualtizationStats.visiblePixelQuantizationErrorSum += QUANTZATION_ERROR_LUT[g];
-                qualtizationStats.visiblePixelQuantizationErrorSum += QUANTZATION_ERROR_LUT[b];
+                qualtizationStats.visiblePixelQuantizationErrorSum += QUANTZATION_ERROR_LUT5[r];
+                qualtizationStats.visiblePixelQuantizationErrorSum += QUANTZATION_ERROR_LUT6[g];
+                qualtizationStats.visiblePixelQuantizationErrorSum += QUANTZATION_ERROR_LUT5[b];
             }
         }
         return qualtizationStats;
     }
 
-    /** Constructs a table of the error introduced by quantizing an 8 bit value to a 4 bit value. */
-    private static int[] create8bppTo4bppQualtizationErrorLookUpTable() {
+    /** Constructs a table of the error introduced by quantizing an 8 bit value to a N bit value. */
+    private static int[] create8bppToNbppQualtizationErrorLookUpTable(int n) {
         int[] table = new int[256];
+        int bitsLost = 8 - n;
+        int twoPowN = 1 << bitsLost;
+        int halfTwoPowN = 1 << (bitsLost - 1);
         for (int i = 0; i < 256; i++) {
-            // This rounds i to the nearest 4 bit value before converting back to an 8 bit value.
-            int quantizedValue = min(((i + 9) / 16) * 16, 255);
+            // This rounds i to the nearest n-bit value before converting back to an 8 bit value.
+            int quantizedValue = min(((i + halfTwoPowN) / twoPowN) * twoPowN, 255);
 
             // Record the error due to qualtization in the table. This has a saw-tooth pattern where
-            // 4 bit values that correspond directly to 8 bit ones have an error of 0, rising to a
-            // maximum error of 8 in between.
+            // n-bit values that correspond directly to 8 bit ones have an error of 0, rising to a
+            // maximum error of halfPlusOne in between.
             table[i] = abs(i - quantizedValue);
         }
         return table;
