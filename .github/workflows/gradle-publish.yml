@@ -5,7 +5,7 @@
 # This workflow will build a Java project with Gradle and cache/restore any dependencies to improve the workflow execution time
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-gradle
 
-name: Java CI with Gradle
+name: Release artifacts
 
 on:
   push:
@@ -26,16 +26,17 @@ jobs:
         distribution: 'corretto'
         architecture: 'x64'
     - name: Build memory-footprint.jar
-      uses: gradle/gradle-build-action@v2
+      uses: gradle/gradle-build-action@v2.4.2
       with:
         gradle-version: 8.4
         arguments: -p play-validations memory-footprint:jar
-    - uses: "marvinpinto/action-automatic-releases@latest"
+    - name: Release memory-footprint.jar
+      uses: "marvinpinto/action-automatic-releases@latest"
       with:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
         automatic_release_tag: "latest"
         prerelease: true
-        title: "Development Build"
+        title: "Memory Footprint Build"
         files: |
           LICENSE.txt
           **/memory-footprint.jar
