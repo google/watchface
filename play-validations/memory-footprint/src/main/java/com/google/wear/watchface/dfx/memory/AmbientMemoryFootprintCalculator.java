@@ -118,11 +118,6 @@ class AmbientMemoryFootprintCalculator {
                 perConfigurationDynamicResources.computeMaximumResourceUsage(
                         visitor.optionResources);
 
-        // There's always at least one layer, even if all the Part* nodes are hidden.
-        if (visitor.numLayers == 0) {
-            visitor.numLayers = 1;
-        }
-
         // In V1 we support a maximum of 2 layers and 2 clocks.
         if (evaluationSettings.applyV1OffloadLimitations()) {
             visitor.numLayers = min(visitor.numLayers, 2);
