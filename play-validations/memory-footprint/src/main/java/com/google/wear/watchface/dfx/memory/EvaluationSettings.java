@@ -26,8 +26,12 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
+import java.io.IOException;
+import java.net.URL;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Optional;
+import java.util.jar.Manifest;
 
 /** Contains the CLI arguments that the script was invoked with. */
 final class EvaluationSettings {
@@ -200,6 +204,13 @@ final class EvaluationSettings {
                         .desc("Turn on verbose mode. Optional.")
                         .hasArg(false)
                         .build();
+        Option versionOption =
+                Option.builder()
+                        .longOpt("version")
+                        .desc("Show the script's version and quit.")
+                        .hasArg(false)
+                        .build();
+
         Option estimateOptimizationOption =
                 Option.builder()
                         .longOpt("estimate-optimization")
@@ -210,8 +221,9 @@ final class EvaluationSettings {
         Option applyV1OffloadLimitationsOption =
                 Option.builder()
                         .longOpt("apply-v1-offload-limitations")
-                        .desc("Whether or not V1 offloading limitations should be applied to " +
-                                "the calculation. I.e. a maximum of 2 layers and two clocks.")
+                        .desc(
+                                "Whether or not V1 offloading limitations should be applied to the"
+                                    + " calculation. I.e. a maximum of 2 layers and two clocks.")
                         .hasArg(false)
                         .build();
 
@@ -245,6 +257,7 @@ final class EvaluationSettings {
         options.addOption(disableOldStyleClocksOption);
         options.addOption(disableAmbientDeduplicationOption);
         options.addOption(verboseOption);
+        options.addOption(versionOption);
         options.addOption(applyV1OffloadLimitationsOption);
         options.addOption(estimateOptimizationOption);
         options.addOption(greedyEvaluationSwitchOption);
@@ -255,6 +268,11 @@ final class EvaluationSettings {
         CommandLineParser parser = new DefaultParser();
         try {
             CommandLine line = parser.parse(options, arguments);
+
+            if (line.hasOption(versionOption)) {
+                printVersion();
+                System.exit(0);
+            }
             validateSchemaVersion(line.getOptionValue(schemaVersionOption));
             EvaluationSettings evaluationSettings =
                     new EvaluationSettings(
@@ -295,7 +313,7 @@ final class EvaluationSettings {
                 evaluationSettings.reportMode = true;
             }
             return Optional.of(evaluationSettings);
-        } catch (ParseException e) {
+        } catch (Exception e) {
             System.out.println("Error: " + e.getLocalizedMessage());
             new HelpFormatter().printHelp(cliInvokeCommand, options, true);
             return Optional.empty();
@@ -308,6 +326,22 @@ final class EvaluationSettings {
                     String.format(
                             "Argument --schema-version has a wrong value. Supported values are %s",
                             String.join(", ", SUPPORTED_VERSIONS)));
+        }
+    }
+
+    private static void printVersion() throws IOException {
+        Enumeration<URL> resources =
+                EvaluationSettings.class.getClassLoader().getResources("META-INF/MANIFEST.MF");
+        while (resources.hasMoreElements()) {
+            Manifest manifest = new Manifest(resources.nextElement().openStream());
+            String version = manifest.getMainAttributes().getValue("Version");
+
+            String hash = manifest.getMainAttributes().getValue("Git-Hash");
+            System.out.println(
+                    "memory-footprint version: "
+                            + (version != null ? version : "n/a")
+                            + " hash: "
+                            + (hash != null ? hash : "n/a"));
         }
     }
 }
