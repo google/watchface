@@ -20,11 +20,11 @@ package com.google.wear.watchface.dfx.memory;
 class TestResultFormatter {
 
     static String formatSuccess(String successMessage) {
-        return String.format("[MEMORY_FOOTPRINT]: %s ✅ ", successMessage);
+        return String.format("[MEMORY_FOOTPRINT]: ✅PASS✅ %s ✅ ", successMessage);
     }
 
     static String formatFailure(String failedMessage) {
-        return String.format("[MEMORY_FOOTPRINT]: %s ❌ ", failedMessage);
+        return String.format("[MEMORY_FOOTPRINT]: ❌FAIL❌ %s ❌ ", failedMessage);
     }
 
     static String formatException(String exceptionMessage) {
