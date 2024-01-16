@@ -25,11 +25,15 @@ jobs:
         java-version: '17'
         distribution: 'corretto'
         architecture: 'x64'
+    - name: Get project hash
+      run: |
+          git_hash=$(git rev-parse --short "$GITHUB_SHA")
+          echo "git_hash=$git_hash" >> $GITHUB_ENV
     - name: Build memory-footprint.jar
       uses: gradle/gradle-build-action@v2.4.2
       with:
         gradle-version: 8.4
-        arguments: -p play-validations memory-footprint:jar
+        arguments: -p play-validations memory-footprint:jar -Dmemory-footprint.git_hash=${{ env.git_hash }} -Dmemory-footprint.version=latest
     - name: Release memory-footprint.jar
       uses: "marvinpinto/action-automatic-releases@latest"
       with:
