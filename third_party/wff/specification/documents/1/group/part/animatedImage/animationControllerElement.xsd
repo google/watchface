@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright 2023 Samsung Electronics Co., Ltd All Rights Reserved
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:include schemaLocation="../../../common/booleanType.xsd"/>
+  <xs:include schemaLocation="../../../common/eventTriggerType.xsd"/>
+  <xs:simpleType name="frameOptionType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="DO_NOTHING"/>
+      <xs:enumeration value="FIRST_FRAME"/>
+      <xs:enumeration value="THUMBNAIL"/>
+      <xs:enumeration value="HIDE"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:element name="AnimationController">
+    <xs:complexType>
+      <xs:attribute name="play" type="eventTriggerListType" use="required"/>
+      <xs:attribute name="delayPlay" type="xs:float" default="0"/>
+      <xs:attribute name="delayRepeat" type="xs:float" default="0"/>
+      <xs:attribute name="repeat" type="booleanType" default="FALSE"/>
+      <xs:attribute name="loopCount" type="xs:integer" default="1"/>
+
+      <xs:attribute name="resumePlayBack" type="booleanType" default="FALSE"/>
+      <xs:attribute name="beforePlaying" type="frameOptionType" default="DO_NOTHING" />
+      <xs:attribute name="afterPlaying" type="frameOptionType" default="DO_NOTHING" />
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

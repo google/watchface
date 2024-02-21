@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright 2023 Samsung Electronics Co., Ltd All Rights Reserved
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:include schemaLocation="dimensionType.xsd"/>
+
+  <xs:attribute name="x" type="dimensionType">
+    <xs:annotation>
+      <xs:documentation>
+        Relative starting point (x,y) of the element on the screen.
+      </xs:documentation>
+    </xs:annotation>
+  </xs:attribute>
+
+  <xs:attribute name="y" type="dimensionType">
+    <xs:annotation>
+      <xs:documentation>
+        Relative starting point (x,y) of the element on the screen.
+      </xs:documentation>
+    </xs:annotation>
+  </xs:attribute>
+
+  <xs:attribute name="width" type="dimensionType">
+    <xs:annotation>
+      <xs:documentation>
+        Size of the element (width, height)
+      </xs:documentation>
+    </xs:annotation>
+  </xs:attribute>
+
+  <xs:attribute name="height" type="dimensionType">
+    <xs:annotation>
+      <xs:documentation>
+        Size of the element (width, height)
+      </xs:documentation>
+    </xs:annotation>
+  </xs:attribute>
+
+  <!-- Attribute groups for convenience. -->
+
+  <xs:attributeGroup name="positionAttributes">
+    <xs:annotation>
+      <xs:documentation>
+        Geometry data. Relative starting position of (x, y) the part on the screen.
+      </xs:documentation>
+    </xs:annotation>
+
+    <xs:attribute ref="x"/>
+    <xs:attribute ref="y"/>
+  </xs:attributeGroup>
+
+  <xs:attributeGroup name="sizeAttributes">
+    <xs:annotation>
+      <xs:documentation>
+        Geometry data. size of (width, height).
+      </xs:documentation>
+    </xs:annotation>
+
+    <xs:attribute ref="width"/>
+    <xs:attribute ref="height"/>
+  </xs:attributeGroup>
+
+  <xs:attributeGroup name="positionAttributesRequired">
+    <xs:annotation>
+      <xs:documentation>
+        Geometry data. Relative starting position of (x, y) the part on the screen.
+      </xs:documentation>
+    </xs:annotation>
+
+    <xs:attribute ref="x" use="required"/>
+    <xs:attribute ref="y" use="required"/>
+  </xs:attributeGroup>
+
+  <xs:attributeGroup name="sizeAttributesRequired">
+    <xs:annotation>
+      <xs:documentation>
+        Geometry data. size of (width, height).
+      </xs:documentation>
+    </xs:annotation>
+
+    <xs:attribute ref="width" use="required"/>
+    <xs:attribute ref="height" use="required"/>
+  </xs:attributeGroup>
+
+  <xs:attributeGroup name="geometricAttributes">
+    <xs:annotation>
+      <xs:documentation>
+        Geometry data.
+        (x, y) is relative start position on screen with the size of (width, height).
+      </xs:documentation>
+    </xs:annotation>
+
+    <xs:attributeGroup ref="positionAttributes"/>
+    <xs:attributeGroup ref="sizeAttributes"/>
+  </xs:attributeGroup>
+
+  <xs:attributeGroup name="geometricAttributesRequired">
+    <xs:annotation>
+      <xs:documentation>
+        Geometry data.
+        (x, y) is relative start position on screen with the size of (width, height).
+      </xs:documentation>
+    </xs:annotation>
+
+    <xs:attributeGroup ref="positionAttributesRequired"/>
+    <xs:attributeGroup ref="sizeAttributesRequired"/>
+  </xs:attributeGroup>
+</xs:schema>

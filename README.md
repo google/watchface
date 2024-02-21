@@ -6,6 +6,17 @@ behavior of watch faces for Wear OS.
 This repository contains materials for helping developers work with the Watch
 Face Format to build both watch faces and watch face design tools.
 
+## XSD specification
+
+The [XSD specification][xsd-specs] provides you with the specification needed in
+order to build validation into your watch face creation tools and processes.
+
+## XSD Validator
+
+The [XSD validator][xsd-validator] is a tool that allows you to check whether
+specific watch face XML file represent valid WFF or not, including providing
+error information to assist in debugging the watch face.
+
 ## Memory footprint
 
 When used on Wear OS devices, watch faces built with WFF must pass a memory-use
@@ -30,3 +41,5 @@ Watch Face Format is distributed under the Apache 2.0 license, see the
 [wff-optimize]: https://developer.android.com/training/wearables/wff/memory-usage
 [wff]: https://developer.android.com/training/wearables/wff/
 [samples]: https://github.com/android/wear-os-samples/tree/main/WatchFaceFormat
+[xsd-specs]: third_party/wff/specification/documents/1/
+[xsd-validator]: third_party/wff/README.md

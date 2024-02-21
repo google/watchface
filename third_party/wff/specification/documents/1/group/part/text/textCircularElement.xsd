@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright 2023 Samsung Electronics Co., Ltd All Rights Reserved
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:include schemaLocation="partTextElement.xsd"/>
+  <xs:include schemaLocation="../../../common/attributes/angleType.xsd"/>
+  <xs:include schemaLocation="../../../common/circularDirectionType.xsd"/>
+  <xs:include schemaLocation="../../../common/transform/transformElements.xsd"/>
+  <xs:include schemaLocation="../../../common/attributes/alignmentAttribute.xsd"/>
+  <xs:include schemaLocation="fontElement.xsd"/>
+  <xs:include schemaLocation="bitmapFontElement.xsd"/>
+
+  <xs:element name="TextCircular" substitutionGroup="TextElement">
+    <xs:annotation>
+      <xs:documentation>
+        Specifies Circular Text configuration
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:choice maxOccurs="unbounded">
+        <xs:element ref="Transform"/>
+        <xs:element ref="Font"/>
+        <xs:element ref="BitmapFont"/>
+      </xs:choice>
+
+      <xs:attributeGroup ref="angleAttributeGroupRequired"/>
+      <xs:attribute name="centerX" type="xs:float" use="required"/>
+      <xs:attribute name="centerY" type="xs:float" use="required"/>
+      <xs:attribute name="direction" type="circularDirectionType"/>
+      <xs:attribute name="width" type="xs:float" use="required"/>
+      <xs:attribute name="height" type="xs:float" use="required"/>
+      <xs:attribute ref="align"/>
+      <xs:attribute name="ellipsis" type="booleanType" default="FALSE"/>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright 2023 Samsung Electronics Co., Ltd All Rights Reserved
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:include schemaLocation="attributes/primitiveListTypes.xsd"/>
+
+  <xs:element name="Animation">
+    <xs:annotation>
+      <xs:documentation>
+        Animation for parent element.
+        Use "ANIMATION_VALUE" from the parent element's arithmetic attribute.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:attribute name="interpolation" default="LINEAR">
+        <xs:annotation>
+          <xs:documentation>
+            Interpolation method. Default is linear.
+          </xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="LINEAR"/>
+            <xs:enumeration value="EASE_IN"/>
+            <xs:enumeration value="EASE_OUT"/>
+            <xs:enumeration value="EASE_IN_OUT"/>
+            <xs:enumeration value="OVERSHOOT"/>
+            <xs:enumeration value="CUBIC_BEZIER"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+
+      <!-- Controls attribute is meaningful only when interpolation type is CUBIC_BEZIER -->
+      <xs:attribute name="controls" default="0.5 0.5 0.5 0.5" type="vector4fType"/>
+      <xs:attribute name="angleDirection" default="NONE">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="NONE"/>
+            <xs:enumeration value="CLOCKWISE"/>
+            <xs:enumeration value="COUNTER_CLOCKWISE"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="repeat" default="0">
+        <xs:annotation>
+          <xs:documentation>
+            Sets how many times the animation should be repeated. If the repeat
+            count is 0, the animation is never repeated. If the repeat count is
+            -1 then the animation will loop indefinitely.
+            The repeat count is 0 by default.
+          </xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:int">
+            <xs:minInclusive value="-1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+
+      <xs:attribute name="fps" type="xs:int" default="15"/>
+      <xs:attribute name="duration" type="xs:float" use="required">
+        <xs:annotation>
+          <xs:documentation>
+            Duration in seconds
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
