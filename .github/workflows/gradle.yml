@@ -53,7 +53,7 @@ jobs:
         java-version: '17'
         distribution: 'corretto'
         architecture: 'x64'
-    - name: Build validator
+    - name: Build the validator
       uses: gradle/gradle-build-action@v2.4.2
       with:
         gradle-version: 8.4
