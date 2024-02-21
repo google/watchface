@@ -88,4 +88,5 @@ class ResourceManager {
             throw new RuntimeException(e.getMessage());
         }
     }
+ERROR - THIS SHOULD NOT BUILD
 }
