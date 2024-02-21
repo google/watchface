@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright 2023 Samsung Electronics Co., Ltd All Rights Reserved
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:include schemaLocation="../group/part/partElementGroup.xsd"/>
+  <xs:include schemaLocation="../group/groupElement.xsd"/>
+  <xs:include schemaLocation="../common/booleanType.xsd"/>
+  <xs:include schemaLocation="../clock/digitalClock.xsd"/>
+
+  <xs:element name="BooleanConfiguration">
+    <xs:complexType>
+      <xs:choice minOccurs="1" maxOccurs="unbounded">
+        <xs:element name="BooleanOption">
+          <xs:complexType>
+            <xs:choice>
+              <xs:group ref="PartElementGroup"/>
+              <xs:element ref="Group"/>
+              <xs:element ref="Condition"/>
+              <xs:element ref="AnalogClock"/>
+              <xs:element ref="DigitalClock"/>
+            </xs:choice>
+            <xs:attribute name="id" type="booleanType" use="required"/>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+      <xs:attribute name="id" type="xs:string" use="required"/>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright 2023 Samsung Electronics Co., Ltd All Rights Reserved
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:include schemaLocation="expressionsElement.xsd"/>
+  <xs:include schemaLocation="../group/groupElement.xsd"/>
+  <xs:include schemaLocation="../group/part/partElementGroup.xsd"/>
+  <xs:include schemaLocation="../clock/analogClock.xsd"/>
+  <xs:include schemaLocation="../clock/digitalClock.xsd"/>
+
+  <xs:group name="_CompareChild">
+    <xs:choice>
+      <xs:element ref="Group"/>
+      <xs:group ref="PartElementGroup"/>
+      <xs:element ref="Condition"/>
+      <xs:element ref="AnalogClock"/>
+      <xs:element ref="DigitalClock"/>
+    </xs:choice>
+  </xs:group>
+
+  <xs:element name="Condition">
+    <xs:annotation>
+      <xs:documentation>
+        The Condition element provides the ability to provide a list of options - Compare
+        Elements - each of which is evaluated against an expression, in turn. Only the first
+        successful Compare element is selected, the others are not rendered or enabled.
+        If none of the Compare elements evaluate successfully, the Default Element is shown.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:all>
+        <xs:element ref="Expressions" minOccurs="1"/>
+        <xs:element name="Compare" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:choice minOccurs="1" maxOccurs="unbounded">
+              <xs:group ref="_CompareChild"/>
+            </xs:choice>
+            <xs:attribute name="expression" type="arithmeticExpressionType" use="required"/>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="Default" minOccurs="0" maxOccurs="1">
+          <xs:annotation>
+            <xs:documentation>
+              The Default element is enabled when no Compare element evaluates successfully.
+            </xs:documentation>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:choice maxOccurs="unbounded">
+              <xs:group ref="_CompareChild"/>
+            </xs:choice>
+          </xs:complexType>
+        </xs:element>
+      </xs:all>
+    </xs:complexType>
+    <xs:key name="Validation.Unique.Condition.Expressions.Expression.name">
+      <xs:selector xpath="Expressions/Expression"/>
+      <xs:field xpath="@name"/>
+    </xs:key>
+    <xs:keyref name="Validation.Reference.Condition.Compare.Expressions.Expression.name"
+               refer="Validation.Unique.Condition.Expressions.Expression.name">
+      <xs:selector xpath="Compare"/>
+      <xs:field xpath="@expression"/>
+    </xs:keyref>
+  </xs:element>
+</xs:schema>
