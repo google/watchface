@@ -21,7 +21,7 @@ import static com.google.wear.watchface.dfx.memory.MemoryFootprint.toMB;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-//import com.samsung.watchface.WatchFaceXmlValidator;
+import com.samsung.watchface.WatchFaceXmlValidator;
 
 import org.w3c.dom.Document;
 
@@ -148,15 +148,15 @@ public class ResourceMemoryEvaluator {
      * @throws TestFailedException if the watch face does not comply to the format version.
      */
     private static void validateFormat(WatchFaceData watchFaceData, String watchFaceFormatVersion) {
-        //WatchFaceXmlValidator xmlValidator = new WatchFaceXmlValidator();
-        //for (Document watchFaceDocument : watchFaceData.watchFaceDocuments) {
-        //    boolean documentHasValidSchema =
-        //            xmlValidator.validate(watchFaceDocument, watchFaceFormatVersion);
-        //    if (!documentHasValidSchema) {
-        //        throw new TestFailedException(
-        //                "Watch Face has syntactic errors and cannot be parsed.");
-        //    }
-        //}
+        WatchFaceXmlValidator xmlValidator = new WatchFaceXmlValidator();
+        for (Document watchFaceDocument : watchFaceData.watchFaceDocuments) {
+           boolean documentHasValidSchema =
+                   xmlValidator.validate(watchFaceDocument, watchFaceFormatVersion);
+           if (!documentHasValidSchema) {
+               throw new TestFailedException(
+                       "Watch Face has syntactic errors and cannot be parsed.");
+           }
+        }
     }
 
     /**
