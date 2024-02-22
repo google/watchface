@@ -24,6 +24,7 @@ dependencies {
     implementation 'com.google.guava:guava:32.0.1-jre'
     implementation 'com.google.mug:mug-guava:6.6'
     implementation 'commons-cli:commons-cli:1.5.0'
+    implementation project(':validator')
 }
 
 compileJava {
@@ -65,6 +66,12 @@ jar {
 
 artifacts {
     executableJar(jar)
+}
+
+afterEvaluate {
+    tasks.named("jar") {
+        dependsOn(":validator:jar")
+    }
 }
 
 java {

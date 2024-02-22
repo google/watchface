@@ -15,3 +15,5 @@
  */
 rootProject.name='play-validations'
 include ':memory-footprint'
+include ':validator'
+project(':validator').projectDir = new File('../third_party/wff/specification/validator')
