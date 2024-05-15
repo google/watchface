@@ -42,7 +42,7 @@ jobs:
     - name: Copy LICENSE files
       run: |
         mv LICENSE.txt memory-footprint_LICENSE.txt
-        mv third_party/wff/LICENSE.txt dwf-format-1-validator-1.0_LICENSE.txt
+        mv third_party/wff/LICENSE.txt dwf-format-2-validator-1.0_LICENSE.txt
 
     - name: Release all jars
       uses: "marvinpinto/action-automatic-releases@latest"
@@ -53,6 +53,6 @@ jobs:
         title: "Memory Footprint Build"
         files: |
           memory-footprint_LICENSE.txt
-          dwf-format-1-validator-1.0_LICENSE.txt
+          dwf-format-2-validator-1.0_LICENSE.txt
           **/memory-footprint.jar
-          **/dwf-format-1-validator-1.0.jar
+          **/dwf-format-2-validator-1.0.jar
