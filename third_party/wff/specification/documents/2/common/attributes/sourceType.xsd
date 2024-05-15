@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright 2023 Samsung Electronics Co., Ltd All Rights Reserved
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <!-- Some specific elements may want to restrict the attribute's value. -->
+
+  <xs:simpleType name="timeUnitSourceType">
+    <xs:annotation>
+      <xs:documentation>
+        Sources related to time unit
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="MILLISECOND"/>
+      <xs:enumeration value="SECOND"/>
+      <xs:enumeration value="SECOND_Z"/>
+      <xs:enumeration value="MINUTE"/>
+      <xs:enumeration value="MINUTE_Z"/>
+      <xs:enumeration value="AMPM_STATE"/>
+      <xs:enumeration value="DAY"/>
+      <xs:enumeration value="DAY_Z"/>
+      <xs:enumeration value="MONTH"/>
+      <xs:enumeration value="MONTH_Z"/>
+      <xs:enumeration value="MONTH_F"/>
+      <xs:enumeration value="MONTH_S"/>
+      <xs:enumeration value="YEAR"/>
+      <xs:enumeration value="YEAR_S"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="_timeSourceType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="UTC_TIMESTAMP"/>
+      <xs:enumeration value="SECOND_MILLISECOND"/>
+      <xs:enumeration value="SECONDS_IN_DAY"/>
+      <xs:enumeration value="MINUTE_SECOND"/>
+      <xs:enumeration value="HOUR_0_11"/>
+      <xs:enumeration value="HOUR_0_11_Z"/>
+      <xs:enumeration value="HOUR_0_11_MINUTE"/>
+      <xs:enumeration value="HOUR_1_12"/>
+      <xs:enumeration value="HOUR_1_12_Z"/>
+      <xs:enumeration value="HOUR_1_12_MINUTE"/>
+      <xs:enumeration value="HOUR_0_23"/>
+      <xs:enumeration value="HOUR_0_23_Z"/>
+      <xs:enumeration value="HOUR_0_23_MINUTE"/>
+      <xs:enumeration value="HOUR_1_24"/>
+      <xs:enumeration value="HOUR_1_24_Z"/>
+      <xs:enumeration value="HOUR_1_24_MINUTE"/>
+      <xs:enumeration value="DAY_HOUR"/>
+      <xs:enumeration value="DAY_0_30"/>
+      <xs:enumeration value="DAY_0_30_HOUR"/>
+      <xs:enumeration value="DAY_OF_YEAR"/>
+      <xs:enumeration value="DAY_OF_WEEK"/>
+      <xs:enumeration value="DAY_OF_WEEK_F"/>
+      <xs:enumeration value="DAY_OF_WEEK_S"/>
+      <xs:enumeration value="FIRST_DAY_OF_WEEK"/>
+      <xs:enumeration value="DAYS_IN_MONTH"/>
+      <xs:enumeration value="MONTH_DAY"/>
+      <xs:enumeration value="MONTH_0_11"/>
+      <xs:enumeration value="MONTH_0_11_DAY"/>
+      <xs:enumeration value="YEAR_MONTH"/>
+      <xs:enumeration value="YEAR_MONTH_DAY"/>
+      <xs:enumeration value="WEEK_IN_MONTH"/>
+      <xs:enumeration value="WEEK_IN_YEAR"/>
+      <xs:enumeration value="IS_24_HOUR_MODE"/>
+      <xs:enumeration value="IS_DAYLIGHT_SAVING_TIME"/>
+      <xs:enumeration value="TIMEZONE"/>
+      <xs:enumeration value="TIMEZONE_ABB"/>
+      <xs:enumeration value="TIMEZONE_ID"/>
+      <xs:enumeration value="TIMEZONE_OFFSET"/>
+      <xs:enumeration value="TIMEZONE_OFFSET_DST"/>
+      <xs:enumeration value="AMPM_POSITION"/>
+      <xs:enumeration value="AMPM_STRING"/>
+      <xs:enumeration value="AMPM_STRING_ENG"/>
+      <xs:enumeration value="AMPM_STRING_SHORT"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="timeSourceType">
+    <xs:annotation>
+      <xs:documentation>
+        Sources related to time and date
+      </xs:documentation>
+    </xs:annotation>
+    <xs:union memberTypes="timeUnitSourceType _timeSourceType"/>
+  </xs:simpleType>
+
+  <xs:simpleType name="languageSourceType">
+    <xs:annotation>
+      <xs:documentation>
+        Sources related to language
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="LANGUAGE_CODE"/>
+      <xs:enumeration value="LANGUAGE_COUNTRY_CODE"/>
+      <xs:enumeration value="LANGUAGE_LOCALE_NAME"/>
+      <xs:enumeration value="LANGUAGE_TEXT_DIRECTION"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="batterySourceType">
+    <xs:annotation>
+      <xs:documentation>
+        Sources related to battery
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="BATTERY_PERCENT"/>
+      <xs:enumeration value="BATTERY_CHARGING_STATUS"/>
+      <xs:enumeration value="BATTERY_IS_LOW"/>
+      <xs:enumeration value="BATTERY_TEMPERATURE_CELSIUS"/>
+      <xs:enumeration value="BATTERY_TEMPERATURE_FAHRENHEIT"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="moonPhaseSourceType">
+    <xs:annotation>
+      <xs:documentation>
+        Sources related to moon phase
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="MOON_PHASE_POSITION"/>
+      <xs:enumeration value="MOON_PHASE_TYPE"/>
+      <xs:enumeration value="MOON_PHASE_TYPE_STRING"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="sensorSourceType">
+    <xs:annotation>
+      <xs:documentation>
+        Sources related to sensor
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="ACCELEROMETER_IS_SUPPORTED"/>
+      <xs:enumeration value="ACCELEROMETER_X"/>
+      <xs:enumeration value="ACCELEROMETER_Y"/>
+      <xs:enumeration value="ACCELEROMETER_Z"/>
+      <xs:enumeration value="ACCELEROMETER_ANGLE_X"/>
+      <xs:enumeration value="ACCELEROMETER_ANGLE_Y"/>
+      <xs:enumeration value="ACCELEROMETER_ANGLE_Z"/>
+      <xs:enumeration value="ACCELEROMETER_ANGLE_XY"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="healthSourceType">
+    <xs:annotation>
+      <xs:documentation>
+        Sources related to health data
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="STEP_COUNT"/>
+      <xs:enumeration value="STEP_GOAL"/>
+      <xs:enumeration value="STEP_PERCENT"/>
+      <xs:enumeration value="HEART_RATE"/>
+      <xs:enumeration value="HEART_RATE_Z"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="notificationSourceType">
+    <xs:annotation>
+      <xs:documentation>
+        Sources of notification data
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="UNREAD_NOTIFICATION_COUNT"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="miscSourceType">
+    <xs:annotation>
+      <xs:documentation>
+        Miscellaneous sources
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="SUPPORTED_FORMAT_VERSION"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="sourceType">
+    <xs:union
+        memberTypes="timeSourceType languageSourceType batterySourceType moonPhaseSourceType
+        sensorSourceType healthSourceType notificationSourceType miscSourceType"/>
+  </xs:simpleType>
+</xs:schema>

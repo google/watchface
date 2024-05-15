@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright 2023 Samsung Electronics Co., Ltd All Rights Reserved
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:include schemaLocation="group/groupElement.xsd"/>
+  <xs:include schemaLocation="userConfiguration/listConfigurationElement.xsd"/>
+  <xs:include schemaLocation="userConfiguration/booleanConfigurationElement.xsd"/>
+  <xs:include schemaLocation="complication/complicationSlotElement.xsd"/>
+  <xs:include schemaLocation="clock/analogClock.xsd"/>
+  <xs:include schemaLocation="clock/digitalClock.xsd"/>
+
+  <xs:element name="Scene">
+    <xs:annotation>
+      <xs:documentation>
+        Scene is a container of Visual tags. A watch face MUST include at least one Scene.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:all>
+        <xs:element ref="Group" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element ref="PartText" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element ref="PartImage" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element ref="PartAnimatedImage" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element ref="PartDraw" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element ref="Condition" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element ref="ListConfiguration" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element ref="BooleanConfiguration" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element ref="Variant" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element ref="ComplicationSlot" minOccurs="0" maxOccurs="8"/>
+        <xs:element ref="AnalogClock" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element ref="DigitalClock" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:all>
+      <xs:attribute name="backgroundColor" type="colorAttributeType">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">
+            The color of the scene's background.
+            Default value is #ff000000 (Black).
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

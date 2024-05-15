@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright 2023 Samsung Electronics Co., Ltd All Rights Reserved
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:include schemaLocation="arithmeticExpressionType.xsd"/>
+
+  <xs:simpleType name="_angleTypeValuePreferences">
+    <xs:restriction base="xs:float">
+      <xs:enumeration value="0"/>
+      <xs:enumeration value="180"/>
+      <xs:enumeration value="360"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="angleType">
+    <xs:annotation>
+      <xs:documentation>
+        Angle in degrees.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:union memberTypes="_angleTypeValuePreferences xs:float"/>
+  </xs:simpleType>
+
+  <xs:simpleType name="angleExpressionType">
+    <xs:annotation>
+      <xs:documentation>
+        Angle in degrees represented by expression.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:union memberTypes="_angleTypeValuePreferences arithmeticExpressionType"/>
+  </xs:simpleType>
+
+  <xs:attributeGroup name="angleAttributeGroupRequired">
+    <xs:annotation>
+      <xs:documentation>
+        Start angle and end angle in degrees.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="startAngle" type="angleType" use="required">
+      <xs:annotation>
+        <xs:documentation>
+          Start angle in degrees.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="endAngle" type="angleType" use="required">
+      <xs:annotation>
+        <xs:documentation>
+          End angle in degrees.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+
+  <xs:attributeGroup name="angleExpressionAttributeGroupRequired">
+    <xs:annotation>
+      <xs:documentation>
+        Start angle and end angle represented by expression.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="startAngle" type="angleExpressionType" use="required">
+      <xs:annotation>
+        <xs:documentation>
+          Start angle in degrees represented by expression.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="endAngle" type="angleExpressionType" use="required">
+      <xs:annotation>
+        <xs:documentation>
+          End angle in degrees represented by expression.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+</xs:schema>

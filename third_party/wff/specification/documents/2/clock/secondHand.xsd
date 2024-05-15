@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright 2023 Samsung Electronics Co., Ltd All Rights Reserved
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:include schemaLocation="../common/attributes/geometricAttributes.xsd"/>
+  <xs:include schemaLocation="../common/transform/pivotType.xsd"/>
+  <xs:include schemaLocation="../userConfiguration/listConfigurationElement.xsd"/>
+  <xs:include schemaLocation="../common/variant/variantElements.xsd" />
+
+  <xs:element name="SecondHand">
+    <xs:annotation>
+      <xs:documentation>
+        A image that represents a second hand, it rotates 360 degree in 1 minute.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="Variant" minOccurs="0" maxOccurs="unbounded" />
+        <xs:choice minOccurs="0" maxOccurs="1">
+          <xs:element ref="Sweep"/>
+          <xs:element ref="Tick"/>
+        </xs:choice>
+      </xs:sequence>
+
+      <xs:attribute name="resource" type="xs:string" use="required"/>
+      <xs:attributeGroup ref="geometricAttributesRequired"/>
+      <xs:attributeGroup ref="pivot2D"/>
+      <xs:attribute ref="alpha"/>
+      <xs:attribute name="tintColor" type='colorAttributeType'/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="Sweep">
+    <xs:annotation>
+    <xs:documentation>
+      Definition of second hand movement.
+      The angle of the second hand will be updated by the given frequency for one second.
+
+      SYNC_TO_DEVICE means that the angle is updated smoothly as allowed by the device. (Since V2)
+    </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:attribute name="frequency" use="required">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="2"/>
+            <xs:enumeration value="5"/>
+            <xs:enumeration value="10"/>
+            <xs:enumeration value="15"/>
+            <xs:enumeration value="SYNC_TO_DEVICE" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="Tick">
+    <xs:annotation>
+      <xs:documentation>
+        Definition of second hand movement. It has 2 attributes below.
+
+        Strength means intensity that exceeded the final value.
+        0.5 : has 125% peek value of the final value.
+        1.0 : has 200% peek value of the final value.
+
+        Duration means how long the animation is interpolated.
+        0.2 :   0 ~ 200 (ms) - interpolated value by given strength and time
+              200 ~ 800 (ms) - no movement.
+
+        These are used as x1, y1 parameters of the cubic bezier curve.
+        cubic-bezier((duration - 0.033) / duration, 1 + strength * 2, 1, 1)
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:attribute name="strength" type="xs:float" use="required"/>
+      <xs:attribute name="duration" type="xs:float" use="required"/>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
