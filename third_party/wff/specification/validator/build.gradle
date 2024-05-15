@@ -34,7 +34,7 @@ jar {
         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
     }
 
-    setArchivesBaseName('dwf-format-1-validator-1.0')
+    setArchivesBaseName('dwf-format-2-validator-1.0')
     from ('build/libs') {
         include 'docs.zip'
     }

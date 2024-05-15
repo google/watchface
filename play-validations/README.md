@@ -39,7 +39,7 @@ in Google Play reviews, but these represent reasonable settings for evaluation:
 
 ```shell
 java -jar ./memory-footprint.jar --watch-face MyWatchFace.apk \
-  --schema-version 1 \
+  --schema-version 2 \
   --ambient-limit-mb 10 \
   --active-limit-mb 100 \
   --apply-v1-offload-limitations \

@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright 2023 Samsung Electronics Co., Ltd All Rights Reserved
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:include schemaLocation="metadataElement.xsd"/>
+  <xs:include schemaLocation="bitmapFontsElement.xsd"/>
+  <xs:include schemaLocation="sceneElement.xsd"/>
+  <xs:include schemaLocation="userConfiguration/userConfigurationsElement.xsd"/>
+
+  <xs:element name="WatchFace">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">
+        WatchFace is a root element of watchface.xml. It contains scheme version of the xml
+        specification and the information of the virtual screen used when the sub-elements are
+        created.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:all>
+        <xs:element ref="Metadata" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element ref="UserConfigurations" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="BitmapFonts" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Scene" minOccurs="1"/>
+      </xs:all>
+      <xs:attribute name="width" type="xs:positiveInteger" use="required">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">
+            Size of the visual screen in which watch face components are drawn. It is not related to
+            the display resolution of the real device, and all figures related to geometry(position
+            and dimension) among the attributes of the child elements indicate the relative position
+            and size in the virtual screen.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="height" type="xs:positiveInteger" use="required">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">
+            Size of the visual screen in which watch face components are drawn. It is not related to
+            the display resolution of the real device, and all figures related to geometry(position
+            and dimension) among the attributes of the child elements indicate the relative position
+            and size in the virtual screen.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="clipShape">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">
+            Creators can require a shape that clips the result. This can be useful, for example, when
+            creators want to produce a circular result on a rectangular device. In some cases, there
+            may be objects that span outside the desired shape.
+            RECTANGLE shape with cornerRadiusX and cornerRadiusY attributes makes round-rectangle.
+            Default value is CIRCLE.
+          </xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="NONE"/>
+            <xs:enumeration value="CIRCLE"/>
+            <xs:enumeration value="RECTANGLE"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="cornerRadiusX" type="xs:float">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">
+            The x-radius of the rounded corners on the rectangle.
+            It is available when the shape type is RECTANGLE.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="cornerRadiusY" type="xs:float">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">
+            The y-radius of the rounded corners on the rectangle.
+            It is available when the shape type is RECTANGLE.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+
+    <!-- Value validations -->
+    <!-- Metadata Value Validation -->
+    <xs:unique name="Validation.Unique.Metadata.key">
+      <xs:selector xpath="Metadata"/>
+      <xs:field xpath="@key"/>
+    </xs:unique>
+
+    <!-- BitmapFont Value Validation -->
+    <xs:unique name="Validation.Unique.WatchFace.BitmapFonts.BitmapFont.name">
+      <xs:selector xpath="BitmapFonts/*"/>
+      <xs:field xpath="@name"/>
+    </xs:unique>
+
+    <!-- Complication Value Validation -->
+    <xs:unique name="Validation.Unique.WatchFace.Scene.ComplicationSlot.slotId">
+      <xs:selector xpath="Scene/*"/>
+      <xs:field xpath="@slotId"/>
+    </xs:unique>
+
+    <!-- Groups Value Validation -->
+    <xs:unique name="Validation.Unique.WatchFace.Groups.type">
+      <xs:selector xpath="Groups"/>
+      <xs:field xpath="@type"/>
+    </xs:unique>
+  </xs:element>
+</xs:schema>

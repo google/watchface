@@ -25,7 +25,7 @@ import java.util.List;
 
 public class DWFValidationApplication {
     private final static String APPLICATION_VERSION = "1.0";
-    private final static String MAX_SUPPORTED_FORMAT_VERSION = "1";
+    private final static String MAX_SUPPORTED_FORMAT_VERSION = "2";
     private WatchFaceXmlValidator validator;
 
     public static void main(String[] args) {
