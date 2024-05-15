@@ -14,7 +14,7 @@ order to build validation into your watch face creation tools and processes.
 There are different versions of the specification: The latest is version 2 which
 builds and expands on version 1. Different versions have different Wear OS
 version support. To understand the differences in capabilities and compatibility
-please [see this guide][wff-versioning].
+please [see this guide][wff-features].
 
 ## XSD Validator
 
@@ -48,4 +48,4 @@ Watch Face Format is distributed under the Apache 2.0 license, see the
 [samples]: https://github.com/android/wear-os-samples/tree/main/WatchFaceFormat
 [xsd-specs]: third_party/wff/specification/documents/1/
 [xsd-validator]: third_party/wff/README.md
-[wff-versioning]: https://developer.android.com/training/wearables/wff/versions
+[wff-features]: https://developer.android.com/training/wearables/wff/features
