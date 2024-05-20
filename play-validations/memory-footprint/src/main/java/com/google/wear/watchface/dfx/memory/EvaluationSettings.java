@@ -38,7 +38,7 @@ final class EvaluationSettings {
 
     private static final String HONEYFACE_VERSION = "honeyface";
 
-    private static final List<String> SUPPORTED_VERSIONS = ImmutableList.of(HONEYFACE_VERSION, "1");
+    private static final List<String> SUPPORTED_VERSIONS = ImmutableList.of(HONEYFACE_VERSION, "1", "2");
 
     private static final int GREEDY_DEFAULT_LIMIT = 10_000_000;
 
