@@ -96,11 +96,11 @@ public class DWFValidationApplication {
 
         if (validator.isSupportedVersion(targetFormatVersion)) {
             if (validator.validate(watchFaceXmlFilePath, targetFormatVersion)) {
-                Log.i("PASSED : " + watchFaceXmlFilePath +
+                Log.i("✅ "+" PASSED : " + watchFaceXmlFilePath +
                         " is valid against watch face format version #" + targetFormatVersion);
                 return true;
             } else {
-                Log.i("FAILED : " + watchFaceXmlFilePath +
+                Log.i("❌ "+" FAILED : " + watchFaceXmlFilePath +
                         " is NOT valid against watch face format version #" + targetFormatVersion);
                 return false;
             }
