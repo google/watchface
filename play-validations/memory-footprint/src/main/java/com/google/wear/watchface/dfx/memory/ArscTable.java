@@ -3,6 +3,7 @@ package com.google.wear.watchface.dfx.memory;
 import com.google.common.io.Files;
 import com.google.devrel.gmscore.tools.apk.arsc.BinaryResourceFile;
 import com.google.devrel.gmscore.tools.apk.arsc.BinaryResourceValue;
+import com.google.devrel.gmscore.tools.apk.arsc.Chunk;
 import com.google.devrel.gmscore.tools.apk.arsc.ResourceTableChunk;
 import com.google.devrel.gmscore.tools.apk.arsc.StringPoolChunk;
 import com.google.devrel.gmscore.tools.apk.arsc.TypeChunk;
@@ -16,18 +17,19 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 /**
  * Represents all the resources of interest in the Android package.
- *
+ * <p>
  * These resources are loaded from the resources.arsc file. Where obfuscation has been applied, the
  * mapping is derived, for the creation of the ArscResource objects. For example, for a logical
  * resource res/raw/watchface.xml, the package may in fact store this as res/aB.xml. The
  * resources.arsc file contains this mapping, and the ArscTable provides a list of resources with
  * their logical types, names and data.
- *
+ * <p>
  * Note that more than one ArscResource object can exist for the given dimensions. For example, if
  * there is a drawable and a drawable-fr folder, then there may be multiple ArscResource entries for
  * drawables with the same type, name and extension. The configuration detail, e.g. "fr" or
@@ -45,6 +47,7 @@ public class ArscTable {
 
     /**
      * Creates the table from a path to an AAB structure on the file system.
+     *
      * @param aabPath The path to the root of the AAB directory.
      * @return The constructed table.
      * @throws IOException when the resources file cannot be found, or other IO errors occur.
@@ -55,61 +58,79 @@ public class ArscTable {
         if (!arscFile.exists()) {
             throw new FileNotFoundException("Resources file not found");
         }
-        InputStream is = new FileInputStream(arscFile);
-        return createTable(is, null, aabPath);
+        ArscTable table;
+        try (InputStream is = new FileInputStream(arscFile)) {
+            Function<Path, byte[]> fn = (Path path) -> {
+                try {
+                    Path absolutePath = Paths.get(aabPath.toString(), path.toString());
+                    return java.nio.file.Files.readAllBytes(absolutePath);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            };
+            table = createTable(is, fn);
+        }
+        return table;
     }
 
     /**
      * Creates the table from a AAB or APK file.
+     *
      * @param zipFile The zip file object representing the AAB/APK.
      * @return The constructed table.
      * @throws IOException when the resources file cannot be found, or other IO errors occur.
      */
     static ArscTable createFromAndroidPackage(ZipFile zipFile) throws IOException {
         ZipEntry arscEntry = new ZipEntry(RESOURCES_FILE_NAME);
-        InputStream is = zipFile.getInputStream(arscEntry);
-        return createTable(is, zipFile, null);
+
+        ArscTable table;
+        try (InputStream is = zipFile.getInputStream(arscEntry)) {
+            Function<Path, byte[]> fn = (Path path) -> {
+                try {
+                    return zipFile.getInputStream(new ZipEntry(path.toString())).readAllBytes();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            };
+            table = createTable(is, fn);
+        }
+        return table;
     }
 
     /**
      * Creates the table from an InputStream.
      *
-     * @param is The InputStream
-     * @param zipFile The source zip file. This must be populated when creating the table from a AAB
-     *                or APK archive. Where the filesystem approach is taken, this should be null.
-     * @param aabRoot The source AAB directory path. This should be null when creating the table
-     *                from an AAB/APK archive.
+     * @param is               The InputStream
+     * @param fileDataProducer A lambda that returns the raw bytes of a file, given a path, which
+     *                         may represent a zip file, or a directory (for example), that is the
+     *                         source of those bytes.
      * @return The constructed table.
      * @throws IOException when errors loading resources occur.
      */
-    private static ArscTable createTable(InputStream is, ZipFile zipFile, Path aabRoot) throws IOException {
+    private static ArscTable createTable(InputStream is, Function<Path, byte[]> fileDataProducer) throws IOException {
         BinaryResourceFile resources = BinaryResourceFile.fromInputStream(is);
-        ResourceTableChunk table = (ResourceTableChunk) resources.getChunks().get(0);
+        List<Chunk> chunks = resources.getChunks();
+        if (chunks.isEmpty()) {
+            throw new IOException("no chunks");
+        }
+        if (!(chunks.get(0) instanceof ResourceTableChunk)) {
+            throw new IOException("no res table chunk");
+        }
+        ResourceTableChunk table = (ResourceTableChunk) chunks.get(0);
         StringPoolChunk stringPool = table.getStringPool();
 
-        List<TypeChunk> chunks = table.getPackages()
+        List<TypeChunk> typeChunks = table.getPackages()
                 .stream()
                 .flatMap(p -> p.getTypeChunks().stream())
                 .toList();
 
-        List<ArscResource> resourcesList = chunks.stream().flatMap(c -> c.getEntries().values().stream())
+        List<ArscResource> resourcesList = typeChunks.stream()
+                .flatMap(c -> c.getEntries().values().stream())
                 .filter(t -> RESOURCE_TYPES.contains(t.typeName()))
                 .filter(t -> t.value().type() == BinaryResourceValue.Type.STRING)
                 .map(entry -> {
                     Path path = Path.of(stringPool.getString(entry.value().data()));
-                    byte[] data = null;
-                    try {
-                        // Loading the resource data requires a different approach depending on
-                        // whether the data is in a zip file or directly on the file system.
-                        if (zipFile != null) {
-                            data = zipFile.getInputStream(new ZipEntry(path.toString())).readAllBytes();
-                        } else {
-                            Path absolutePath = Paths.get(aabRoot.toString(), path.toString());
-                            data = java.nio.file.Files.readAllBytes(absolutePath);
-                        }
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
+                    byte[] data = fileDataProducer.apply(path);
                     return new ArscResource(
                             entry.parent().getTypeName(),
                             entry.key(),

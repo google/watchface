@@ -56,6 +56,8 @@ public class ArscResource {
         return data;
     }
 
+    // TODO: This should be improved to parse res/xml/watch_face_info.xml where present, so as not
+    // to assume all XML files in the res/raw directory are watch face XML files.
     public Boolean isWatchFaceXml() {
         return extension.equals("xml") && resourceType.equals("raw");
     }
