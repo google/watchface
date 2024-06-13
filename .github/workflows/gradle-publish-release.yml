@@ -5,10 +5,10 @@
 # This workflow will build a Java project with Gradle and cache/restore any dependencies to improve the workflow execution time
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-gradle
 
-# The "current" release is built manually from a given git sha and it puts the artifacts
+# The "release" release is built manually from a given git sha and it puts the artifacts
 # that are meant to be used currently on a permalink.
 
-name: Release current artifacts
+name: Create the release artifacts
 
 on:
   workflow_dispatch:
@@ -23,5 +23,5 @@ jobs:
     uses: ./.github/workflows/gradle-publish-base.yml
     with:
       release_git_sha: '${{ inputs.release_git_sha }}'
-      release_name: 'current'
+      release_name: 'release'
 

@@ -16,5 +16,5 @@ jobs:
     uses: ./.github/workflows/gradle-publish-base.yml
     with:
       release_git_sha: ''
-      release_name: 'current'
+      release_name: 'latest'
 
