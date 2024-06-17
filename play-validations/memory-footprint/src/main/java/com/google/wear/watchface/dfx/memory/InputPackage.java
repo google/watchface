@@ -40,36 +40,12 @@ import java.util.zip.ZipInputStream;
  * the package.
  */
 interface InputPackage extends AutoCloseable {
-
-    /** Represents a file in a watch face package (apk or aab). */
-    class PackageFile {
-
-        private final Path filePath;
-
-        private final byte[] data;
-
-        PackageFile(Path filePath, byte[] data) {
-            this.filePath = filePath;
-            this.data = data;
-        }
-
-        /** File path relative to the root of the declarative watch face package. */
-        public Path getFilePath() {
-            return filePath;
-        }
-
-        /** File raw data. */
-        public byte[] getData() {
-            return data;
-        }
-    }
-
     /**
-     * Returns a stream of file representations form the watch face package. The stream must not be
-     * consumed more than once. The InputPackage must be closed only after consuming the stream of
-     * files.
+     * Returns a stream of resource representations form the watch face package. The stream must not
+     * be consumed more than once. The InputPackage must be closed only after consuming the stream
+     * of files.
      */
-    Stream<PackageFile> getWatchFaceFiles();
+    Stream<ArscResource> getWatchFaceFiles();
 
     /** Close the backing watch face package resource. */
     void close();
@@ -83,10 +59,6 @@ interface InputPackage extends AutoCloseable {
         }
         if (packageFile.isDirectory()) {
             return openFromAabDirectory(packageFile);
-        } else if (packagePath.endsWith("zip")) {
-            // TODO(b/279866804): if open sourcing, skip the zip case because it is irrelevant
-            // for the outside world.
-            return openFromMokkaZip(packagePath);
         } else if (packagePath.endsWith("aab") || packagePath.endsWith("apk")) {
             return openFromAndroidPackage(packagePath);
         } else {
@@ -100,29 +72,20 @@ interface InputPackage extends AutoCloseable {
      */
     static InputPackage openFromAabDirectory(File aabDirectory) throws IOException {
         Path rootPath = aabDirectory.toPath();
-        Stream<Path> childrenFilesStream = Files.walk(rootPath);
         return new InputPackage() {
             @Override
-            public Stream<PackageFile> getWatchFaceFiles() {
-                return childrenFilesStream
-                        .filter(childPath -> childPath.toFile().isFile())
-                        .map(
-                                childPath -> {
-                                    byte[] fileContent;
-                                    try {
-                                        fileContent = Files.readAllBytes(childPath);
-                                    } catch (IOException e) {
-                                        throw new RuntimeException(
-                                                "Cannot read file " + childPath, e);
-                                    }
-                                    return new PackageFile(
-                                            rootPath.relativize(childPath), fileContent);
-                                });
+            public Stream<ArscResource> getWatchFaceFiles() {
+                try {
+                    ArscTable table = ArscTable.createFromAabDirectory(rootPath);
+                    return table.getAllResources().stream();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
 
             @Override
             public void close() {
-                childrenFilesStream.close();
+
             }
         };
     }
@@ -135,18 +98,13 @@ interface InputPackage extends AutoCloseable {
         final ZipFile zipFile = new ZipFile(aabPath);
         return new InputPackage() {
             @Override
-            public Stream<PackageFile> getWatchFaceFiles() {
-                return zipFile.stream()
-                        .map(
-                                entry -> {
-                                    byte[] fileData;
-                                    try {
-                                        fileData = readAllBytes(zipFile.getInputStream(entry));
-                                    } catch (IOException e) {
-                                        throw new RuntimeException(e);
-                                    }
-                                    return new PackageFile(Paths.get(entry.getName()), fileData);
-                                });
+            public Stream<ArscResource> getWatchFaceFiles() {
+                try {
+                    ArscTable table = ArscTable.createFromAndroidPackage(zipFile);
+                    return table.getAllResources().stream();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
 
             @Override
@@ -158,86 +116,5 @@ interface InputPackage extends AutoCloseable {
                 }
             }
         };
-    }
-
-    /**
-     * Creates an input package from a zip file containing the base split apk, as produced by mokka.
-     * TODO(b/279866804): Ignore this if open sourcing this method to not leak mokka details.
-     */
-    static InputPackage openFromMokkaZip(String zipPath) throws IOException {
-        ZipFile mokkaZip = new ZipFile(zipPath);
-
-        try {
-            Pattern baseSplitPattern = Pattern.compile(".*base[-_]split.*");
-            Optional<? extends ZipEntry> baseSplitApk =
-                    mokkaZip.stream()
-                            .filter(x -> baseSplitPattern.matcher(x.getName()).matches())
-                            .findFirst();
-            if (!baseSplitApk.isPresent()) {
-                throw new InvalidTestRunException("Zip file does not contain a base split apk");
-            }
-            ZipInputStream baseSplitApkZip =
-                    new ZipInputStream(mokkaZip.getInputStream(baseSplitApk.get()));
-            Iterator<PackageFile> iterator =
-                    new Iterator<PackageFile>() {
-                        private ZipEntry zipEntry;
-
-                        @Override
-                        public boolean hasNext() {
-                            try {
-                                zipEntry = baseSplitApkZip.getNextEntry();
-                            } catch (IOException e) {
-                                throw new RuntimeException(e);
-                            }
-                            return zipEntry != null;
-                        }
-
-                        @Override
-                        public PackageFile next() {
-                            byte[] entryData;
-                            try {
-                                entryData = readAllBytes(baseSplitApkZip);
-                            } catch (IOException e) {
-                                throw new RuntimeException(e);
-                            }
-                            return new PackageFile(Paths.get(zipEntry.getName()), entryData);
-                        }
-                    };
-            return new InputPackage() {
-                @Override
-                public Stream<PackageFile> getWatchFaceFiles() {
-                    return StreamSupport.stream(
-                            Spliterators.spliteratorUnknownSize(iterator, Spliterator.ORDERED),
-                            false);
-                }
-
-                @Override
-                public void close() {
-                    try {
-                        mokkaZip.close();
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-            };
-        } catch (Exception e) {
-            mokkaZip.close();
-            throw e;
-        }
-    }
-
-    /** Read all bytes from an input stream to a new byte array. */
-    static byte[] readAllBytes(InputStream inputStream) throws IOException {
-        int len;
-        byte[] buffer = new byte[1024];
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        while ((len = inputStream.read(buffer)) > 0) {
-            bos.write(buffer, 0, len);
-        }
-        return bos.toByteArray();
-    }
-
-    static boolean pathMatchesGlob(Path path, String glob) {
-        return path.getFileSystem().getPathMatcher("glob:" + glob).matches(path);
     }
 }
