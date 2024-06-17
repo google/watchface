@@ -5,11 +5,16 @@
 # This workflow will build a Java project with Gradle and cache/restore any dependencies to improve the workflow execution time
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-gradle
 
-name: Release artifacts
-
 on:
-  push:
-    branches: [ "main" ]
+  workflow_call:
+    inputs:
+      release_git_sha:
+        type: string
+        description: The git sha of the commit from where the current release will be built from.
+        required: true
+      release_name:
+        type: string
+        required: true
 
 jobs:
   build_memory_footprint:
@@ -19,6 +24,8 @@ jobs:
     steps:
     - name: Checkout project
       uses: actions/checkout@v3
+      with:
+        ref: ${{ inputs.release_git_sha }}
     - name: Set up JDK 17
       uses: actions/setup-java@v3
       with:
@@ -48,7 +55,7 @@ jobs:
       uses: "marvinpinto/action-automatic-releases@latest"
       with:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
-        automatic_release_tag: "latest"
+        automatic_release_tag: "${{ inputs.release_name }}"
         prerelease: true
         title: "Memory Footprint Build"
         files: |
