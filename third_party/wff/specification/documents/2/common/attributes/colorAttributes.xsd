@@ -53,7 +53,8 @@
       </xs:documentation>
     </xs:annotation>
     <xs:restriction base="xs:string">
-      <xs:pattern value="\[[A-Z0-9]+(\.\w+)*\]|#([A-Fa-f0-9]{6,8})"/>
+      <xs:pattern value="\[[A-Z0-9]+([._]\w+)*\]|#([A-Fa-f0-9]{6,8})"/>
     </xs:restriction>
   </xs:simpleType>
+
 </xs:schema>

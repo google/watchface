@@ -148,6 +148,21 @@
 				e.g., "#FF00FF #FFFFFF #80FF1234 #12345678 #123456 ..."
 			</xs:documentation>
 		</xs:annotation>
-		<xs:list itemType="argbHexadecimalType"/>
+		<xs:list itemType="colorAttributeType"/>
 	</xs:simpleType>
+
+	<xs:simpleType name="colorWeightListType">
+		<xs:annotation>
+			<xs:documentation>
+				List type for floats or integers
+				e.g., "0.1 0.2 0.3 0.4 0.5 0.6 0.7 ...", "1 2 3",
+				or
+				Data source representing a weight: COMPLICATION.RANGED_VALUE_COLOR_INTERPOLATE
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:pattern value="\[[A-Z0-9]+([._]\w+)*\]|([0-9 fF]+(.[0-9fF]+)?)+"/>
+		</xs:restriction>
+	</xs:simpleType>
+
 </xs:schema>

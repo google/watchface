@@ -35,17 +35,4 @@
       </xs:complexContent>
     </xs:complexType>
   </xs:element>
-
-  <xs:element name="PartVectorImage">
-    <xs:complexType>
-      <xs:complexContent>
-        <xs:extension base="AbstractPartType">
-          <xs:all>
-            <xs:element ref="ImageFilters" minOccurs="0" maxOccurs="1"/>
-            <xs:element ref="ImageElement" minOccurs="1" maxOccurs="1"/>
-          </xs:all>
-        </xs:extension>
-      </xs:complexContent>
-    </xs:complexType>
-  </xs:element>
 </xs:schema>
