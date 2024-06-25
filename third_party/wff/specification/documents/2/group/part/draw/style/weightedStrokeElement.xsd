@@ -38,7 +38,7 @@
                     </xs:documentation>
                 </xs:annotation>
             </xs:attribute>
-            <xs:attribute name="weights" type="floatListType" default="" >
+            <xs:attribute name="weights" type="colorWeightListType" default="0.0" >
                 <xs:annotation>
                     <xs:documentation>
                         Series of weight in float like "3.0 4.0 5.0". Each value represents a
