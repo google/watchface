@@ -1,0 +1,26 @@
+<WatchFace width="450" height="450">
+    <Scene>
+        <Group name="always_disabled" alpha="0">
+            <PartImage x="0" y="225" width="450" height="225">
+                <Image resource="static-image" />
+            </PartImage>
+        </Group>
+        <Group name="always_enabled_no_alpha">
+            <PartImage x="0" y="225" width="450" height="225">
+                <Image resource="static-image" />
+            </PartImage>
+        </Group>
+        <Group name="disabled_in_active" alpha="0">
+            <Variant mode="AMBIENT" target="alpha" value="255" />
+            <PartImage x="0" y="225" width="450" height="225">
+                <Image resource="static-image" />
+            </PartImage>
+        </Group>
+        <Group name="disabled_in_ambient">
+            <Variant mode="AMBIENT" target="alpha" value="0" />
+            <PartImage x="0" y="225" width="450" height="225">
+                <Image resource="static-image" />
+            </PartImage>
+        </Group>
+    </Scene>
+</WatchFace>

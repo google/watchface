@@ -1,0 +1,39 @@
+<!--
+Tests that animated images are evaluated correctly.
+In active mode, each PartAnimatedImage is evaluated to the set of the resources reference by its
+children:
+- [(webp1, webp1-thumbnail), (sequence1-image1, sequence1-image2),
+   (sequence2-image1, sequence2-image2)] = 1 + 2 + 4 + 8 + 16 + 32 + 64 = 127
+In ambient mode, the animation is paused, so the memory footprint is evaluated to the maximum footprint
+of a single frame of the animation:
+- [maxFrameOf(webp1, webp1-thumbnail),
+   maxFrameOf(sequence1-image1, sequence1-image2),
+   maxFrameOf(sequence2-image1, sequence2-image2)] = 2 + 8 + 64 = 74
+-->
+<WatchFace width="450" height="450">
+    <Scene>
+        <PartAnimatedImage x="0" y="100" width="400" height="100">
+            <AnimatedImage resource="webp1" format="WEBP" thumbnail="webp1-thumbnail" />
+            <AnimationController play="TAP" />
+        </PartAnimatedImage>
+
+        <PartAnimatedImage x="0" y="200" width="400" height="100">
+            <SequenceImages>
+                <Image resource="sequence1-image1" />
+                <Image resource="sequence1-image2" />
+            </SequenceImages>
+            <AnimationController play="TAP" />
+        </PartAnimatedImage>
+
+        <PartAnimatedImage x="0" y="300" width="400" height="100">
+            <AnimatedImages>
+                <AnimatedImage resource="webp2" format="WEBP" />
+                <SequenceImages>
+                    <Image resource="sequence2-image1" />
+                    <Image resource="sequence2-image2" />
+                </SequenceImages>
+            </AnimatedImages>
+            <AnimationController play="TAP" />
+        </PartAnimatedImage>
+    </Scene>
+</WatchFace>

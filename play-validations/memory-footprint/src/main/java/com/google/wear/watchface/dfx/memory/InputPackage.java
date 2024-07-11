@@ -84,8 +84,6 @@ interface InputPackage extends AutoCloseable {
         if (packageFile.isDirectory()) {
             return openFromAabDirectory(packageFile);
         } else if (packagePath.endsWith("zip")) {
-            // TODO(b/279866804): if open sourcing, skip the zip case because it is irrelevant
-            // for the outside world.
             return openFromMokkaZip(packagePath);
         } else if (packagePath.endsWith("aab") || packagePath.endsWith("apk")) {
             return openFromAndroidPackage(packagePath);

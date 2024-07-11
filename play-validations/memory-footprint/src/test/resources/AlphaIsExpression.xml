@@ -1,0 +1,18 @@
+<!--
+Checks that the algorithm handles alpha expressions properly. Also, that the algorithm works when
+there are no configurations.
+-->
+<WatchFace width="450" height="450">
+    <Scene>
+        <Group name="group" x="0" y="0" width="450" height="450">
+            <PartImage name="img1" alpha="255" height="450" pivotX="0.5" pivotY="0.5" width="450" x="0" y="0">
+                <Gyro alpha="((100 - ((100 - 100)/90)* clamp([ACCELEROMETER_ANGLE_X], 0, 90) - ((100 - 100)/-90)* clamp([ACCELEROMETER_ANGLE_X], -90, 0))/100 * (100 - ((100 - 100)/60)* clamp([ACCELEROMETER_ANGLE_Y], 0, 60) - ((100 - 0)/0)* clamp([ACCELEROMETER_ANGLE_Y], 0, 0))/100) * 255" angle="(-15/90)* clamp([ACCELEROMETER_ANGLE_X], 0, 90) + (15/-90)* clamp([ACCELEROMETER_ANGLE_X], -90, 0) + (0/60)* clamp([ACCELEROMETER_ANGLE_Y], 0, 60) + (0/0)* clamp([ACCELEROMETER_ANGLE_Y], 0, 0)" y="(0/90)* clamp([ACCELEROMETER_ANGLE_X], 0, 90) + (0/-90)* clamp([ACCELEROMETER_ANGLE_X], -90, 0) + (100/60)* clamp([ACCELEROMETER_ANGLE_Y], 0, 60) + (-30/0)* clamp([ACCELEROMETER_ANGLE_Y], 0, 0)" />
+                <Image resource="always-rendered-image" />
+            </PartImage>
+        </Group>
+        <PartImage x="200" y="200" width="100" height="100">
+            <Variant mode="AMBIENT" target="alpha" value="clamp(floor((0 + (((([HOUR_0_23]&gt;=19)*([HOUR_0_23]&lt;=23))+(([HOUR_0_23]&gt;=00)*([HOUR_0_23]&lt;=06)))?100:0)) / 100 * 255), 0, 255)" />
+            <Image resource="always-rendered-image-2" />
+        </PartImage>
+    </Scene>
+</WatchFace>

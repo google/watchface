@@ -1,0 +1,23 @@
+<WatchFace width="450" height="450">
+    <Scene>
+        <PartAnimatedImage x="0" y="100" width="400" height="100">
+            <AnimatedImage resource="webp1" format="WEBP" />
+            <AnimationController play="TAP" />
+            <Thumbnail resource="webp1-thumbnail-node" />
+        </PartAnimatedImage>
+
+        <PartAnimatedImage x="0" y="200" width="400" height="100">
+            <AnimatedImage resource="webp2" format="WEBP" thumbnail="webp2-thumbnail" />
+            <AnimationController play="TAP" />
+            <Thumbnail resource="webp2-thumbnail-node" />
+        </PartAnimatedImage>
+
+        <PartAnimatedImage x="0" y="300" width="400" height="100">
+            <AnimatedImages>
+                <AnimatedImage resource="animated-images-webp1" format="WEBP" thumbnail="animated-images-webp1-thumbnail" />
+                <AnimatedImage resource="animated-images-webp2" format="WEBP" thumbnail="animated-images-webp2-thumbnail" />
+            </AnimatedImages>
+            <AnimationController play="TAP" />
+        </PartAnimatedImage>
+    </Scene>
+</WatchFace>

@@ -1,0 +1,51 @@
+<WatchFace width="450" height="450">
+    <UserConfigurations>
+        <ListConfiguration id="l1" displayName="list1" defaultValue="l1-1">
+            <ListOption id="l1-1" />
+            <ListOption id="l1-2" />
+        </ListConfiguration>
+        <ListConfiguration id="l2" displayName="list2" defaultValue="l2-1">
+            <ListOption id="l2-1" />
+            <ListOption id="l2-2" />
+        </ListConfiguration>
+    </UserConfigurations>
+    <Scene>
+        <Group name="group1" width="450" height="200" x="0" y="0">
+            <PartImage x="0" y="0" width="200" height="200">
+                <Image resource="image1" />
+            </PartImage>
+        </Group>
+
+        <ListConfiguration id="l1">
+            <ListOption id="l1-1">
+                <DigitalClock>
+                    <Image resource="digital-clock-1" />
+                </DigitalClock>
+            </ListOption>
+            <ListOption id="l1-2">
+                <DigitalClock>
+                    <Image resource="digital-clock-2" />
+                </DigitalClock>
+            </ListOption>
+        </ListConfiguration>
+
+        <ListConfiguration id="l2">
+            <ListOption id="l2-1">
+                <DigitalClock>
+                    <Image resource="digital-clock-3" />
+                </DigitalClock>
+            </ListOption>
+            <ListOption id="l2-2">
+                <DigitalClock>
+                    <Image resource="digital-clock-1" />
+                </DigitalClock>
+            </ListOption>
+        </ListConfiguration>
+
+        <Group name="group2" width="450" height="200" x="0" y="0">
+            <PartImage x="0" y="200" width="200" height="200">
+                <Image resource="image2" />
+            </PartImage>
+        </Group>
+    </Scene>
+</WatchFace>

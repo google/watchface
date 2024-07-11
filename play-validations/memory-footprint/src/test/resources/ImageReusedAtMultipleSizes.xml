@@ -1,0 +1,13 @@
+<WatchFace width="450" height="450">
+    <Scene>
+        <PartImage x="0" y="225" width="70" height="70">
+            <Image resource="image" />
+        </PartImage>
+        <PartImage x="0" y="225" width="150" height="150">
+            <Image resource="image" />
+        </PartImage>
+        <PartImage x="0" y="225" width="200" height="200">
+            <Image resource="image" />
+        </PartImage>
+    </Scene>
+</WatchFace>

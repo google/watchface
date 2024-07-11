@@ -1,0 +1,72 @@
+<!--
+Tests that independent list options and ambient options are counted properly.
+-->
+<WatchFace width="450" height="450">
+    <UserConfigurations>
+        <ListConfiguration id="l1" displayName="list1" defaultValue="l1-1">
+            <ListOption id="l1-1" />
+            <ListOption id="l1-2" />
+            <ListOption id="l1-3" />
+        </ListConfiguration>
+        <ListConfiguration id="l2" displayName="list2" defaultValue="l2-1">
+            <ListOption id="l2-1" />
+            <ListOption id="l2-2" />
+            <ListOption id="l2-3" />
+        </ListConfiguration>
+        <BooleanConfiguration id="b1" displayName="bool1" defaultValue="TRUE" />
+    </UserConfigurations>
+    <Scene>
+        <Group name="img-active-group" x="0" y="0" width="200" height="100">
+            <Variant mode="AMBIENT" target="alpha" value="0" />
+            <PartImage x="0" y="0" width="100" height="100">
+                <Image resource="image-active" />
+            </PartImage>
+        </Group>
+        <ListConfiguration id="l1">
+            <ListOption id="l1-1">
+                <PartImage x="0" y="100" width="200" height="100">
+                    <Image resource="list1-image1" />
+                </PartImage>
+            </ListOption>
+            <ListOption id="l1-2">
+                <PartImage x="0" y="100" width="200" height="100">
+                    <Image resource="list1-image2" />
+                </PartImage>
+            </ListOption>
+            <ListOption id="l1-3">
+                <PartImage x="0" y="100" width="200" height="100">
+                    <Image resource="list1-image3" />
+                </PartImage>
+            </ListOption>
+        </ListConfiguration>
+        <ListConfiguration id="l2">
+            <ListOption id="l2-1">
+                <PartImage x="0" y="200" width="200" height="100">
+                    <Image resource="list2-image1" />
+                </PartImage>
+            </ListOption>
+            <ListOption id="l2-2">
+                <PartImage x="0" y="200" width="200" height="100">
+                    <Image resource="list2-image2" />
+                </PartImage>
+            </ListOption>
+            <ListOption id="l2-3">
+                <PartImage x="0" y="200" width="200" height="100">
+                    <Image resource="list2-image3" />
+                </PartImage>
+            </ListOption>
+        </ListConfiguration>
+        <BooleanConfiguration id="b1">
+            <BooleanOption id="TRUE">
+                <PartImage x="0" y="300" width="200" height="100">
+                    <Image resource="boolean-image-true" />
+                </PartImage>
+            </BooleanOption>
+            <BooleanOption id="FALSE">
+                <PartImage x="0" y="300" width="200" height="100">
+                    <Image resource="boolean-image-false" />
+                </PartImage>
+            </BooleanOption>
+        </BooleanConfiguration>
+    </Scene>
+</WatchFace>

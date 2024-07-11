@@ -1,0 +1,18 @@
+<!--
+Checks that a sub-tree that is hidden in ambient is counted properly.
+-->
+<WatchFace width="450" height="450">
+    <Scene>
+        <Group name="group1" width="450" height="200" x="0" y="0">
+            <Variant mode="AMBIENT" target="alpha" value="0" />
+            <PartImage width="200" height="200" x="0" y="0">
+                <Image resource="active-only-image" />
+            </PartImage>
+        </Group>
+        <Group name="group2" width="450" height="200" x="0" y="200">
+            <PartImage width="200" height="200" x="0" y="0">
+                <Image resource="always-rendered-image" />
+            </PartImage>
+        </Group>
+    </Scene>
+</WatchFace>

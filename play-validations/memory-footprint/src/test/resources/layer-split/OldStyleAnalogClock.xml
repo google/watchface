@@ -1,0 +1,26 @@
+<WatchFace width="450" height="450">
+    <Scene>
+        <Group name="group1" width="450" height="200" x="0" y="0">
+            <PartImage x="0" y="0" width="200" height="200">
+                <Image resource="image1" />
+            </PartImage>
+        </Group>
+
+        <Group name="hands" x="0" y="0" width="360" height="360">
+            <PartImage x="160" y="0" width="40" height="360">
+                <Transform target="angle" value="[HOUR_0_11_MINUTE]*30"/>
+                <Image resource="hour-hand"/>
+            </PartImage>
+            <PartImage x="160" y="0" width="40" height="360">
+                <Transform target="angle" value="[MINUTE_SECOND]*6"/>
+                <Image resource="minute-hand"/>
+            </PartImage>
+        </Group>
+
+        <Group name="group2" width="450" height="200" x="0" y="0">
+            <PartImage x="0" y="200" width="200" height="200">
+                <Image resource="image2" />
+            </PartImage>
+        </Group>
+    </Scene>
+</WatchFace>
