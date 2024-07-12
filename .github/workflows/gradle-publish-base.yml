@@ -18,48 +18,47 @@ on:
 
 jobs:
   build_memory_footprint:
-
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout project
-      uses: actions/checkout@v3
-      with:
-        ref: ${{ inputs.release_git_sha }}
-    - name: Set up JDK 17
-      uses: actions/setup-java@v3
-      with:
-        java-version: '17'
-        distribution: 'corretto'
-        architecture: 'x64'
-    - name: Get project hash
-      run: |
+      - name: Checkout project
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ inputs.release_git_sha }}
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: "17"
+          distribution: "corretto"
+          architecture: "x64"
+      - name: Get project hash
+        run: |
           git_hash=$(git rev-parse --short "$GITHUB_SHA")
           echo "git_hash=$git_hash" >> $GITHUB_ENV
-    - name: Build memory-footprint.jar
-      uses: gradle/gradle-build-action@v2.4.2
-      with:
-        gradle-version: 8.4
-        arguments: -p play-validations memory-footprint:jar -Dmemory-footprint.git_hash=${{ env.git_hash }} -Dmemory-footprint.version=latest
-    - name: Build dwf-format-1-validator-1.0.jar
-      uses: gradle/gradle-build-action@v2.4.2
-      with:
-        gradle-version: 8.4
-        arguments: -p third_party/wff :specification:validator:build
-    - name: Copy LICENSE files
-      run: |
-        mv LICENSE.txt memory-footprint_LICENSE.txt
-        mv third_party/wff/LICENSE.txt dwf-format-2-validator-1.0_LICENSE.txt
+      - name: Build memory-footprint.jar
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          build-root-directory: play-validations
+          arguments: memory-footprint:jar -Dmemory-footprint.git_hash=${{ env.git_hash }} -Dmemory-footprint.version=latest
+      - name: Build dwf-format-1-validator-1.0.jar
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          build-root-directory: third_party/wff
+          arguments: :specification:validator:build
+      - name: Copy LICENSE files
+        run: |
+          mv LICENSE.txt memory-footprint_LICENSE.txt
+          mv third_party/wff/LICENSE.txt dwf-format-2-validator-1.0_LICENSE.txt
 
-    - name: Release all jars
-      uses: "marvinpinto/action-automatic-releases@latest"
-      with:
-        repo_token: "${{ secrets.GITHUB_TOKEN }}"
-        automatic_release_tag: "${{ inputs.release_name }}"
-        prerelease: true
-        title: "Memory Footprint Build"
-        files: |
-          memory-footprint_LICENSE.txt
-          dwf-format-2-validator-1.0_LICENSE.txt
-          **/memory-footprint.jar
-          **/dwf-format-2-validator-1.0.jar
+      - name: Release all jars
+        uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "${{ inputs.release_name }}"
+          prerelease: true
+          title: "Memory Footprint Build"
+          files: |
+            memory-footprint_LICENSE.txt
+            dwf-format-2-validator-1.0_LICENSE.txt
+            **/memory-footprint.jar
+            **/dwf-format-2-validator-1.0.jar
