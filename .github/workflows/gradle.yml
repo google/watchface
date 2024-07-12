@@ -9,52 +9,50 @@ name: Continuous Build
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 permissions:
   contents: read
 
 jobs:
   build_memory_footprint:
-
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout project
-      uses: actions/checkout@v3
-    - name: Set up JDK 17
-      uses: actions/setup-java@v3
-      with:
-        java-version: '17'
-        distribution: 'corretto'
-        architecture: 'x64'
-    - name: Get project hash
-      run: |
+      - name: Checkout project
+        uses: actions/checkout@v3
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: "17"
+          distribution: "corretto"
+          architecture: "x64"
+      - name: Get project hash
+        run: |
           git_hash=$(git rev-parse --short "$GITHUB_SHA")
           echo "git_hash=$git_hash" >> $GITHUB_ENV
-    - name: Build memory-footprint.jar
-      uses: gradle/gradle-build-action@v2.4.2
-      with:
-        gradle-version: 8.4
-        arguments: -p play-validations memory-footprint:jar -Dmemory-footprint.git_hash=${{ env.git_hash }}
+      - name: Build memory-footprint.jar
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          build-root-directory: play-validations
+          arguments: memory-footprint:jar -Dmemory-footprint.git_hash=${{ env.git_hash }}
 
   build_validator:
-
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout project
-      uses: actions/checkout@v3
-    - name: Set up JDK 17
-      uses: actions/setup-java@v3
-      with:
-        java-version: '17'
-        distribution: 'corretto'
-        architecture: 'x64'
-    - name: Build the validator
-      uses: gradle/gradle-build-action@v2.4.2
-      with:
-        gradle-version: 8.4
-        arguments: -p third_party/wff :specification:validator:build
+      - name: Checkout project
+        uses: actions/checkout@v3
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: "17"
+          distribution: "corretto"
+          architecture: "x64"
+      - name: Build the validator
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          build-root-directory: third_party/wff
+          arguments: :specification:validator:build
