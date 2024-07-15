@@ -1,0 +1,10 @@
+<WatchFace width="450" height="450">
+    <Scene>
+        <DigitalClock x="205" y="47" width="200" height="200">
+            <Localization calendar="GREGORIAN" />
+            <TimeText format="hh:mm" x="0" y="0" width="200" height="200">
+                <Font color="#ffffffff" family="custom_font" size="150" slant="NORMAL" weight="NORMAL" />
+            </TimeText>
+        </DigitalClock>
+    </Scene>
+</WatchFace>

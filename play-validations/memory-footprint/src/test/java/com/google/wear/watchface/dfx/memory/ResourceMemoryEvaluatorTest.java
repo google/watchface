@@ -964,6 +964,74 @@ public class ResourceMemoryEvaluatorTest {
                             .setExpectedActiveFootprint(4)
                             .setExpectedAmbientFootprint(4)
                             .setExpectedTotalFootprint(4)
+                            .build(),
+                    new TestParams.Builder()
+                            .setLayoutPath("/ActiveAnalogClock.xml")
+                            .addImageFootprints(
+                                    images -> {
+                                        images.put(
+                                                "hour-hand",
+                                                DrawableResourceDetails.builder()
+                                                        .setName("hour-hand")
+                                                        .setSha1("hour-hand")
+                                                        .setNumberOfImages(1)
+                                                        .setBiggestFrameFootprintBytes(2)
+                                                        .build());
+                                        images.put(
+                                                "minute-hand",
+                                                DrawableResourceDetails.builder()
+                                                        .setName("minute-hand")
+                                                        .setSha1("minute-hand")
+                                                        .setNumberOfImages(1)
+                                                        .setBiggestFrameFootprintBytes(4)
+                                                        .build());
+                                        images.put(
+                                                "second-hand",
+                                                DrawableResourceDetails.builder()
+                                                        .setName("second-hand")
+                                                        .setSha1("second-hand")
+                                                        .setNumberOfImages(1)
+                                                        .setBiggestFrameFootprintBytes(8)
+                                                        .build());
+                                    })
+                            .setExpectedActiveFootprint(14)
+                            .setExpectedAmbientFootprint(6)
+                            .setExpectedTotalFootprint(14)
+                            .build(),
+                    new TestParams.Builder()
+                            .setLayoutPath("/ActiveDigitalClockBitmapFont.xml")
+                            .addImageFootprints(
+                                    images -> {
+                                        for (int digit = 0; digit <= 9; digit++) {
+                                            images.put(
+                                                    "char-" + digit,
+                                                    DrawableResourceDetails.builder()
+                                                            .setName("char-" + digit)
+                                                            .setNumberOfImages(1)
+                                                            .setSha1("asd" + digit)
+                                                            .setBiggestFrameFootprintBytes(2)
+                                                            .build());
+                                        }
+                                    })
+                            .setExpectedActiveFootprint(20)
+                            .setExpectedAmbientFootprint(20)
+                            .setExpectedTotalFootprint(20)
+                            .build(),
+                    new TestParams.Builder()
+                            .setLayoutPath("/ActiveDigitalClockTtfFont.xml")
+                            .addImageFootprints(
+                                    images -> {
+                                        images.put(
+                                                "custom_font",
+                                                DrawableResourceDetails.builder()
+                                                        .setName("custom_font")
+                                                        .setNumberOfImages(1)
+                                                        .setBiggestFrameFootprintBytes(24)
+                                                        .build());
+                                    })
+                            .setExpectedActiveFootprint(24)
+                            .setExpectedAmbientFootprint(24)
+                            .setExpectedTotalFootprint(24)
                             .build());
         }
 
