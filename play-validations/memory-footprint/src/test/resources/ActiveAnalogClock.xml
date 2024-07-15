@@ -1,0 +1,13 @@
+<WatchFace width="450" height="450">
+    <Scene>
+        <AnalogClock x="205" y="47" width="200" height="200">
+            <Localization timeZone="SYNC_TO_DEVICE" />
+            <HourHand resource="hour-hand" x="88" y="0" width="25" height="200" pivotX="0.5" pivotY="0.5"/>
+            <MinuteHand resource="minute-hand" x="88" y="0" width="25" height="200" pivotX="0.5" pivotY="0.5"/>
+            <SecondHand resource="second-hand" x="88" y="0" width="25" height="200" pivotX="0.5" pivotY="0.5">
+                <Variant mode="AMBIENT" target="alpha" value="0"/>
+                <Tick duration="0.2" strength="0.5" />
+            </SecondHand>
+        </AnalogClock>
+    </Scene>
+</WatchFace>

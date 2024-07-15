@@ -48,11 +48,17 @@ class WatchFaceDocuments {
         return currentNode.getNodeName().equals("Font");
     }
 
+    static boolean isClock(Node currentNode) {
+        return currentNode.getNodeName().equals("DigitalClock")
+                || currentNode.getNodeName().equals("AnalogClock");
+    }
+
     static boolean isDrawableNode(Node currentNode) {
         return isPartImage(currentNode)
                 || isPartAnimatedImage(currentNode)
                 || isBitmapFont(currentNode)
-                || isFont(currentNode);
+                || isFont(currentNode)
+                || isClock(currentNode);
     }
 
     static Node findSceneNode(Document document) {
