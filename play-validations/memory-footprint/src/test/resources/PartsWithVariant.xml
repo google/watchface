@@ -1,0 +1,13 @@
+<WatchFace width="450" height="450">
+    <Scene>
+        <PartAnimatedImage x="0" y="0" width="450" height="225">
+            <Variant mode="AMBIENT" target="alpha" value="0" />
+            <AnimatedImage resource="animated-image" format="WEBP" thumbnail="webp1-thumbnail" />
+            <AnimationController play="TAP" />
+        </PartAnimatedImage>
+        <PartImage x="0" y="225" width="450" height="225">
+            <Variant mode="AMBIENT" target="alpha" value="0" />
+            <Image resource="static-image" />
+        </PartImage>
+    </Scene>
+</WatchFace>

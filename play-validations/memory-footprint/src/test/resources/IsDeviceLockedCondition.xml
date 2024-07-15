@@ -1,0 +1,26 @@
+<!-- Used to test non-ambient expressions. -->
+<WatchFace width="450" height="450">
+    <Scene>
+        <Group name="group1" width="450" height="200" x="0" y="0">
+            <Condition>
+                <Expressions>
+                    <Expression name="isLocked"><![CDATA[ [STATE.IS_DEVICE_LOCKED] ]]></Expression>
+                </Expressions>
+                <Compare expression="isLocked">
+                    <Group name="enabled_when_locked" width="200" height="200" x="0" y="0">
+                        <PartImage x="0" y="0" width="200" height="200">
+                            <Image resource="locked-only-image" />
+                        </PartImage>
+                    </Group>
+                </Compare>
+                <Default>
+                    <Group name="enabled_when_unlocked" width="200" height="200" x="0" y="0">
+                        <PartImage x="0" y="0" width="200" height="200">
+                            <Image resource="unlocked-only-image" />
+                        </PartImage>
+                    </Group>
+                </Default>
+            </Condition>
+        </Group>
+    </Scene>
+</WatchFace>

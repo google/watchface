@@ -1,0 +1,113 @@
+<!--
+Checks that nested, repeated list options are handled properly. In this case, L1 contains L2 which
+contains again L1. The value of the inner L1 is determined by the value of the outer L1, meaning
+there are some impossible configurations. The possible configurations are:
+- l1-1, l2-1, l1-1
+- l1-1, l2-2, l1-1
+- l1-2, l2-1, l1-2
+- l1-2, l2-2, l1-2
+
+The impossible configurations are:
+- l1-1, l2-1, l1-2
+- l1-1, l2-2, l1-2
+- l1-2, l2-1, l1-1
+- l1-2, l2-2, l1-1
+
+If any of the impossible configurations would yield a bigger memory budget, they should be ignored.
+-->
+<WatchFace width="450" height="450">
+    <UserConfigurations>
+        <ListConfiguration id="l1" displayName="list1" defaultValue="l1-1">
+            <ListOption id="l1-1" />
+            <ListOption id="l1-2" />
+        </ListConfiguration>
+        <ListConfiguration id="l2" displayName="list2" defaultValue="l2-1">
+            <ListOption id="l2-1" />
+            <ListOption id="l2-2" />
+        </ListConfiguration>
+    </UserConfigurations>
+    <Scene>
+        <ListConfiguration id="l1">
+            <ListOption id="l1-1">
+                <Group name="group1" x="0" y="0" width="450" height="225">
+                    <ListConfiguration id="l2">
+                        <ListOption id="l2-1">
+                            <Group name="group2" x="0" y="0" width="450" height="112">
+                                <ListConfiguration id="l1">
+                                    <ListOption id="l1-1">
+                                        <PartImage x="0" y="0" width="300" height="100" name="part-image-list1-option1-list2-option1-list1-option1">
+                                            <Image resource="list1-option1-list2-option1-list1-option1" />
+                                        </PartImage>
+                                    </ListOption>
+                                    <ListOption id="l1-2">
+                                        <!-- Should not be possible   -->
+                                        <PartImage x="0" y="0" width="300" height="100" name="part-image-list1-option1-list2-option1-list1-option2">
+                                            <Image resource="list1-option1-list2-option1-list1-option2" />
+                                        </PartImage>
+                                    </ListOption>
+                                </ListConfiguration>
+                            </Group>
+                        </ListOption>
+                        <ListOption id="l2-2">
+                            <Group name="group3" x="0" y="112" width="450" height="112">
+                                <ListConfiguration id="l1">
+                                    <ListOption id="l1-1">
+                                        <PartImage x="0" y="0" width="300" height="100" name="part-image-list1-option1-list2-option2-list1-option1">
+                                            <Image resource="list1-option1-list2-option2-list1-option1" />
+                                        </PartImage>
+                                    </ListOption>
+                                    <ListOption id="l1-2">
+                                        <!-- Should not be possible   -->
+                                        <PartImage x="0" y="0" width="300" height="100" name="part-image-list1-option1-list2-option2-list1-option2">
+                                            <Image resource="list1-option1-list2-option2-list1-option2" />
+                                        </PartImage>
+                                    </ListOption>
+                                </ListConfiguration>
+                            </Group>
+                        </ListOption>
+                    </ListConfiguration>
+                </Group>
+            </ListOption>
+            <ListOption id="l1-2">
+                <Group name="group4" x="0" y="225" width="450" height="225">
+                    <ListConfiguration id="l2">
+                        <ListOption id="l2-1">
+                            <Group name="group5" x="0" y="0" width="450" height="112">
+                                <ListConfiguration id="l1">
+                                    <ListOption id="l1-1">
+                                        <!-- Should not be possible   -->
+                                        <PartImage x="0" y="0" width="300" height="100" name="part-image-list1-option2-list2-option1-list1-option1">
+                                            <Image resource="list1-option2-list2-option1-list1-option1" />
+                                        </PartImage>
+                                    </ListOption>
+                                    <ListOption id="l1-2">
+                                        <PartImage x="0" y="0" width="300" height="100" name="part-image-list1-option2-list2-option1-list1-option2">
+                                            <Image resource="list1-option2-list2-option1-list1-option2" />
+                                        </PartImage>
+                                    </ListOption>
+                                </ListConfiguration>
+                            </Group>
+                        </ListOption>
+                        <ListOption id="l2-2">
+                            <Group name="group6" x="0" y="112" width="450" height="112">
+                                <ListConfiguration id="l1">
+                                    <ListOption id="l1-1">
+                                        <!-- Should not be possible   -->
+                                        <PartImage x="0" y="0" width="300" height="100" name="part-image-list1-option2-list2-option2-list1-option1">
+                                            <Image resource="list1-option2-list2-option2-list1-option1" />
+                                        </PartImage>
+                                    </ListOption>
+                                    <ListOption id="l1-2">
+                                        <PartImage x="0" y="0" width="300" height="100" name="part-image-list1-option2-list2-option2-list1-option2">
+                                            <Image resource="list1-option2-list2-option2-list1-option2" />
+                                        </PartImage>
+                                    </ListOption>
+                                </ListConfiguration>
+                            </Group>
+                        </ListOption>
+                    </ListConfiguration>
+                </Group>
+            </ListOption>
+        </ListConfiguration>
+    </Scene>
+</WatchFace>

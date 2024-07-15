@@ -29,6 +29,10 @@ jobs:
           java-version: "17"
           distribution: "corretto"
           architecture: "x64"
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          packages: "tools platform-tools build-tools;30.0.3"
       - name: Get project hash
         run: |
           git_hash=$(git rev-parse --short "$GITHUB_SHA")
@@ -38,7 +42,11 @@ jobs:
         with:
           build-root-directory: play-validations
           arguments: memory-footprint:jar -Dmemory-footprint.git_hash=${{ env.git_hash }}
-
+      - name: Test memory-footprint
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          build-root-directory: play-validations
+          arguments: memory-footprint:test
   build_validator:
     runs-on: ubuntu-latest
 

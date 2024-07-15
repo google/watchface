@@ -1,0 +1,36 @@
+<!--
+Tests that when an animation has the same biggest frame, then that frame is counted only once in
+the memory footprint calculation for ambient.
+-->
+<WatchFace width="450" height="450">
+    <Scene>
+        <!--    max frame of webp1 should be counted once    -->
+        <PartAnimatedImage x="0" y="0" width="400" height="100">
+            <AnimatedImage resource="webp1" format="WEBP" />
+            <AnimationController play="TAP" />
+        </PartAnimatedImage>
+
+        <PartAnimatedImage x="0" y="100" width="400" height="100">
+            <AnimatedImage resource="webp1" format="WEBP" />
+            <AnimationController play="TAP" />
+        </PartAnimatedImage>
+
+
+        <!--    sequences-shared-frame is counted once    -->
+        <PartAnimatedImage x="0" y="200" width="400" height="100">
+            <SequenceImages>
+                <Image resource="sequence1-image1" />
+                <Image resource="sequences-shared-frame" />
+            </SequenceImages>
+            <AnimationController play="TAP" />
+        </PartAnimatedImage>
+
+        <PartAnimatedImage x="0" y="300" width="400" height="100">
+            <SequenceImages>
+                <Image resource="sequence2-image1" />
+                <Image resource="sequences-shared-frame" />
+            </SequenceImages>
+            <AnimationController play="TAP" />
+        </PartAnimatedImage>
+    </Scene>
+</WatchFace>

@@ -1,0 +1,7 @@
+<WatchFace width="450" height="450">
+    <Scene>
+        <PartImage name="img1" alpha="255" height="450" pivotX="0.5" pivotY="0.5" width="450" x="0" y="0">
+            <Image resource="missing-image" />
+        </PartImage>
+    </Scene>
+</WatchFace>

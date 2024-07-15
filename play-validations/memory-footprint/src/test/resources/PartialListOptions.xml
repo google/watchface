@@ -1,0 +1,74 @@
+<!--
+Tests that the algorithm iterates over all values of a list config, even if all its options are not
+used at the same time.
+If not looking at the top level user configuration, the algorithm could consider options from only
+one of the ListConfigurations from the Scene node, so for l1 it could only consider (l1-1, l1-2) or
+(l1-2, l1-3). Similarly for l2.
+-->
+<WatchFace width="450" height="450">
+    <UserConfigurations>
+        <ListConfiguration id="l1" displayName="list1" defaultValue="l1-1">
+            <ListOption id="l1-1" />
+            <ListOption id="l1-2" />
+            <ListOption id="l1-3" />
+        </ListConfiguration>
+        <ListConfiguration id="l2" displayName="list2" defaultValue="l2-1">
+            <ListOption id="l2-1" />
+            <ListOption id="l2-2" />
+            <ListOption id="l2-3" />
+        </ListConfiguration>
+    </UserConfigurations>
+    <Scene>
+        <!--    Check that the algorithm does not consider only the last instance of a
+                ListConfiguration by putting the max in the first instance, under l1-1   -->
+        <ListConfiguration id="l1">
+            <ListOption id="l1-1">
+                <PartImage x="0" y="0" width="200" height="200">
+                    <Image resource="image1" />
+                </PartImage>
+            </ListOption>
+            <ListOption id="l1-2">
+                <PartImage x="0" y="0" width="200" height="200">
+                    <Image resource="image2" />
+                </PartImage>
+            </ListOption>
+        </ListConfiguration>
+
+        <ListConfiguration id="l1">
+            <ListOption id="l1-2">
+                <PartImage x="0" y="0" width="200" height="200">
+                    <Image resource="image2" />
+                </PartImage>
+            </ListOption>
+            <ListOption id="l1-3">
+                <PartImage x="0" y="0" width="200" height="200">
+                    <Image resource="image3" />
+                </PartImage>
+            </ListOption>
+        </ListConfiguration>
+
+        <!--    Check that the algorithm does not consider only the first instance of a
+                ListConfiguration by putting the max in the last instance, under l2-3   -->
+        <ListConfiguration id="l2">
+            <ListOption id="l2-1">
+                <PartImage x="0" y="0" width="200" height="200">
+                    <Image resource="image4" />
+                </PartImage>
+            </ListOption>
+            <ListOption id="l2-2">
+                <PartImage x="0" y="0" width="200" height="200">
+                    <Image resource="image5" />
+                </PartImage>
+            </ListOption>
+        </ListConfiguration>
+
+        <ListConfiguration id="l2">
+            <ListOption id="l2-3">
+                <PartImage x="0" y="0" width="200" height="200">
+                    <Image resource="image6" />
+                </PartImage>
+            </ListOption>
+        </ListConfiguration>
+
+    </Scene>
+</WatchFace>

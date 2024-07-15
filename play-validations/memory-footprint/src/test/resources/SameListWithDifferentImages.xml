@@ -1,0 +1,77 @@
+<!--
+Test that it counts repeated images only once. The only possible image sets are:
+- [option1-image1] = 128L
+- [option2-image1, option2-image2, option2-image3] = [32L, 64L, 64L]
+- [option3-img1, option3-image2, option3-image2] = [16L, 128L]
+
+If each ListConfiguration is optimised independently, then we'd have 3*option1-image1, which has the
+biggest size. However, since option1-image1 appears multiple times when l1-1 is selected,
+and l2-2 option has a different image in each instance of the ListOption, the l2-2 produces a bigger
+total size.
+-->
+<WatchFace width="450" height="450">
+    <UserConfigurations>
+        <ListConfiguration id="l1" displayName="list1" defaultValue="l1-1">
+            <ListOption id="l1-1" />
+            <ListOption id="l1-2" />
+            <ListOption id="l1-3" />
+        </ListConfiguration>
+    </UserConfigurations>
+    <Scene>
+        <ListConfiguration id="l1">
+            <ListOption id="l1-1">
+                <PartImage x="0" y="0" width="300" height="100">
+                    <Image resource="option1-image1" />
+                </PartImage>
+            </ListOption>
+            <ListOption id="l1-2">
+                <PartImage x="0" y="0" width="300" height="100">
+                    <Image resource="option2-image1" />
+                </PartImage>
+            </ListOption>
+            <ListOption id="l1-3">
+                <PartImage x="0" y="0" width="300" height="100">
+                    <Image resource="option3-image1" />
+                </PartImage>
+            </ListOption>
+        </ListConfiguration>
+        <Group x="0" y="100" width="300" height="300" name="group1">
+            <ListConfiguration id="l1">
+                <ListOption id="l1-1">
+                    <PartImage x="0" y="0" width="300" height="100">
+                        <Image resource="option1-image1" />
+                    </PartImage>
+                </ListOption>
+                <ListOption id="l1-2">
+                    <PartImage x="0" y="0" width="300" height="100">
+                        <Image resource="option2-image2" />
+                    </PartImage>
+                </ListOption>
+                <ListOption id="l1-3">
+                    <PartImage x="0" y="0" width="300" height="100">
+                        <Image resource="option3-image2" />
+                    </PartImage>
+                </ListOption>
+            </ListConfiguration>
+            <Group x="0" y="100" width="300" height="100" name="group2">
+                <ListConfiguration id="l1">
+                    <ListOption id="l1-1">
+                        <PartImage x="0" y="0" width="300" height="100">
+                            <Image resource="option1-image1" />
+                        </PartImage>
+                    </ListOption>
+                    <ListOption id="l1-2">
+                        <PartImage x="0" y="0" width="300" height="100">
+                            <Image resource="option2-image3" />
+                        </PartImage>
+                    </ListOption>
+                    <ListOption id="l1-3">
+                        <PartImage x="0" y="0" width="300" height="100">
+                            <Image resource="option3-image2" />
+                        </PartImage>
+                    </ListOption>
+                </ListConfiguration>
+            </Group>
+        </Group>
+    </Scene>
+</WatchFace>
