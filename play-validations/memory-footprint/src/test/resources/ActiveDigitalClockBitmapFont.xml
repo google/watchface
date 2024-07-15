@@ -1,0 +1,24 @@
+<WatchFace width="450" height="450">
+    <BitmapFonts>
+        <BitmapFont name="digital-clock">
+            <Character height="32" name="0" resource="char-0" width="20" />
+            <Character height="32" name="1" resource="char-1" width="20" />
+            <Character height="32" name="2" resource="char-2" width="20" />
+            <Character height="32" name="3" resource="char-3" width="20" />
+            <Character height="32" name="4" resource="char-4" width="20" />
+            <Character height="32" name="5" resource="char-5" width="20" />
+            <Character height="32" name="6" resource="char-6" width="20" />
+            <Character height="32" name="7" resource="char-7" width="20" />
+            <Character height="32" name="8" resource="char-8" width="20" />
+            <Character height="32" name="9" resource="char-9" width="20" />
+        </BitmapFont>
+    </BitmapFonts>
+    <Scene>
+        <DigitalClock x="205" y="47" width="200" height="200">
+            <Localization calendar="GREGORIAN" />
+            <TimeText format="hh:mm" x="0" y="0" width="200" height="200">
+                <BitmapFont family="digital-clock" size="32" color="#FFFFFF"/>
+            </TimeText>
+        </DigitalClock>
+    </Scene>
+</WatchFace>

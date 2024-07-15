@@ -21,6 +21,7 @@ import static com.google.wear.watchface.dfx.memory.UserConfigValue.SupportedConf
 import static com.google.wear.watchface.dfx.memory.WatchFaceDocuments.childrenStream;
 import static com.google.wear.watchface.dfx.memory.WatchFaceDocuments.findSceneNode;
 import static com.google.wear.watchface.dfx.memory.WatchFaceDocuments.isBitmapFont;
+import static com.google.wear.watchface.dfx.memory.WatchFaceDocuments.isClock;
 import static com.google.wear.watchface.dfx.memory.WatchFaceDocuments.isDrawableNode;
 import static com.google.wear.watchface.dfx.memory.WatchFaceDocuments.isFont;
 import static com.google.wear.watchface.dfx.memory.WatchFaceDocuments.isPartAnimatedImage;
@@ -218,7 +219,10 @@ class VariantMemoryFootprintCalculator {
             Node currentNode, VariantConfigValue variant) {
         if (isPartAnimatedImage(currentNode)) {
             return collectPartAnimatedImageResources(currentNode, variant);
-        } else if (isPartImage(currentNode) || isBitmapFont(currentNode) || isFont(currentNode)) {
+        } else if (isPartImage(currentNode)
+                || isBitmapFont(currentNode)
+                || isFont(currentNode)
+                || isClock(currentNode)) {
             return collectTotalOfResources(currentNode);
         }
         // explicitly check for the expected nodes and throw if we forget one of them to make it
