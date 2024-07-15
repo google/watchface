@@ -1,0 +1,28 @@
+<!--
+Tests simple ambient expressions.
+-->
+<WatchFace width="450" height="450">
+    <Scene>
+        <Group name="group1" width="450" height="200" x="0" y="0">
+            <Condition>
+                <Expressions>
+                    <Expression name="isAmbient"><![CDATA[ [STATE.IS_AMBIENT] ]]></Expression>
+                </Expressions>
+                <Compare expression="isAmbient">
+                    <Group name="enabled_in_ambient" width="200" height="200" x="0" y="0">
+                        <PartImage x="0" y="0" width="200" height="200">
+                            <Image resource="ambient-only-image" />
+                        </PartImage>
+                    </Group>
+                </Compare>
+                <Default>
+                    <Group name="enabled_in_active" width="200" height="200" x="0" y="0">
+                        <PartImage x="0" y="0" width="200" height="200">
+                            <Image resource="active-only-image" />
+                        </PartImage>
+                    </Group>
+                </Default>
+            </Condition>
+        </Group>
+    </Scene>
+</WatchFace>

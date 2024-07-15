@@ -1,0 +1,30 @@
+<WatchFace width="450" height="450">
+    <Scene>
+        <Group name="group1" width="450" height="200" x="0" y="0">
+            <PartImage x="0" y="0" width="200" height="200">
+                <Image resource="image1" />
+            </PartImage>
+        </Group>
+
+        <Group name="clock" x="0" y="0" width="360" height="360">
+            <PartText height="30" width="360" x="0" y="200">
+                <Localization timeZone="America/New_York" locales="en_US" calendar="GREGORIAN"/>
+                <Text align="CENTER" ellipsis="TRUE">
+                    <Font family="ariel.ttf" size="17" width="EXTRA_CONDENSED">
+                        <Template>%s (%s:%s)
+                            <Parameter expression="icuBestText(&quot;yyyy MMM d EE a h:mm:ss&quot;)" />
+                            <Parameter expression="icuText(&quot;z&quot;)" />
+                            <Parameter expression="icuText(&quot;O&quot;)" />
+                        </Template>
+                    </Font>
+                </Text>
+            </PartText>
+        </Group>
+
+        <Group name="group2" width="450" height="200" x="0" y="0">
+            <PartImage x="0" y="200" width="200" height="200">
+                <Image resource="image2" />
+            </PartImage>
+        </Group>
+    </Scene>
+</WatchFace>

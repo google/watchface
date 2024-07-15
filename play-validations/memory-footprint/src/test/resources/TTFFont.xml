@@ -1,0 +1,87 @@
+<!--
+Tests that TTF fonts are counted properly
+-->
+<WatchFace height="450" width="450">
+    <UserConfigurations>
+        <ListConfiguration defaultValue="l1-1" displayName="list1" id="l1">
+            <ListOption id="l1-1" />
+            <ListOption id="l1-2" />
+            <ListOption id="l1-3" />
+        </ListConfiguration>
+        <BooleanConfiguration defaultValue="TRUE" displayName="bool1" id="b1" />
+    </UserConfigurations>
+    <Scene>
+        <ListConfiguration id="l1">
+            <ListOption id="l1-1">
+                <PartText height="200" width="200" x="0" y="0" name="l1-1-text">
+                    <Localization calendar="GREGORIAN" locales="en_US" timeZone="America/New_York" />
+                    <Text align="CENTER" ellipsis="TRUE">
+                        <Font family="list1-font1.ttf" size="17" width="EXTRA_CONDENSED">
+                            Lorem Ipsum
+                        </Font>
+                    </Text>
+                </PartText>
+            </ListOption>
+            <ListOption id="l1-2">
+                <PartText height="200" width="200" x="0" y="0" name="l1-2-text">
+                    <Localization calendar="GREGORIAN" locales="en_US" timeZone="America/New_York" />
+                    <Text align="CENTER" ellipsis="TRUE">
+                        <Font family="list1-font2.ttf" size="17" width="EXTRA_CONDENSED">
+                            Lorem Ipsum
+                        </Font>
+                    </Text>
+                </PartText>
+            </ListOption>
+            <ListOption id="l1-3">
+                <PartText height="200" width="200" x="0" y="0" name="l1-3-text">
+                    <Localization calendar="GREGORIAN" locales="en_US" timeZone="America/New_York" />
+                    <Text align="CENTER" ellipsis="TRUE">
+                        <Font family="list1-font3.ttf" size="17" width="EXTRA_CONDENSED">
+                            Lorem Ipsum
+                        </Font>
+                    </Text>
+                </PartText>
+            </ListOption>
+        </ListConfiguration>
+        <BooleanConfiguration id="b1">
+            <BooleanOption id="TRUE">
+                <PartText height="100" width="200" x="0" y="300" name="b1-1-text">
+                    <Localization calendar="GREGORIAN" locales="en_US" timeZone="America/New_York" />
+                    <Text align="CENTER" ellipsis="TRUE">
+                        <Font family="bool1-font1.ttf" size="17" width="EXTRA_CONDENSED">
+                            Lorem Ipsum
+                        </Font>
+                    </Text>
+                </PartText>
+            </BooleanOption>
+            <BooleanOption id="FALSE">
+                <PartText height="100" width="200" x="0" y="300" name="b1-2-text">
+                    <Localization calendar="GREGORIAN" locales="en_US" timeZone="America/New_York" />
+                    <Text align="CENTER" ellipsis="TRUE">
+                        <Font family="bool1-font2.ttf" size="17" width="EXTRA_CONDENSED">
+                            Lorem Ipsum
+                        </Font>
+                    </Text>
+                </PartText>
+            </BooleanOption>
+        </BooleanConfiguration>
+        <PartText height="100" width="200" x="0" y="400" alpha="0" name="free-text-1">
+            <Variant mode="AMBIENT" target="alpha" value="255" />
+            <Localization calendar="GREGORIAN" locales="en_US" timeZone="America/New_York" />
+            <Text align="CENTER" ellipsis="TRUE">
+                <Font family="font-in-ambient.ttf" size="17" width="EXTRA_CONDENSED">
+                    Lorem Ipsum
+                </Font>
+            </Text>
+        </PartText>
+        <PartText height="100" width="200" x="0" y="400" name="free-text-2">
+            <Variant mode="AMBIENT" target="alpha" value="0" />
+            <Localization calendar="GREGORIAN" locales="en_US" timeZone="America/New_York" />
+            <Text align="CENTER" ellipsis="TRUE">
+                <Font family="font-in-active.ttf" size="17" width="EXTRA_CONDENSED">
+                    Lorem Ipsum
+                </Font>
+            </Text>
+        </PartText>
+    </Scene>
+</WatchFace>

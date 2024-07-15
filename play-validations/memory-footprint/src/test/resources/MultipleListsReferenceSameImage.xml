@@ -1,0 +1,74 @@
+<!--
+Tests that the algorithm works well when multiple lists reference the same image resource. Once the
+biggest, duplicated image is matched by one list, it is not matched again by the second list, but
+the second to biggest size image set is picked up. This also tests that when a list option has
+multiple image resources, they are all counted.
+
+The possible image sets are:
+- [list1-option1-list2-option2, list2-option1] = [128 + 8]
+- [list1-option1-list2-option2, list2-option2-image2] = [128 + 2]
+- [list1-option1-list2-option2, list2-option3] = [128 +
+
+- [list1-option2, list2-option1] = [64 + 8]
+- [list1-option2, list1-option1-list2-option2, list2-option2-image2] = [64 + 128 + 2]
+- [list1-option2, list2-option3] = [64 + 4]
+
+- [list1-option3, list2-option1] = [32 + 8]
+- [list1-option3, list1-option1-list2-option2, list2-option2-image2] = [32 + 128 + 2]
+- [list1-option3, list2-option3] = [32 + 4]
+-->
+<WatchFace width="450" height="450">
+    <UserConfigurations>
+        <ListConfiguration id="l1" displayName="list1" defaultValue="l1-1">
+            <ListOption id="l1-1" />
+            <ListOption id="l1-2" />
+            <ListOption id="l1-3" />
+        </ListConfiguration>
+        <ListConfiguration id="l2" displayName="list2" defaultValue="l2-1">
+            <ListOption id="l2-1" />
+            <ListOption id="l2-2" />
+            <ListOption id="l2-3" />
+        </ListConfiguration>
+    </UserConfigurations>
+    <Scene>
+        <ListConfiguration id="l1">
+            <ListOption id="l1-1">
+                <PartImage x="0" y="0" width="300" height="100">
+                    <Image resource="list1-option1-list2-option2" />
+                </PartImage>
+            </ListOption>
+            <ListOption id="l1-2">
+                <PartImage x="0" y="0" width="300" height="100">
+                    <Image resource="list1-option2" />
+                </PartImage>
+            </ListOption>
+            <ListOption id="l1-3">
+                <PartImage x="0" y="0" width="300" height="100">
+                    <Image resource="list1-option3" />
+                </PartImage>
+            </ListOption>
+        </ListConfiguration>
+        <ListConfiguration id="l2">
+            <ListOption id="l2-1">
+                <PartImage x="0" y="100" width="300" height="100">
+                    <Image resource="list2-option1" />
+                </PartImage>
+            </ListOption>
+            <ListOption id="l2-2">
+                <Group name="group" x="0" y="100" width="300" height="200">
+                    <PartImage x="0" y="0" width="300" height="100">
+                        <Image resource="list1-option1-list2-option2" />
+                    </PartImage>
+                    <PartImage x="0" y="100" width="300" height="100">
+                        <Image resource="list2-option2-image2" />
+                    </PartImage>
+                </Group>
+            </ListOption>
+            <ListOption id="l2-3">
+                <PartImage x="0" y="400" width="300" height="100">
+                    <Image resource="list2-option3" />
+                </PartImage>
+            </ListOption>
+        </ListConfiguration>
+    </Scene>
+</WatchFace>

@@ -1,0 +1,70 @@
+<WatchFace width="450" height="450">
+    <BitmapFonts>
+        <BitmapFont name="digital-clock">
+            <Character height="32" name="0" resource="char-0" width="20" />
+            <Character height="32" name="1" resource="char-1" width="20" />
+            <Character height="32" name="2" resource="char-2" width="20" />
+            <Character height="32" name="3" resource="char-3" width="20" />
+            <Character height="32" name="4" resource="char-4" width="20" />
+            <Character height="32" name="5" resource="char-5" width="20" />
+            <Character height="32" name="6" resource="char-6" width="20" />
+            <Character height="32" name="7" resource="char-7" width="20" />
+            <Character height="32" name="8" resource="char-8" width="20" />
+            <Character height="32" name="9" resource="char-9" width="20" />
+        </BitmapFont>
+    </BitmapFonts>
+    <Scene>
+        <Group name="group1" width="450" height="200" x="0" y="0">
+            <PartImage x="0" y="0" width="200" height="200">
+                <Image resource="image1" />
+            </PartImage>
+        </Group>
+
+        <AnalogClock x="205" y="47" width="200" height="200">
+            <Localization timeZone="SYNC_TO_DEVICE" />
+            <HourHand resource="hour-hand" x="88" y="0" width="25" height="200" pivotX="0.5" pivotY="0.5"/>
+            <MinuteHand resource="minute-hand" x="88" y="0" width="25" height="200" pivotX="0.5" pivotY="0.5"/>
+            <SecondHand resource="second-hand" x="88" y="0" width="25" height="200" pivotX="0.5" pivotY="0.5">
+                <Variant mode="AMBIENT" target="alpha" value="0"/>
+                <Variant mode="AMBIENT" target="angle" value="0"/>
+                <Variant mode="AMBIENT" target="width" value="0"/>
+                <Variant mode="AMBIENT" target="height" value="0"/>
+                <Variant mode="AMBIENT" target="x" value="25 / 2"/>
+                <Variant mode="AMBIENT" target="y" value="200 / 2"/>
+                <Tick duration="0.2" strength="0.5" />
+            </SecondHand>
+        </AnalogClock>
+
+        <Group name="group2" width="450" height="200" x="0" y="0">
+            <PartImage x="0" y="200" width="200" height="200">
+                <Image resource="image2" />
+            </PartImage>
+        </Group>
+
+        <DigitalClock>
+            <Localization calendar="GREGORIAN" />
+            <TimeText format="hh:mm">
+                <BitmapFont family="digital-clock" size="23" color="#FFFFFF"/>
+            </TimeText>
+        </DigitalClock>
+
+        <Group name="group3" width="450" height="200" x="0" y="0">
+            <PartImage x="0" y="200" width="200" height="200">
+                <Image resource="image3" />
+            </PartImage>
+        </Group>
+
+        <DigitalClock>
+            <Localization calendar="GREGORIAN" />
+            <TimeText format="hh:mm">
+                <BitmapFont family="digital-clock" size="23" color="#FFFFFF"/>
+            </TimeText>
+        </DigitalClock>
+
+        <Group name="group4" width="450" height="200" x="0" y="0">
+            <PartImage x="0" y="200" width="200" height="200">
+                <Image resource="image4" />
+            </PartImage>
+        </Group>
+    </Scene>
+</WatchFace>

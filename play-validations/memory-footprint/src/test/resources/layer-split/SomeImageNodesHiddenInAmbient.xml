@@ -1,0 +1,32 @@
+<WatchFace width="450" height="450">
+    <Scene>
+        <Group name="group1" width="450" height="200" x="0" y="0">
+            <Variant mode="AMBIENT" target="alpha" value="0" />
+            <PartImage x="0" y="0" width="200" height="200">
+                <Image resource="image1" />
+            </PartImage>
+        </Group>
+
+        <DigitalClock>
+            <Image resource="digital-clock-1" />
+        </DigitalClock>
+
+        <Group name="group2" width="450" height="200" x="0" y="0">
+            <Variant mode="AMBIENT" target="alpha" value="0" />
+            <PartImage x="0" y="200" width="200" height="200">
+                <Image resource="image2" />
+            </PartImage>
+        </Group>
+
+        <DigitalClock>
+            <Image resource="digital-clock-2" />
+        </DigitalClock>
+
+        <Group name="group3" width="450" height="200" x="0" y="0">
+            <Variant mode="AMBIENT" target="alpha" value="50" />
+            <PartImage x="0" y="200" width="200" height="200">
+                <Image resource="image3" />
+            </PartImage>
+        </Group>
+    </Scene>
+</WatchFace>

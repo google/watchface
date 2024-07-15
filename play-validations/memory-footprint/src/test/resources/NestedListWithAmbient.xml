@@ -1,0 +1,28 @@
+<!--
+Checks that an ambient dependent resource is counted properly when it is inside a ListOption.
+-->
+<WatchFace width="450" height="450">
+    <UserConfigurations>
+        <ListConfiguration id="l1">
+            <ListOption id="l1-1" />
+            <ListOption id="l1-2" />
+            <ListOption id="l1-3" />
+        </ListConfiguration>
+    </UserConfigurations>
+    <Scene>
+        <ListConfiguration id="l1">
+            <ListOption id="l1-1">
+                <Image resource="img1" />
+            </ListOption>
+            <ListOption id="l1-2">
+                <Image resource="img2" />
+            </ListOption>
+            <ListOption id="l1-3">
+                <Group>
+                    <Variant mode="AMBIENT" target="alpha" value="0" />
+                    <Image resource="img3" />
+                </Group>
+            </ListOption>
+        </ListConfiguration>
+    </Scene>
+</WatchFace>

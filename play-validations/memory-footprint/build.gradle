@@ -26,6 +26,10 @@ dependencies {
     implementation 'commons-cli:commons-cli:1.5.0'
     implementation 'com.android.tools.apkparser:binary-resources:31.4.0'
     implementation project(':validator')
+
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'com.google.truth:truth:1.1.5'
+    testImplementation 'com.google.jimfs:jimfs:1.3.0'
 }
 
 compileJava {
@@ -50,11 +54,11 @@ jar {
         attributes "Main-Class": "com.google.wear.watchface.dfx.memory.ResourceMemoryEvaluator"
         // Use `gradle :memory-footprint:jar -Dmemory-footprint.git_hash=$(git rev-parse --short HEAD)` to store
         // the current build's hash in the manifest file.
-        if(System.getProperty("memory-footprint.git_hash")) {
-          attributes "Git-Hash": System.getProperty("memory-footprint.git_hash")
+        if (System.getProperty("memory-footprint.git_hash")) {
+            attributes "Git-Hash": System.getProperty("memory-footprint.git_hash")
         }
-        if(System.getProperty("memory-footprint.version")) {
-          attributes "Version": System.getProperty("memory-footprint.version")
+        if (System.getProperty("memory-footprint.version")) {
+            attributes "Version": System.getProperty("memory-footprint.version")
         }
     }
 
@@ -82,8 +86,17 @@ java {
 
 test {
     testLogging {
-        outputs.upToDateWhen {false}
+        outputs.upToDateWhen { false }
+        events "passed", "skipped", "failed"
         showStandardStreams = true
         exceptionFormat = "full"
     }
+
+    // build the artifacts needed for the ResourceMemoryEvaluatorTest.GoldenTest
+    dependsOn(
+            "test-samples:sample-wf:bundleRelease",
+            "test-samples:sample-wf:assembleRelease",
+            "test-samples:sample-wf:unpackBundle",
+            "test-samples:sample-wf:zipApk"
+    )
 }

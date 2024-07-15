@@ -1,0 +1,176 @@
+<Watchface width="450" height="450" shape="CIRCLE" schemeVersion="1.1.1">
+    <Metadata key="CLOCK_TYPE" value="ANALOG" />
+    <Metadata key="TICK_PER_SECOND" value="15" />
+    <Metadata key="PREVIEW_TIME" value="10:08:32" />
+    <BitmapFonts>
+        <BitmapFont name="hrs">
+            <Character name="0" resource="bitmap_font_0" width="64" height="120" />
+            <Character name="1" resource="bitmap_font_1" width="64" height="120" />
+            <Character name="2" resource="bitmap_font_2" width="64" height="120" />
+            <Character name="3" resource="bitmap_font_3" width="64" height="120" />
+            <Character name="4" resource="bitmap_font_4" width="64" height="120" />
+            <Character name="5" resource="bitmap_font_5" width="64" height="120" />
+            <Character name="6" resource="bitmap_font_6" width="64" height="120" />
+            <Character name="7" resource="bitmap_font_7" width="64" height="120" />
+            <Character name="8" resource="bitmap_font_8" width="64" height="120" />
+            <Character name="9" resource="bitmap_font_9" width="64" height="120" />
+        </BitmapFont>
+    </BitmapFonts>
+    <Complications>
+        <Complication id="0" defaultProvider="STEP_COUNT" defaultType="SHORT_TEXT" supportedType="SHORT_TEXT" customizable="TRUE" x="159" y="292" width="129" height="78" />
+    </Complications>
+    <UserConfigurations>
+        <ListConfiguration id="l1" displayName="SET 1" defaultValue="0" icon="l1_icon" description="Style of SET 1">
+            <ListOption id="0" icon="l1_0_icon" displayName="SET 1 0" />
+            <ListOption id="1" icon="l1_1_icon" displayName="SET 1 1" />
+        </ListConfiguration>
+        <ListConfiguration id="l2" displayName="SET 2" defaultValue="0" icon="l2_icon" description="Style of SET 2">
+            <ListOption id="0" icon="l2_0_icon" displayName="SET 2 0" />
+            <ListOption id="1" icon="l2_1_icon" displayName="SET 2 1" />
+            <ListOption id="2" icon="l2_2_icon" displayName="SET 2 2" />
+        </ListConfiguration>
+        <ListConfiguration id="l3" displayName="SET 3" defaultValue="0" icon="l3_0_icon" description="Style of SET 3">
+            <ListOption id="0" icon="l3_0_icon" displayName="SET 3 0" />
+            <ListOption id="1" icon="l3_1_icon" displayName="SET 3 1" />
+            <ListOption id="2" icon="l3_2_icon" displayName="SET 3 2" />
+        </ListConfiguration>
+    </UserConfigurations>
+    <Scene backgroundColor="#ffe1b1b1" ambientBackgroundColor="#ff000000">
+        <Group name="rootGroup" x="0" y="0" width="450" height="450" angle="0" pivotX="0.5" pivotY="0.5">
+            <Group x="0" y="0" width="450" height="450" name="optimizedGroup_28ea" angle="0" pivotX="0.5" pivotY="0.5">
+                <Group x="0" y="0" width="450" height="450" name="baitian_7ca8" angle="0" pivotX="0.5" pivotY="0.5" hint="IMAGE" alpha="255" alphaAmbient="0">
+                    <ListConfiguration id="l2">
+                        <ListOption id="0">
+                            <PartImage x="0" y="0" width="450" height="450" angle="0" pivotX="0.5" pivotY="0.5" hint="IMAGE">
+                                <Image resource="image_1" />
+                            </PartImage>
+                        </ListOption>
+                        <ListOption id="1">
+                            <PartImage x="0" y="0" width="450" height="450" angle="0" pivotX="0.5" pivotY="0.5" hint="IMAGE">
+                                <Image resource="image_2" />
+                            </PartImage>
+                        </ListOption>
+                        <ListOption id="2">
+                            <PartImage x="0" y="0" width="450" height="450" angle="0" pivotX="0.5" pivotY="0.5" hint="IMAGE">
+                                <Image resource="image_3" />
+                            </PartImage>
+                        </ListOption>
+                    </ListConfiguration>
+                </Group>
+                <Group x="34" y="34" width="383" height="383" name="dian_6d88" angle="0" pivotX="0.5" pivotY="0.5" hint="IMAGE">
+                    <ListConfiguration id="l3">
+                        <ListOption id="0">
+                            <PartImage x="0" y="0" width="383" height="383" angle="0" pivotX="0.5" pivotY="0.5" hint="IMAGE">
+                                <Image resource="image_4" />
+                            </PartImage>
+                        </ListOption>
+                        <ListOption id="1">
+                            <PartImage x="0" y="0" width="383" height="383" name="dian_6d88" angle="0" pivotX="0.5" pivotY="0.5" hint="IMAGE">
+                                <Image resource="image_5" />
+                            </PartImage>
+                        </ListOption>
+                        <ListOption id="2">
+                            <PartImage x="0" y="0" width="383" height="383" name="dian_6d88" angle="0" pivotX="0.5" pivotY="0.5" hint="IMAGE">
+                                <Image resource="image_6" />
+                            </PartImage>
+                        </ListOption>
+                    </ListConfiguration>
+                </Group>
+            </Group>
+            <Group x="65" y="65" width="320" height="320" name="baitian sec_d86e" angle="0" pivotX="0.5" pivotY="0.5" hint="PROGRESS_BAR_CIRCULAR" alpha="255" alphaAmbient="0">
+                <PartDraw x="0" y="0" width="320" height="320" name="baitian sec_d86e" angle="0" pivotX="0.5" pivotY="0.5" hint="PROGRESS_BAR_CIRCULAR">
+                    <DrawArc direction="CLOCKWISE" style="STROKE" cap="ROUND" startAngle="0" endAngle="359.999" thickness="2">
+                        <Color r="255" g="255" b="255" a="0" />
+                    </DrawArc>
+                </PartDraw>
+                <PartDraw x="0" y="0" width="320" height="320" name="baitian sec_d86e" angle="0" pivotX="0.5" pivotY="0.5" hint="PROGRESS_BAR_CIRCULAR">
+                    <DrawArc direction="CLOCKWISE" style="STROKE" cap="ROUND" startAngle="0" endAngle="0" thickness="2">
+                        <Transform target="endAngle" value="0 + (((clamp((0 + [SECOND]), 0, 60) - 0) / (60 - 0)) * (360))" />
+                        <Color r="255" g="255" b="255" a="255" />
+                    </DrawArc>
+                </PartDraw>
+            </Group>
+            <Group x="223" y="114" width="5" height="222" name="baitian Hour_6525" angle="0" pivotX="0.5" pivotY="0.5" hint="ANALOG_HANDS_HOUR_MIN" alpha="255" alphaAmbient="0">
+                <ListConfiguration id="l1">
+                    <ListOption id="0">
+                        <PartImage x="0" y="0" width="5" height="222" name="baitian Hour_6525" angle="0" pivotX="0.5" pivotY="0.5" hint="ANALOG_HANDS_HOUR_MIN">
+                            <Transform target="angle" value="0 + (clamp([HOUR_0_23_MINUTE], 0, 24) + 0 - 0) * 30 * (1)" />
+                            <Image resource="image_minute_hand_1" />
+                        </PartImage>
+                    </ListOption>
+                    <ListOption id="1">
+                        <PartImage x="0" y="0" width="5" height="222" name="baitian Hour_6525" angle="0" pivotX="0.5" pivotY="0.5" hint="ANALOG_HANDS_HOUR_MIN">
+                            <Transform target="angle" value="0 + (clamp([HOUR_0_23_MINUTE], 0, 24) + 0 - 0) * 30 * (1)" />
+                            <Image resource="image_minute_hand_2" />
+                        </PartImage>
+                    </ListOption>
+                </ListConfiguration>
+            </Group>
+            <PartImage x="223" y="58" width="5" height="334" name="baitian Minute_ec08" angle="0" pivotX="0.5" pivotY="0.5" hint="ANALOG_HANDS_MIN_SEC" alpha="255" alphaAmbient="0">
+                <Transform target="angle" value="0 + (clamp([MINUTE_SECOND], 0, 60) + 0 - 0) * 6 * (1)" />
+                <Image resource="image_second_hand" />
+            </PartImage>
+            <Condition>
+                <Expressions>
+                    <Expression name="isProviderSelected"><![CDATA[[COMPLICATION.0.TYPE] != NOT_CONFIGURED && [COMPLICATION.0.TYPE] != EMPTY]]></Expression>
+                </Expressions>
+                <Compare expression="isProviderSelected">
+                    <Group x="159" y="292" width="129" height="78" name="Short Text Complication_58ef" angle="0" pivotX="0.5" pivotY="0.5" id="COMPLICATION.0" hint="COMPLICATION_SHORT_TEXT">
+                        <Effect>
+                            <FilterColor r="58" g="69" b="65" a="255" />
+                        </Effect>
+                        <TouchAction actionId="TAP_0" type="TAP" />
+                        <Launch target="COMPLICATION.0" actionBy="TAP_0" />
+                        <PartText x="0" y="0" width="129" height="44" name="Text_b7b9" angle="0" pivotX="0.5" pivotY="0.5" hint="TEXT">
+                            <Text align="CENTER" ellipsis="TRUE">
+                                <Font family="SYNC_TO_DEVICE" size="36" weight="NORMAL" slant="NORMAL">
+                                    <Color r="255" g="255" b="255" a="255">
+                                        <Template>%s
+                                            <Parameter expression="[COMPLICATION.0.TEXT]" />
+                                        </Template>
+                                    </Color>
+                                </Font>
+                            </Text>
+                        </PartText>
+                        <PartText x="16" y="50" width="97" height="28" name="Title_bd89" angle="0" pivotX="0.5" pivotY="0.5" hint="TEXT">
+                            <Text align="CENTER" ellipsis="TRUE">
+                                <Font family="SYNC_TO_DEVICE" size="23" weight="NORMAL" slant="NORMAL">
+                                    <Color r="173" g="173" b="173" a="255">
+                                        <Template>%s
+                                            <Parameter expression="[COMPLICATION.0.TITLE]" />
+                                        </Template>
+                                    </Color>
+                                </Font>
+                            </Text>
+                        </PartText>
+                    </Group>
+                </Compare>
+            </Condition>
+            <PartImage x="0" y="0" width="450" height="450" name="AOD_1b0b" angle="0" pivotX="0.5" pivotY="0.5" hint="IMAGE" alpha="0" alphaAmbient="255">
+                <Effect>
+                    <FilterColor r="145" g="207" b="174" a="255" />
+                </Effect>
+                <Image resource="image_ambient_1" />
+            </PartImage>
+            <PartImage x="223" y="114" width="5" height="222" name="AODHour 4_e9f5" angle="0" pivotX="0.5" pivotY="0.5" hint="ANALOG_HANDS_HOUR_MIN" alpha="0" alphaAmbient="255">
+                <Effect>
+                    <FilterColor r="187" g="219" b="203" a="255" />
+                </Effect>
+                <Transform target="angle" value="0 + (clamp([HOUR_0_23_MINUTE], 0, 24) + 0 - 0) * 30 * (1)" />
+                <Image resource="image_hour_hand_ambient" />
+            </PartImage>
+            <PartText x="233" y="82" width="159" height="133" name="hh copy_76ac" angle="0" pivotX="0.5" pivotY="0.5" hint="DIGITAL_CLOCK_TIME">
+                <WorldClock calendar="GREGORIAN" />
+                <Text align="CENTER" ellipsis="FALSE">
+                    <BitmapFont family="hrs" size="120">
+                        <Color r="255" g="255" b="255" a="191">
+                            <Template>%s
+                                <Parameter expression="[HOUR_1_12_MINUTE]" />
+                            </Template>
+                        </Color>
+                    </BitmapFont>
+                </Text>
+            </PartText>
+        </Group>
+    </Scene>
+</Watchface>

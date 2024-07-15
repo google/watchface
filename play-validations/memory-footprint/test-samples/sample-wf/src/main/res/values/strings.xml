@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">MemorySample</string>
+    <string name="hand">Hand</string>
+    <string name="hand_option_1">Hand 1</string>
+    <string name="hand_option_2">Hand 2</string>
+</resources>

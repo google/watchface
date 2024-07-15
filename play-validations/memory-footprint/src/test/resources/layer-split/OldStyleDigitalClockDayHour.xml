@@ -1,0 +1,29 @@
+<WatchFace width="450" height="450">
+    <Scene>
+        <Group name="group1" width="450" height="200" x="0" y="0">
+            <PartImage x="0" y="0" width="200" height="200">
+                <Image resource="image1" />
+            </PartImage>
+        </Group>
+
+        <Group name="clock" x="0" y="0" width="360" height="360">
+            <PartText height="30" width="360" x="0" y="80">
+                <Text align="CENTER" ellipsis="TRUE">
+                    <Font family="Ariel" size="20" weight="EXTRA_BOLD">
+                        <OutGlow color="#808000" radius="8">Glow:&#x20;
+                            <Template>value %d
+                                <Parameter expression="[DAY_HOUR]" />
+                            </Template>
+                        </OutGlow>
+                    </Font>
+                </Text>
+            </PartText>
+        </Group>
+
+        <Group name="group2" width="450" height="200" x="0" y="0">
+            <PartImage x="0" y="200" width="200" height="200">
+                <Image resource="image2" />
+            </PartImage>
+        </Group>
+    </Scene>
+</WatchFace>
