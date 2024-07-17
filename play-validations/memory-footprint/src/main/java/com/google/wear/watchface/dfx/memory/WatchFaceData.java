@@ -87,7 +87,7 @@ class WatchFaceData {
 
     /** Creates a WatchFaceData object from a stream of watch face package resources. */
     static WatchFaceData fromResourcesStream(
-            Stream<ArscResource> resources, EvaluationSettings evaluationSettings) {
+            Stream<AndroidResource> resources, EvaluationSettings evaluationSettings) {
         WatchFaceData watchFaceData = new WatchFaceData();
 
         resources.forEach(

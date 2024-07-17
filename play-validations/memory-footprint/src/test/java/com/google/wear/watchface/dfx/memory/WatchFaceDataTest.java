@@ -61,7 +61,7 @@ public class WatchFaceDataTest {
 
     @Test
     public void fromResourcesStream_createsPackageFromLinuxPaths() {
-        Stream<InputPackage.PackageFile> packageFileStream =
+        Stream<AndroidResource> packageFileStream =
                 TEST_FILES.stream().map(this::readPackageFile);
 
         WatchFaceData watchFaceData =
@@ -74,7 +74,7 @@ public class WatchFaceDataTest {
     @Test
     public void fromResourcesStream_createsPackageFromWindowsPaths() throws Exception {
         try (FileSystem windowsFs = Jimfs.newFileSystem(Configuration.windows())) {
-            Stream<InputPackage.PackageFile> packageFileStream =
+            Stream<AndroidResource> packageFileStream =
                     TEST_FILES.stream().map(x -> readWindowsPackageFile(x, windowsFs));
 
             WatchFaceData watchFaceData =
@@ -85,7 +85,7 @@ public class WatchFaceDataTest {
         }
     }
 
-    private InputPackage.PackageFile readPackageFile(String path) throws RuntimeException {
+    private AndroidResource readPackageFile(String path) throws RuntimeException {
         Path rootPath = Paths.get(TEST_PACKAGE_FILES_ROOT);
         Path filePath = Paths.get(TEST_PACKAGE_FILES_ROOT, path);
         byte[] bytes;
@@ -94,10 +94,12 @@ public class WatchFaceDataTest {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        return new InputPackage.PackageFile(rootPath.relativize(filePath), bytes);
+        return AndroidResource.fromPath(
+                rootPath.relativize(filePath),
+                bytes);
     }
 
-    private InputPackage.PackageFile readWindowsPackageFile(String path, FileSystem fileSystem) {
+    private AndroidResource readWindowsPackageFile(String path, FileSystem fileSystem) {
         Path filePath = Paths.get(TEST_PACKAGE_FILES_ROOT, path);
         byte[] bytes;
         try {
@@ -109,6 +111,8 @@ public class WatchFaceDataTest {
         Path windowsPath =
                 fileSystem.getPath(
                         pathSplits[0], Arrays.copyOfRange(pathSplits, 1, pathSplits.length));
-        return new InputPackage.PackageFile(windowsPath, bytes);
+        return AndroidResource.fromPath(
+                windowsPath,
+                bytes);
     }
 }

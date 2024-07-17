@@ -43,10 +43,10 @@ public class DrawableResourceDetailsTest {
 
     @Test
     public void fromPackageFile_parsesTtfWithExtension() throws Exception {
-        InputPackage.PackageFile ttfFile = readPackageFile("base/res/font/roboto_regular.ttf");
+        AndroidResource ttfFile = readPackageFile("base/res/font/roboto_regular.ttf");
 
         Optional<DrawableResourceDetails> fontDetails =
-                DrawableResourceDetails.fromPackageFile(ttfFile);
+                DrawableResourceDetails.fromPackageResource(ttfFile);
 
         assertThat(fontDetails.isPresent()).isTrue();
         assertThat(fontDetails.get()).isEqualTo(expectedRobotoRegular);
@@ -54,13 +54,13 @@ public class DrawableResourceDetailsTest {
 
     @Test
     public void fromPackageFile_parsesTtfWithoutExtension() throws Exception {
-        InputPackage.PackageFile ttfFile =
+        AndroidResource ttfFile =
                 changePath(
                         readPackageFile("base/res/font/roboto_regular.ttf"),
                         Paths.get("base/res/font/roboto_regular"));
 
         Optional<DrawableResourceDetails> fontDetails =
-                DrawableResourceDetails.fromPackageFile(ttfFile);
+                DrawableResourceDetails.fromPackageResource(ttfFile);
 
         assertThat(fontDetails.isPresent()).isTrue();
         assertThat(fontDetails.get()).isEqualTo(expectedRobotoRegular);
@@ -68,10 +68,10 @@ public class DrawableResourceDetailsTest {
 
     @Test
     public void fromPackageFile_parsesPngWithExtension() throws Exception {
-        InputPackage.PackageFile pngFile = readPackageFile("base/res/drawable-nodpi/dial.png");
+        AndroidResource pngFile = readPackageFile("base/res/drawable-nodpi/dial.png");
 
         Optional<DrawableResourceDetails> pngDetails =
-                DrawableResourceDetails.fromPackageFile(pngFile);
+                DrawableResourceDetails.fromPackageResource(pngFile);
 
         assertThat(pngDetails.isPresent()).isTrue();
         assertThat(pngDetails.get()).isEqualTo(expectedPng);
@@ -79,13 +79,13 @@ public class DrawableResourceDetailsTest {
 
     @Test
     public void fromPackageFile_parsesPngWithoutExtension() throws Exception {
-        InputPackage.PackageFile pngFile =
+        AndroidResource pngFile =
                 changePath(
                         readPackageFile("base/res/drawable-nodpi/dial.png"),
                         Paths.get("base/res/drawable-nodpi/dial"));
 
         Optional<DrawableResourceDetails> pngDetails =
-                DrawableResourceDetails.fromPackageFile(pngFile);
+                DrawableResourceDetails.fromPackageResource(pngFile);
 
         assertThat(pngDetails.isPresent()).isTrue();
         assertThat(pngDetails.get()).isEqualTo(expectedPng);
@@ -95,14 +95,14 @@ public class DrawableResourceDetailsTest {
     public void fromPackageFile_parsesPngFromDifferentQualifierDrawable() throws Exception {
         ImmutableList<String> testFilePaths =
                 ImmutableList.of("base/res/drawable-xhdpi/dial.png", "base/res/drawable/dial.png");
-        InputPackage.PackageFile originalPackageFile =
+        AndroidResource originalPackageFile =
                 readPackageFile("base/res/drawable-nodpi/dial.png");
         for (String testFilePath : testFilePaths) {
-            InputPackage.PackageFile testPackageFile =
+            AndroidResource testPackageFile =
                     changePath(originalPackageFile, Paths.get(testFilePath));
 
             Optional<DrawableResourceDetails> testDrawableDetails =
-                    DrawableResourceDetails.fromPackageFile(testPackageFile);
+                    DrawableResourceDetails.fromPackageResource(testPackageFile);
 
             assertThat(testDrawableDetails.isPresent()).isTrue();
         }
@@ -116,14 +116,14 @@ public class DrawableResourceDetailsTest {
                 ImmutableList.of(
                         "base/res/drawable-nodpi/dial.png", "base/res/font/roboto_regular.ttf");
         for (String testFilePath : testFilePaths) {
-            InputPackage.PackageFile testPackageFile =
+            AndroidResource testPackageFile =
                     changePath(
                             readPackageFile(testFilePath),
                             // drop the module name from the paths
                             dropSections(Paths.get(testFilePath), 1));
 
             Optional<DrawableResourceDetails> testDrawableDetails =
-                    DrawableResourceDetails.fromPackageFile(testPackageFile);
+                    DrawableResourceDetails.fromPackageResource(testPackageFile);
 
             assertThat(testDrawableDetails.isPresent()).isTrue();
         }
@@ -135,16 +135,15 @@ public class DrawableResourceDetailsTest {
         // first component) and APK-style paths, where the module name does not exist
         try (FileSystem windowsFileSystem = Jimfs.newFileSystem(Configuration.windows())) {
             ImmutableList<String> testFilePaths =
-                    ImmutableList.of(
-                            "base/res/drawable-nodpi/dial.png", "base/res/font/roboto_regular.ttf");
+                ImmutableList.of(
+                     "base/res/font/roboto_regular.ttf", "base/res/drawable-nodpi/dial.png");
             for (String testFilePath : testFilePaths) {
-                InputPackage.PackageFile testPackageFile =
-                        changePath(
-                                readPackageFile(testFilePath),
-                                makeWindowsPath(testFilePath, windowsFileSystem));
+                AndroidResource testPackageFile =
+                    changePath(readPackageFile(testFilePath),
+                    makeWindowsPath(testFilePath, windowsFileSystem));
 
                 Optional<DrawableResourceDetails> testDrawableDetails =
-                        DrawableResourceDetails.fromPackageFile(testPackageFile);
+                        DrawableResourceDetails.fromPackageResource(testPackageFile);
 
                 assertThat(testDrawableDetails.isPresent()).isTrue();
             }
@@ -155,13 +154,13 @@ public class DrawableResourceDetailsTest {
     public void fromPackageFile_parsesResourceFromAssetsAndRaw() throws Exception {
         ImmutableList<String> testFilePaths =
                 ImmutableList.of("base/res/drawable-xhdpi/dial.png", "base/res/drawable/dial.png");
-        InputPackage.PackageFile originalFile = readPackageFile("base/res/drawable-nodpi/dial.png");
+        AndroidResource originalFile = readPackageFile("base/res/drawable-nodpi/dial.png");
         for (String testFilePath : testFilePaths) {
-            InputPackage.PackageFile testPackageFile =
+            AndroidResource testPackageFile =
                     changePath(originalFile, Paths.get(testFilePath));
 
             Optional<DrawableResourceDetails> testDrawableDetails =
-                    DrawableResourceDetails.fromPackageFile(testPackageFile);
+                    DrawableResourceDetails.fromPackageResource(testPackageFile);
 
             assertThat(testDrawableDetails.isPresent()).isTrue();
             assertThat(testDrawableDetails.get()).isEqualTo(expectedPng);
@@ -171,24 +170,23 @@ public class DrawableResourceDetailsTest {
     @Test
     public void fromPackageFile_returnsNoneOnNonDrawableResourceFileUnderDrawables()
             throws Exception {
-        InputPackage.PackageFile unexpectedFile =
+        AndroidResource unexpectedFile =
                 changePath(
                         readPackageFile("base/res/xml/watch_face_info.xml"),
                         Paths.get("base/res/drawable/non-image"));
 
         Optional<DrawableResourceDetails> resourceDetailsOptional =
-                DrawableResourceDetails.fromPackageFile(unexpectedFile);
+                DrawableResourceDetails.fromPackageResource(unexpectedFile);
 
         assertThat(resourceDetailsOptional.isPresent()).isFalse();
     }
 
     @Test
     public void fromPackageFile_returnsNoneOnNonDrawableResourceFile() throws Exception {
-        InputPackage.PackageFile unexpectedFile =
-                readPackageFile("base/res/xml/watch_face_info.xml");
+        AndroidResource unexpectedFile = readPackageFile("base/res/xml/watch_face_info.xml");
 
         Optional<DrawableResourceDetails> resourceDetailsOptional =
-                DrawableResourceDetails.fromPackageFile(unexpectedFile);
+                DrawableResourceDetails.fromPackageResource(unexpectedFile);
 
         assertThat(resourceDetailsOptional.isPresent()).isFalse();
     }
@@ -215,14 +213,14 @@ public class DrawableResourceDetailsTest {
         assertThat(eightBppNeeded.canUseRGB565()).isFalse();
     }
 
-    private InputPackage.PackageFile readPackageFile(String originFilePath) throws Exception {
+    private AndroidResource readPackageFile(String originFilePath) throws Exception {
         Path filePath = Paths.get(TEST_PACKAGE_FILES_ROOT, originFilePath);
         byte[] bytes = Files.readAllBytes(filePath);
-        return new InputPackage.PackageFile(Paths.get(originFilePath), bytes);
+        return  AndroidResource.fromPath(filePath, bytes);
     }
 
-    private InputPackage.PackageFile changePath(InputPackage.PackageFile origin, Path newPath) {
-        return new InputPackage.PackageFile(newPath, origin.getData());
+    private AndroidResource changePath(AndroidResource origin, Path newPath) {
+        return AndroidResource.fromPath(newPath, origin.getData());
     }
 
     private Path dropSections(Path path, int count) {
@@ -241,7 +239,7 @@ public class DrawableResourceDetailsTest {
             return fromPackageFile(
                     new InputPackage.PackageFile(
                             FileSystems.getDefault().getPath("res", "drawable", name),
-                            InputPackage.readAllBytes(is)));
+                            AndroidResourceTable.readAllBytes(is)));
         }
     }
 }

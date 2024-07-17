@@ -5,9 +5,7 @@ import static com.google.wear.watchface.dfx.memory.ResourceMemoryEvaluator.evalu
 import static com.google.wear.watchface.dfx.memory.ResourceMemoryEvaluator.evaluateWatchFaceForLayout;
 import static com.google.wear.watchface.dfx.memory.WatchFaceData.SYSTEM_DEFAULT_FONT;
 import static com.google.wear.watchface.dfx.memory.WatchFaceData.SYSTEM_DEFAULT_FONT_SIZE;
-
 import static junit.framework.TestCase.assertEquals;
-
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.junit.runners.Parameterized.Parameter;
@@ -88,6 +86,7 @@ public class ResourceMemoryEvaluatorTest {
             return Stream.of(
                             "unpackedBundle/release",
                             "apk/release/sample-wf-release.apk",
+                            "apk/debug/sample-wf-debug.apk",
                             "bundle/release/sample-wf-release.aab",
                             "zipApk/com.google.wear.watchface.memory.sample.zip")
                     .map(
