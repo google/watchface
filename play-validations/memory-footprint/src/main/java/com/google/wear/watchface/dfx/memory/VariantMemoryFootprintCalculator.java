@@ -68,11 +68,13 @@ class VariantMemoryFootprintCalculator {
      * @return the memory footprint, in bytes, that the watch face consumes under the given variant.
      */
     long evaluateBytes(VariantConfigValue variant) {
+        DrawableNodeConfigTable drawableNodeConfigTable =
+                DrawableNodeConfigTable.create(sceneNode, variant);
         // find the user config keys that are mutually exclusive, meaning that no two keys from
         // different sets are parents of the same resource.
         List<Set<UserConfigKey>> userConfigSplit =
-                ResourceConfigTable.findConfigsForResources(
-                                document, variant, resourceMemoryMap, evaluationSettings)
+                ResourceConfigTable.fromDrawableNodeConfigTable(
+                                drawableNodeConfigTable, resourceCollector, variant)
                         .replaceWithTopLevelKeys(document)
                         .joinRelatedUserConfigKeys();
 
@@ -95,7 +97,7 @@ class VariantMemoryFootprintCalculator {
             return greedyEvaluate(variant);
         }
 
-        return lazyEvaluate(variant, configIterators);
+        return lazyEvaluate(variant, configIterators, drawableNodeConfigTable);
     }
 
     /**
@@ -141,9 +143,9 @@ class VariantMemoryFootprintCalculator {
      * @param configIterators the list of iterators producing mutually-exclusive config sets.
      */
     private long lazyEvaluate(
-            VariantConfigValue variant, List<SizedIterator<UserConfigSet>> configIterators) {
-        DrawableNodeConfigTable drawableNodeConfigTable =
-                DrawableNodeConfigTable.create(sceneNode, variant);
+            VariantConfigValue variant,
+            List<SizedIterator<UserConfigSet>> configIterators,
+            DrawableNodeConfigTable drawableNodeConfigTable) {
 
         long footprintOfResourcesWithConfigs =
                 configIterators.stream()
