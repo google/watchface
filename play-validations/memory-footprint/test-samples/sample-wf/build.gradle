@@ -57,6 +57,9 @@ afterEvaluate {
         dependsOn 'assembleDebug'
         from 'build/outputs/apk/debug'
         include 'sample-wf-debug.apk'
+        dependsOn 'assembleRelease'
+        from 'build/outputs/apk/release'
+        include 'sample-wf-release.apk'
         rename {
             'com.google.wear.watchface.memory.sample-base-split.apk'
         }

@@ -6,6 +6,7 @@ import static com.google.wear.watchface.dfx.memory.ResourceMemoryEvaluator.evalu
 import static com.google.wear.watchface.dfx.memory.WatchFaceData.SYSTEM_DEFAULT_FONT;
 import static com.google.wear.watchface.dfx.memory.WatchFaceData.SYSTEM_DEFAULT_FONT_SIZE;
 import static junit.framework.TestCase.assertEquals;
+
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.junit.runners.Parameterized.Parameter;

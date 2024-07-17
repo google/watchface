@@ -43,6 +43,7 @@ public class DrawableResourceDetailsTest {
 
     @Test
     public void fromPackageFile_parsesTtfWithExtension() throws Exception {
+
         AndroidResource ttfFile = readPackageFile("base/res/font/roboto_regular.ttf");
 
         Optional<DrawableResourceDetails> fontDetails =
@@ -54,6 +55,7 @@ public class DrawableResourceDetailsTest {
 
     @Test
     public void fromPackageFile_parsesTtfWithoutExtension() throws Exception {
+
         AndroidResource ttfFile =
                 changePath(
                         readPackageFile("base/res/font/roboto_regular.ttf"),
