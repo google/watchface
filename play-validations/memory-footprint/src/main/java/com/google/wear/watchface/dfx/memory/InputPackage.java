@@ -16,20 +16,12 @@
 
 package com.google.wear.watchface.dfx.memory;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Iterator;
 import java.util.Optional;
-import java.util.Spliterator;
-import java.util.Spliterators;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
@@ -40,12 +32,35 @@ import java.util.zip.ZipInputStream;
  * the package.
  */
 interface InputPackage extends AutoCloseable {
+    /** Represents a file in a watch face package (apk or aab). */
+    class PackageFile {
+
+        private final Path filePath;
+
+        private final byte[] data;
+
+        PackageFile(Path filePath, byte[] data) {
+            this.filePath = filePath;
+            this.data = data;
+        }
+
+        /** File path relative to the root of the declarative watch face package. */
+        public Path getFilePath() {
+            return filePath;
+        }
+
+        /** File raw data. */
+        public byte[] getData() {
+            return data;
+        }
+    }
+
     /**
      * Returns a stream of resource representations form the watch face package. The stream must not
      * be consumed more than once. The InputPackage must be closed only after consuming the stream
      * of files.
      */
-    Stream<ArscResource> getWatchFaceFiles();
+    Stream<AndroidResource> getWatchFaceFiles();
 
     /** Close the backing watch face package resource. */
     void close();
@@ -59,8 +74,12 @@ interface InputPackage extends AutoCloseable {
         }
         if (packageFile.isDirectory()) {
             return openFromAabDirectory(packageFile);
-        } else if (packagePath.endsWith("aab") || packagePath.endsWith("apk")) {
-            return openFromAndroidPackage(packagePath);
+        } else if (packagePath.endsWith("zip")) {
+            return openFromMokkaZip(packagePath);
+        } else if (packagePath.endsWith("aab")) {
+            return openFromAabFile(packagePath);
+        } else if (packagePath.endsWith("apk")) {
+            return openFromApkFile(packagePath);
         } else {
             throw new IllegalArgumentException("Incorrect file type");
         }
@@ -70,13 +89,13 @@ interface InputPackage extends AutoCloseable {
      * Creates an input package from a directory containing the structure of a Declarative Watch
      * Face AAB. Each file is relative to the base module of the directory.
      */
-    static InputPackage openFromAabDirectory(File aabDirectory) throws IOException {
+    static InputPackage openFromAabDirectory(File aabDirectory) {
         Path rootPath = aabDirectory.toPath();
         return new InputPackage() {
             @Override
-            public Stream<ArscResource> getWatchFaceFiles() {
+            public Stream<AndroidResource> getWatchFaceFiles() {
                 try {
-                    ArscTable table = ArscTable.createFromAabDirectory(rootPath);
+                    AndroidResourceTable table = AndroidResourceTable.createFromAabDirectory(rootPath);
                     return table.getAllResources().stream();
                 } catch (IOException e) {
                     throw new RuntimeException(e);
@@ -91,16 +110,15 @@ interface InputPackage extends AutoCloseable {
     }
 
     /**
-     * Creates an input package from a declarative watch face AAB. Each file is relative to the base
-     * module of the app bundle. Every other module will be ignored.
+     * Creates an input package from a declarative watch face APK.
      */
-    static InputPackage openFromAndroidPackage(String aabPath) throws IOException {
-        final ZipFile zipFile = new ZipFile(aabPath);
+    static InputPackage openFromApkFile(String apkPath) throws IOException {
+        final ZipFile zipFile = new ZipFile(apkPath);
         return new InputPackage() {
             @Override
-            public Stream<ArscResource> getWatchFaceFiles() {
+            public Stream<AndroidResource> getWatchFaceFiles() {
                 try {
-                    ArscTable table = ArscTable.createFromAndroidPackage(zipFile);
+                    AndroidResourceTable table = AndroidResourceTable.createFromApkFile(zipFile);
                     return table.getAllResources().stream();
                 } catch (IOException e) {
                     throw new RuntimeException(e);
@@ -116,5 +134,78 @@ interface InputPackage extends AutoCloseable {
                 }
             }
         };
+    }
+
+    /**
+     * Creates an input package from a declarative watch face AAB. Each file is relative to the base
+     * module of the app bundle. Every other module will be ignored.
+     */
+    static InputPackage openFromAabFile(String aabPath) throws IOException {
+        final ZipFile zipFile = new ZipFile(aabPath);
+        return new InputPackage() {
+            @Override
+            public Stream<AndroidResource> getWatchFaceFiles() {
+                AndroidResourceTable table = AndroidResourceTable.createFromAabFile(zipFile);
+                return table.getAllResources().stream();
+            }
+
+            @Override
+            public void close() {
+                try {
+                    zipFile.close();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        };
+    }
+
+    /**
+     * Creates an input package from a zip file containing the base split apk, as produced by mokka.
+     * TODO(b/279866804): Ignore this if open sourcing this method to not leak mokka details.
+     */
+    static InputPackage openFromMokkaZip(String zipPath) throws IOException {
+        ZipFile mokkaZip = new ZipFile(zipPath);
+
+        try {
+            Pattern baseSplitPattern = Pattern.compile(".*base[-_]split.*");
+            Optional<? extends ZipEntry> baseSplitApk =
+                    mokkaZip.stream()
+                            .filter(x -> baseSplitPattern.matcher(x.getName()).matches())
+                            .findFirst();
+            if (!baseSplitApk.isPresent()) {
+                throw new InvalidTestRunException("Zip file does not contain a base split apk");
+            }
+            ZipInputStream baseSplitApkZip =
+                    new ZipInputStream(mokkaZip.getInputStream(baseSplitApk.get()));
+
+            return new InputPackage() {
+                @Override
+                public Stream<AndroidResource> getWatchFaceFiles() {
+                    try {
+                        AndroidResourceTable table = AndroidResourceTable.createFromMokkaZip(baseSplitApkZip);
+                        return table.getAllResources().stream();
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+
+                @Override
+                public void close() {
+                    try {
+                        mokkaZip.close();
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            };
+        } catch (Exception e) {
+            mokkaZip.close();
+            throw e;
+        }
+    }
+
+    static boolean pathMatchesGlob(Path path, String glob) {
+        return path.getFileSystem().getPathMatcher("glob:" + glob).matches(path);
     }
 }
