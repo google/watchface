@@ -54,6 +54,7 @@ afterEvaluate {
 
     // create a zip that follows the structure used internally, for tests
     tasks.register('zipApk', Zip) {
+        duplicatesStrategy DuplicatesStrategy.INHERIT
         dependsOn 'assembleDebug'
         from 'build/outputs/apk/debug'
         include 'sample-wf-debug.apk'
