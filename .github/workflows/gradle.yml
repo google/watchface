@@ -64,3 +64,33 @@ jobs:
         with:
           build-root-directory: third_party/wff
           arguments: :specification:validator:build
+  build_wff_optimizer:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout project
+        uses: actions/checkout@v3
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: "17"
+          distribution: "corretto"
+          architecture: "x64"
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          packages: "tools platform-tools build-tools;30.0.3"
+      - name: Get project hash
+        run: |
+          git_hash=$(git rev-parse --short "$GITHUB_SHA")
+          echo "git_hash=$git_hash" >> $GITHUB_ENV
+      - name: Build wff-optimizer.jar
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          build-root-directory: tools
+          arguments: wff-optimizer:jar -Dmemory-footprint.git_hash=${{ env.git_hash }}
+      - name: Test wff-optimizer
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          build-root-directory: tools
+          arguments: wff-optimizer:test
