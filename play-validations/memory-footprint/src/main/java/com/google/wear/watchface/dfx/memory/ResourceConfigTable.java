@@ -16,17 +16,12 @@
 
 package com.google.wear.watchface.dfx.memory;
 
-import static com.google.mu.util.stream.BiStream.biStream;
-import static com.google.wear.watchface.dfx.memory.UserConfigValue.SupportedConfigs.isValidUserConfigNode;
-import static com.google.wear.watchface.dfx.memory.WatchFaceDocuments.findSceneNode;
-import static com.google.wear.watchface.dfx.memory.WatchFaceDocuments.isDrawableNode;
-
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSetMultimap;
-import com.google.common.collect.MultimapBuilder.SetMultimapBuilder;
+import com.google.common.collect.MultimapBuilder;
 import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
 import com.google.common.graph.GraphBuilder;
@@ -35,9 +30,7 @@ import com.google.common.graph.Traverser;
 import com.google.mu.util.stream.BiStream;
 
 import org.w3c.dom.Document;
-import org.w3c.dom.Node;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -89,42 +82,30 @@ import java.util.Set;
  * </ul>
  */
 class ResourceConfigTable {
-    /** Constructs the ResourceConfigTable from a given scene node, under a given variant. */
-    static ResourceConfigTable findConfigsForResources(
-            Document document,
-            VariantConfigValue variant,
-            Map<String, DrawableResourceDetails> resourceMemoryMap,
-            EvaluationSettings evaluationSettings) {
-        return findConfigsForResources(
-                findSceneNode(document),
-                variant,
-                Collections.emptySet(),
-                new WatchFaceResourceCollector(document, resourceMemoryMap, evaluationSettings));
-    }
 
-    private static ResourceConfigTable findConfigsForResources(
-            Node currentNode,
-            VariantConfigValue variant,
-            Set<UserConfigKey> pathSoFar,
-            WatchFaceResourceCollector resourceCollector) {
-        if (isDrawableNode(currentNode)) {
-            // handle leaf
-            Set<String> resources = resourceCollector.collectResources(currentNode);
-            return ResourceConfigTable.fromResourcesAndConfigs(resources, pathSoFar);
+    /**
+     * Constructs the ResourceConfigTable from a given DrawableNodeConfigTable, using the provided
+     * WatchFaceResourceCollector and under the given variant. The DrawableNodeConfigTable contains,
+     * for each node that is being drawn dynamically, the set of user config keys and values that
+     * enables the node for rendering. From this information, we can derive for each actual
+     * resource, the set of user config keys that they depend on.
+     */
+    static ResourceConfigTable fromDrawableNodeConfigTable(
+            DrawableNodeConfigTable drawableNodeConfigTable,
+            WatchFaceResourceCollector resourceCollector,
+            VariantConfigValue variant) {
+        SetMultimap<String, UserConfigKey> keysForResources =
+                MultimapBuilder.hashKeys().hashSetValues().build();
+
+        for (DrawableNodeConfigTable.Entry entry : drawableNodeConfigTable.getAllEntries()) {
+            Set<String> resources = resourceCollector.collectResources(entry.node, variant);
+            Set<UserConfigKey> userConfigKeys = entry.userConfigSet.config.keySet();
+            for (String resource : resources) {
+                keysForResources.putAll(resource, userConfigKeys);
+            }
         }
 
-        if (variant.isNodeSkipped(currentNode)) {
-            return ResourceConfigTable.empty();
-        }
-
-        Set<UserConfigKey> newPath =
-                isValidUserConfigNode(currentNode)
-                        ? plus(pathSoFar, UserConfigKey.fromNode(currentNode))
-                        : pathSoFar;
-
-        return WatchFaceDocuments.childrenStream(currentNode)
-                .map(child -> findConfigsForResources(child, variant, newPath, resourceCollector))
-                .reduce(ResourceConfigTable.empty(), ResourceConfigTable::plus);
+        return new ResourceConfigTable(keysForResources);
     }
 
     private final SetMultimap<String, UserConfigKey> resourceNameToKeys;
@@ -169,18 +150,6 @@ class ResourceConfigTable {
         }
 
         return resultBuilder.build();
-    }
-
-    /**
-     * Computes the union of two ResourceConfigTables. If a resource is present in both tables, then
-     * its value will be the union of its UserConfigSet from the two tables.
-     */
-    ResourceConfigTable plus(ResourceConfigTable other) {
-        SetMultimap<String, UserConfigKey> newMap =
-                SetMultimapBuilder.hashKeys().hashSetValues().build();
-        newMap.putAll(resourceNameToKeys);
-        newMap.putAll(other.resourceNameToKeys);
-        return new ResourceConfigTable(newMap);
     }
 
     /**
@@ -243,25 +212,5 @@ class ResourceConfigTable {
                         .collect(ImmutableSetMultimap::toImmutableSetMultimap);
 
         return new ResourceConfigTable(resourceNameToTopLevelKeys);
-    }
-
-    private static ResourceConfigTable fromResourcesAndConfigs(
-            Set<String> resources, Set<UserConfigKey> path) {
-        SetMultimap<String, UserConfigKey> resourcesToConfigs =
-                biStream(resources)
-                        .flatMapValues(ignored -> path.stream())
-                        .collect(ImmutableSetMultimap::toImmutableSetMultimap);
-
-        return new ResourceConfigTable(resourcesToConfigs);
-    }
-
-    private static ResourceConfigTable empty() {
-        return new ResourceConfigTable(ImmutableSetMultimap.of());
-    }
-
-    private static Set<UserConfigKey> plus(Set<UserConfigKey> set, UserConfigKey element) {
-        HashSet<UserConfigKey> userConfigKeys = new HashSet<>(set);
-        userConfigKeys.add(element);
-        return userConfigKeys;
     }
 }
