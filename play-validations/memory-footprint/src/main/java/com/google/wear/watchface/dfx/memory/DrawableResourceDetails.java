@@ -22,9 +22,7 @@ import static java.lang.Math.abs;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 
-import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
-import java.awt.image.DataBuffer;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.security.MessageDigest;
@@ -34,9 +32,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import javax.imageio.ImageIO;
-import javax.imageio.ImageReadParam;
 import javax.imageio.ImageReader;
-import javax.imageio.ImageTypeSpecifier;
 import javax.imageio.stream.ImageInputStream;
 
 /** Details about a drawable resource that are relevant for the memory footprint calculation. */

@@ -47,8 +47,10 @@ class AmbientMemoryFootprintCalculator {
     private final VariantConfigValue ambientConfigValue;
     private final Document document;
     private final Map<String, DrawableResourceDetails> resourceMemoryMap;
+
     /** Maps a resource to the first resource found with the same sha-1. */
     private final Map<String, String> resourceDedupMap = new HashMap<>();
+
     private final WatchFaceResourceCollector resourceCollector;
     private final EvaluationSettings evaluationSettings;
 
@@ -110,7 +112,8 @@ class AmbientMemoryFootprintCalculator {
                 new PerConfigurationDynamicResources();
         Visitor visitor =
                 new Visitor(
-                        perConfigurationDynamicResources, /* prevNodeIsDrawnDynamically= */ true,
+                        perConfigurationDynamicResources,
+                        /* prevNodeIsDrawnDynamically= */ true,
                         /* numClocks= */ 0);
         visitor.visitNodes(findSceneNode(document));
 
@@ -193,7 +196,7 @@ class AmbientMemoryFootprintCalculator {
                                 ((double) imageBytes) / 1024 / 1024,
                                 details.getWidth(),
                                 details.getHeight(),
-                                details.canUseRGB565() ? "RGB565" : "ARGB8888" );
+                                details.canUseRGB565() ? "RGB565" : "ARGB8888");
                     }
                     total += imageBytes;
                     if (maxResourceSize < imageBytes) {
@@ -210,8 +213,9 @@ class AmbientMemoryFootprintCalculator {
 
             if (evaluationSettings.isVerbose()) {
                 long average = (numResources > 0) ? (maxTotal / numResources) : 0;
-                System.out.printf("Resource count %s average size %s max size %s\n", numResources,
-                        average, maxResourceSize);
+                System.out.printf(
+                        "Resource count %s average size %s max size %s\n",
+                        numResources, average, maxResourceSize);
             }
 
             return maxTotal;
@@ -351,8 +355,11 @@ class AmbientMemoryFootprintCalculator {
                         continue;
                 }
 
-                Visitor visitor = new Visitor(
-                        perConfigurationDynamicResources, prevNodeIsDrawnDynamically, numClocks);
+                Visitor visitor =
+                        new Visitor(
+                                perConfigurationDynamicResources,
+                                prevNodeIsDrawnDynamically,
+                                numClocks);
                 visitor.visitNodes(childNodes.item(i));
 
                 if (maxConfigNumLayers < visitor.numLayers) {
