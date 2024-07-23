@@ -32,6 +32,12 @@ The [Memory footprint evaluator][memory-footprint] allows you to check watch
 faces ahead of submission to Play or to incorporate memory usage checking into
 your tools and processes.
 
+## Watch Face Format optimizer
+
+The [Watch Face Format optimizer][optimizer] is a tool which can be incorporated
+into your work flow to reduce the memory usage of your watch face at runtime, by
+optimizing aspects of your WFF XML and your resources.
+
 ## Samples
 
 For WFF samples, please see the [Wear OS Samples repository][samples] on GitHub.
@@ -49,3 +55,4 @@ Watch Face Format is distributed under the Apache 2.0 license, see the
 [xsd-specs]: third_party/wff/specification/documents/1/
 [xsd-validator]: third_party/wff/README.md
 [wff-features]: https://developer.android.com/training/wearables/wff/features
+[optimizer]: tools/wff-optimizer/
