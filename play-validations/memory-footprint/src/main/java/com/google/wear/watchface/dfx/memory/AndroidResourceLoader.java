@@ -167,8 +167,8 @@ public class AndroidResourceLoader {
             };
 
         return StreamSupport.stream(
-                Spliterators.spliteratorUnknownSize(iterator, Spliterator.ORDERED),
-                false);
+            Spliterators.spliteratorUnknownSize(iterator, Spliterator.ORDERED),
+            false);
     }
 
     /**
@@ -197,31 +197,31 @@ public class AndroidResourceLoader {
         StringPoolChunk stringPool = table.getStringPool();
 
         List<TypeChunk> typeChunks = table.getPackages()
-                .stream()
-                .flatMap(p -> p.getTypeChunks().stream())
-                .toList();
+            .stream()
+            .flatMap(p -> p.getTypeChunks().stream())
+            .toList();
 
         return typeChunks.stream()
-                .flatMap(c -> c.getEntries().values().stream())
-                .filter(t -> RESOURCE_TYPES.contains(t.typeName()))
-                .filter(t -> t.value().type() == BinaryResourceValue.Type.STRING)
-                .map(entry -> {
-                    Path path = Path.of(stringPool.getString(entry.value().data()));
-                    byte[] data = null;
-                    try {
-                        data = zipFile.getInputStream(new ZipEntry(path.toString())).readAllBytes();
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
+            .flatMap(c -> c.getEntries().values().stream())
+            .filter(t -> RESOURCE_TYPES.contains(t.typeName()))
+            .filter(t -> t.value().type() == BinaryResourceValue.Type.STRING)
+            .map(entry -> {
+                Path path = Path.of(stringPool.getString(entry.value().data()));
+                byte[] data = null;
+                try {
+                    data = zipFile.getInputStream(new ZipEntry(path.toString())).readAllBytes();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
 
-                    return new AndroidResource(
-                            entry.parent().getTypeName(),
-                            entry.key(),
-                            Files.getFileExtension(path.toString()),
-                            path,
-                            data
-                    );
-                });
+                return new AndroidResource(
+                        entry.parent().getTypeName(),
+                        entry.key(),
+                        Files.getFileExtension(path.toString()),
+                        path,
+                        data
+                );
+            });
     }
 
     /** Read all bytes from an input stream to a new byte array. */
