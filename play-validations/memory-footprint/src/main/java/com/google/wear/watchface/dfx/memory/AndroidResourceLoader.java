@@ -14,10 +14,14 @@ import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
-import java.util.function.Function;
+import java.util.Spliterator;
+import java.util.Spliterators;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
@@ -52,39 +56,40 @@ public class AndroidResourceTable {
      * @return The constructed table.
      * @throws IOException when the resources file cannot be found, or other IO errors occur.
      */
-    static AndroidResourceTable createFromAabDirectory(Path aabPath) throws IOException {
+    static Stream<AndroidResource> streamFromAabDirectory(Path aabPath) throws IOException {
         Stream<Path> childrenFilesStream = java.nio.file.Files.walk(aabPath);
         ArrayList<AndroidResource> resources = new ArrayList<>();
         int relativePathOffset = aabPath.toString().length() + 1;
 
-        childrenFilesStream
-            .forEach(
+        return childrenFilesStream
+            .map(
                 filePath -> {
+                    AndroidResource resource = null;
                     if (AndroidResource.isValidResourcePath(filePath)) {
                         try {
-                            resources.add(AndroidResource.fromPath(
+                            resource = AndroidResource.fromPath(
                                 Paths.get(filePath.toString().substring(relativePathOffset)),
                                 java.nio.file.Files.readAllBytes(filePath)
-                            ));
+                            );
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         }
                     } else if (filePath.endsWith("manifest/AndroidManifest.xml")) {
                         try {
-                            resources.add(new AndroidResource(
+                            resource = new AndroidResource(
                                 "xml",
                                 "AndroidManifest",
                                 "xml",
                                 Paths.get(filePath.toString().substring(relativePathOffset)),
                                 java.nio.file.Files.readAllBytes(filePath)
-                            ));
+                            );
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         }
                     }
+                    return resource;
                 }
-            );
-        return new AndroidResourceTable(resources);
+            ).filter(Objects::nonNull);
     }
 
     /**
@@ -94,22 +99,22 @@ public class AndroidResourceTable {
      * @return The constructed table.
      * @throws IOException when the resources file cannot be found, or other IO errors occur.
      */
-    static AndroidResourceTable createFromApkFile(ZipFile zipFile) throws IOException {
-        ZipEntry arscEntry = new ZipEntry(RESOURCES_FILE_NAME);
-
-        AndroidResourceTable table;
-        try (InputStream is = zipFile.getInputStream(arscEntry)) {
-            Function<Path, byte[]> fn = (Path path) -> {
-                try {
-                    return zipFile.getInputStream(new ZipEntry(path.toString())).readAllBytes();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            };
-            table = createTable(is, fn);
-        }
-        return table;
-    }
+//    static Stream<AndroidResource> createFromApkFile(ZipFile zipFile) throws IOException {
+//        ZipEntry arscEntry = new ZipEntry(RESOURCES_FILE_NAME);
+//
+//        AndroidResourceTable table;
+//        try (InputStream is = zipFile.getInputStream(arscEntry)) {
+//            Function<Path, byte[]> fn = (Path path) -> {
+//                try {
+//                    return zipFile.getInputStream(new ZipEntry(path.toString())).readAllBytes();
+//                } catch (IOException e) {
+//                    throw new RuntimeException(e);
+//                }
+//            };
+//            table = createTable(is, fn);
+//        }
+//        return table;
+//    }
 
     /**
      * Creates the table from an APK file.
@@ -117,37 +122,38 @@ public class AndroidResourceTable {
      * @param aabZipFile The zip file object representing the APK.
      * @return The constructed table.
      */
-    static AndroidResourceTable createFromAabFile(ZipFile aabZipFile) {
+    static Stream<AndroidResource> streamFromAabFile(ZipFile aabZipFile) {
         ArrayList<AndroidResource> resources = new ArrayList<>();
-        aabZipFile.stream()
-            .forEach(
+        return aabZipFile.stream()
+            .map(
                 zipEntry -> {
                     Path zipEntryPath = Paths.get(zipEntry.getName());
+                    AndroidResource resource = null;
                     if (AndroidResource.isValidResourcePath(zipEntryPath)) {
                         try {
-                            resources.add(AndroidResource.fromPath(
+                            resource = AndroidResource.fromPath(
                                 zipEntryPath,
                                 aabZipFile.getInputStream(zipEntry).readAllBytes()
-                            ));
+                            );
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         }
                     } else if (zipEntry.getName().endsWith("manifest/AndroidManifest.xml")) {
                         try {
-                            resources.add(new AndroidResource(
+                            resource = new AndroidResource(
                                 "xml",
                                 "AndroidManifest",
                                 "xml",
                                 Paths.get(zipEntry.getName()),
                                 aabZipFile.getInputStream(zipEntry).readAllBytes()
-                            ));
+                            );
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         }
                     }
+                    return resource;
                 }
-            );
-        return new AndroidResourceTable(resources);
+            ).filter(Objects::nonNull);
     }
 
     /**
@@ -157,18 +163,45 @@ public class AndroidResourceTable {
      * @return The constructed table.
      * @throws IOException when the resources file cannot be found, or other IO errors occur.
      */
-    static AndroidResourceTable createFromMokkaZip(ZipInputStream baseSplitZipStream) throws IOException {
+    static Stream<AndroidResource> streamFromMokkaZip(ZipInputStream baseSplitZipStream) throws IOException {
         List<AndroidResource> resources = new ArrayList<>();
 
-        ZipEntry zipEntry;
-        while ((zipEntry = baseSplitZipStream.getNextEntry()) != null) {
-            String name = zipEntry.getName();
-            byte[] fileData = readAllBytes(baseSplitZipStream);
-            if (AndroidResource.isValidResourcePath(name)) {
-                resources.add(AndroidResource.fromPath(name, fileData));
-            }
-        }
-        return new AndroidResourceTable(resources);
+        Iterator<AndroidResource> iterator =
+            new Iterator<AndroidResource>() {
+                private ZipEntry zipEntry;
+
+                @Override
+                public boolean hasNext() {
+                    try {
+                        zipEntry = baseSplitZipStream.getNextEntry();
+                        // Advance over entries in the zip that aren't relevant.
+                        while (zipEntry != null && !AndroidResource.isValidResourcePath(zipEntry.getName())) {
+                            System.out.println("Not valid:" + (zipEntry.getName()));
+                            zipEntry = baseSplitZipStream.getNextEntry();
+                        }
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                    System.out.println("Has next:" + (zipEntry != null));
+                    return zipEntry != null;
+                }
+
+                @Override
+                public AndroidResource next() {
+                    System.out.println(zipEntry);
+                    byte[] entryData;
+                    try {
+                        entryData = readAllBytes(baseSplitZipStream);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                    return AndroidResource.fromPath(zipEntry.getName(), entryData);
+                }
+            };
+
+        return StreamSupport.stream(
+                Spliterators.spliteratorUnknownSize(iterator, Spliterator.ORDERED),
+                false);
     }
 
     /** Read all bytes from an input stream to a new byte array. */
@@ -193,7 +226,10 @@ public class AndroidResourceTable {
      * @return The constructed table.
      * @throws IOException when errors loading resources occur.
      */
-    private static AndroidResourceTable createTable(InputStream is, Function<Path, byte[]> fileDataProducer) throws IOException {
+    static Stream<AndroidResource> streamFromApkFile(ZipFile zipFile) throws IOException {
+        ZipEntry arscEntry = new ZipEntry(RESOURCES_FILE_NAME);
+        InputStream is = zipFile.getInputStream(arscEntry);
+
         BinaryResourceFile resources = BinaryResourceFile.fromInputStream(is);
         List<Chunk> chunks = resources.getChunks();
         if (chunks.isEmpty()) {
@@ -210,24 +246,27 @@ public class AndroidResourceTable {
                 .flatMap(p -> p.getTypeChunks().stream())
                 .toList();
 
-        List<AndroidResource> resourcesList = typeChunks.stream()
-                .flatMap(c -> c.getEntries().values().stream())
-                .filter(t -> RESOURCE_TYPES.contains(t.typeName()))
-                .filter(t -> t.value().type() == BinaryResourceValue.Type.STRING)
-                .map(entry -> {
-                    Path path = Path.of(stringPool.getString(entry.value().data()));
-                    byte[] data = fileDataProducer.apply(path);
-                    return new AndroidResource(
-                            entry.parent().getTypeName(),
-                            entry.key(),
-                            Files.getFileExtension(path.toString()),
-                            path,
-                            data
-                    );
-                })
-                .toList();
+        return typeChunks.stream()
+            .flatMap(c -> c.getEntries().values().stream())
+            .filter(t -> RESOURCE_TYPES.contains(t.typeName()))
+            .filter(t -> t.value().type() == BinaryResourceValue.Type.STRING)
+            .map(entry -> {
+                Path path = Path.of(stringPool.getString(entry.value().data()));
+                byte[] data = null;
+                try {
+                    data = zipFile.getInputStream(new ZipEntry(path.toString())).readAllBytes();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
 
-        return new AndroidResourceTable(resourcesList);
+                return new AndroidResource(
+                        entry.parent().getTypeName(),
+                        entry.key(),
+                        Files.getFileExtension(path.toString()),
+                        path,
+                        data
+                );
+            });
     }
 
     public List<AndroidResource> getAllResources() {
