@@ -241,7 +241,7 @@ public class DrawableResourceDetailsTest {
             return fromPackageFile(
                     new InputPackage.PackageFile(
                             FileSystems.getDefault().getPath("res", "drawable", name),
-                            AndroidResourceTable.readAllBytes(is)));
+                            AndroidResourceLoader.readAllBytes(is)));
         }
     }
 }

@@ -95,8 +95,7 @@ interface InputPackage extends AutoCloseable {
             @Override
             public Stream<AndroidResource> getWatchFaceFiles() {
                 try {
-                    AndroidResourceTable table = AndroidResourceTable.createFromAabDirectory(rootPath);
-                    return table.getAllResources().stream();
+                    return AndroidResourceLoader.streamFromAabDirectory(rootPath);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -118,8 +117,7 @@ interface InputPackage extends AutoCloseable {
             @Override
             public Stream<AndroidResource> getWatchFaceFiles() {
                 try {
-                    AndroidResourceTable table = AndroidResourceTable.createFromApkFile(zipFile);
-                    return table.getAllResources().stream();
+                    return AndroidResourceLoader.streamFromApkFile(zipFile);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -145,8 +143,7 @@ interface InputPackage extends AutoCloseable {
         return new InputPackage() {
             @Override
             public Stream<AndroidResource> getWatchFaceFiles() {
-                AndroidResourceTable table = AndroidResourceTable.createFromAabFile(zipFile);
-                return table.getAllResources().stream();
+                return AndroidResourceLoader.streamFromAabFile(zipFile);
             }
 
             @Override
@@ -183,8 +180,7 @@ interface InputPackage extends AutoCloseable {
                 @Override
                 public Stream<AndroidResource> getWatchFaceFiles() {
                     try {
-                        AndroidResourceTable table = AndroidResourceTable.createFromMokkaZip(baseSplitApkZip);
-                        return table.getAllResources().stream();
+                        return AndroidResourceLoader.streamFromMokkaZip(baseSplitApkZip);
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }

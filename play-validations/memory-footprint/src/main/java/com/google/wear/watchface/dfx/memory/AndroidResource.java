@@ -62,7 +62,7 @@ public class AndroidResource {
 
     public Boolean isDrawable() { return "drawable".equals(resourceType); }
 
-    public Boolean isFont() { return resourceType.equals("font"); }
+    public Boolean isFont() { return "font".equals(resourceType); }
 
     public Boolean isAsset() { return "asset".equals(resourceType); }
 
