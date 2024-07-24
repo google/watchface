@@ -1,5 +1,6 @@
 package com.google.wear.watchface.dfx.memory;
 
+import static com.google.wear.watchface.dfx.memory.DrawableResourceDetails.findInMap;
 import static com.google.wear.watchface.dfx.memory.WatchFaceDocuments.findSceneNode;
 
 import org.w3c.dom.Document;
@@ -30,11 +31,11 @@ public class ActiveMemoryFootprintCalculator {
                 new WatchFaceResourceCollector(document, resourceMemoryMap, evaluationSettings);
         return new DynamicNodePerConfigurationFootprintCalculator(
                         document,
-                        resourceMemoryMap,
                         evaluationSettings,
                         activeConfigValue,
                         resourceCollector,
-                        drawableNodeConfigTable)
+                        drawableNodeConfigTable,
+                        (res) -> findInMap(resourceMemoryMap, res).getTotalFootprintBytes())
                 .calculateMaxFootprintBytes();
     }
 }

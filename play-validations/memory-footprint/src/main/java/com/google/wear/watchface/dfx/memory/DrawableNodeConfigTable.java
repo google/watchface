@@ -20,10 +20,13 @@ import static com.google.wear.watchface.dfx.memory.UserConfigValue.SupportedConf
 import static com.google.wear.watchface.dfx.memory.WatchFaceDocuments.childrenStream;
 import static com.google.wear.watchface.dfx.memory.WatchFaceDocuments.isDrawableNode;
 
+import static java.util.Collections.emptyMap;
+import static java.util.stream.Collectors.*;
 import static java.util.stream.Collectors.toList;
 
 import org.w3c.dom.Node;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -80,6 +83,10 @@ import java.util.stream.Stream;
 class DrawableNodeConfigTable {
 
     private final List<Entry> drawableNodes;
+
+    DrawableNodeConfigTable() {
+        this(new ArrayList<>());
+    }
 
     DrawableNodeConfigTable(List<Entry> drawableNodes) {
         this.drawableNodes = drawableNodes;
@@ -223,5 +230,30 @@ class DrawableNodeConfigTable {
             UserConfigKey key, UserConfigValue configValue, UserConfigSet configSet) {
 
         return !configSet.containsKey(key) || configValue.equals(configSet.get(key));
+    }
+
+    public DrawableNodeConfigTable withConfig(UserConfigKey key, UserConfigValue value) {
+        List<Entry> newEntries =
+                drawableNodes.stream()
+                        .filter(
+                                // if a particular node in the watchface DOM is found under two
+                                // different values for the same user config key, then it will never
+                                // be rendered, so we do not keep it in the new table. This is to
+                                // avoid the case when multiple ListConfiguration or
+                                // BooleanConfiguration with the same id are nested.
+                                entry ->
+                                        userConfigIsCompatibleWithConfigSet(
+                                                key, value, entry.userConfigSet))
+                        .map(entry -> new Entry(entry.node, entry.userConfigSet.plus(key, value)))
+                        .collect(toList());
+        return new DrawableNodeConfigTable(newEntries);
+    }
+
+    public void addAll(DrawableNodeConfigTable other) {
+        this.drawableNodes.addAll(other.drawableNodes);
+    }
+
+    public void addNodeWithEmptyConfig(Node node) {
+        this.drawableNodes.add(new Entry(node, new UserConfigSet(emptyMap())));
     }
 }
