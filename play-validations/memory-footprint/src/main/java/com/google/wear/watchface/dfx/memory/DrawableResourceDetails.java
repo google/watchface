@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.security.MessageDigest;
 import java.util.Formatter;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -352,8 +353,8 @@ class DrawableResourceDetails {
     }
 
     /**
-     * Whether this image can be quantised into an RGB565 image with out loosing too much
-     * visual fidelity.
+     * Whether this image can be quantised into an RGB565 image with out loosing too much visual
+     * fidelity.
      */
     boolean canUseRGB565() {
         return canUseRGB565;
@@ -462,7 +463,13 @@ class DrawableResourceDetails {
     @Override
     public int hashCode() {
         return Objects.hash(
-                name, numberOfImages, biggestFrameFootprintBytes, bounds, width, height, sha1,
+                name,
+                numberOfImages,
+                biggestFrameFootprintBytes,
+                bounds,
+                width,
+                height,
+                sha1,
                 canUseRGB565);
     }
 
@@ -523,7 +530,13 @@ class DrawableResourceDetails {
 
         public DrawableResourceDetails build() {
             return new DrawableResourceDetails(
-                    name, numberOfImages, biggestFrameFootprintBytes, bounds, width, height, sha1,
+                    name,
+                    numberOfImages,
+                    biggestFrameFootprintBytes,
+                    bounds,
+                    width,
+                    height,
+                    sha1,
                     canUseRGB565);
         }
     }
@@ -612,7 +625,7 @@ class DrawableResourceDetails {
         long visiblePixelQuantizationErrorSum = 0;
 
         double getVisibleError() {
-           return (double)visiblePixelQuantizationErrorSum / (double)visiblePixels;
+            return (double) visiblePixelQuantizationErrorSum / (double) visiblePixels;
         }
     }
 
@@ -666,5 +679,16 @@ class DrawableResourceDetails {
             formatter.format("%02x", b);
         }
         return formatter.toString();
+    }
+
+    static DrawableResourceDetails findInMap(
+            Map<String, DrawableResourceDetails> resourceMemoryMap, String resourceName) {
+        DrawableResourceDetails details = resourceMemoryMap.get(resourceName);
+        if (details == null) {
+            throw new TestFailedException(
+                    String.format(
+                            "Asset %s was not found in the watch face package", resourceName));
+        }
+        return details;
     }
 }

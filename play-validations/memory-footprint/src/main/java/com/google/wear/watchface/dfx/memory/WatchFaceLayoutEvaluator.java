@@ -16,10 +16,8 @@
 
 package com.google.wear.watchface.dfx.memory;
 
-import static com.google.wear.watchface.dfx.memory.FootprintResourceReference.sumDrawableResourceFootprintBytes;
+import static com.google.wear.watchface.dfx.memory.DrawableResourceDetails.findInMap;
 import static com.google.wear.watchface.dfx.memory.WatchFaceDocuments.findSceneNode;
-
-import static java.util.stream.Collectors.toSet;
 
 import org.w3c.dom.Document;
 
@@ -54,11 +52,9 @@ class WatchFaceLayoutEvaluator {
 
         long totalFootprint = computeTotalMemory(document, resourceMemoryMap, settings);
 
-        VariantMemoryFootprintCalculator variantMemoryFootprintCalculator =
-                new VariantMemoryFootprintCalculator(document, resourceMemoryMap, settings);
-
         long maxInActive =
-                variantMemoryFootprintCalculator.evaluateBytes(VariantConfigValue.active(settings));
+                new ActiveMemoryFootprintCalculator(document, resourceMemoryMap, settings)
+                        .computeAmbientMemoryFootprint();
         long maxInAmbient =
                 new AmbientMemoryFootprintCalculator(document, resourceMemoryMap, settings)
                         .computeAmbientMemoryFootprint(450, 450);
@@ -84,10 +80,11 @@ class WatchFaceLayoutEvaluator {
                         currentLayout, resourceMemoryMap, evaluationSettings);
         Set<String> allResourceNames =
                 resourceCollector.collectResources(findSceneNode(currentLayout));
-        return sumDrawableResourceFootprintBytes(
-                resourceMemoryMap,
-                allResourceNames.stream()
-                        .map(FootprintResourceReference::totalOf)
-                        .collect(toSet()));
+
+        return allResourceNames.stream()
+                .mapToLong(
+                        resourceName ->
+                                findInMap(resourceMemoryMap, resourceName).getTotalFootprintBytes())
+                .sum();
     }
 }

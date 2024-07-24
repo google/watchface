@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!-- Copyright (C) 2024 Google LLC
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+--><WatchFace clipShape="CIRCLE" height="450" width="450">
+  <Metadata key="CLOCK_TYPE" value="ANALOG"/>
+  <Scene backgroundColor="#ff000000">
+    <Group height="200" name="one" width="300" x="0" y="0">
+      <PartImage height="100" width="100" x="0" y="0">
+        <Image resource="file_a1"/>
+      </PartImage>
+      <PartImage height="100" width="100" x="100" y="0">
+        <Image resource="file_a1"/>
+      </PartImage>
+      <PartImage height="100" width="100" x="200" y="0">
+        <Image resource="file_a1"/>
+      </PartImage>
+      <PartImage height="100" width="100" x="0" y="100">
+        <Image resource="file_b1"/>
+      </PartImage>
+      <PartImage height="100" width="100" x="100" y="100">
+        <Image resource="file_b1"/>
+      </PartImage>
+    </Group>
+  </Scene>
+</WatchFace>
