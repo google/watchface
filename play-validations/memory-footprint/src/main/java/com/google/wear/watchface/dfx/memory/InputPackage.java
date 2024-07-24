@@ -32,29 +32,6 @@ import java.util.zip.ZipInputStream;
  * the package.
  */
 interface InputPackage extends AutoCloseable {
-    /** Represents a file in a watch face package (apk or aab). */
-    class PackageFile {
-
-        private final Path filePath;
-
-        private final byte[] data;
-
-        PackageFile(Path filePath, byte[] data) {
-            this.filePath = filePath;
-            this.data = data;
-        }
-
-        /** File path relative to the root of the declarative watch face package. */
-        public Path getFilePath() {
-            return filePath;
-        }
-
-        /** File raw data. */
-        public byte[] getData() {
-            return data;
-        }
-    }
-
     /**
      * Returns a stream of resource representations form the watch face package. The stream must not
      * be consumed more than once. The InputPackage must be closed only after consuming the stream
@@ -199,9 +176,5 @@ interface InputPackage extends AutoCloseable {
             mokkaZip.close();
             throw e;
         }
-    }
-
-    static boolean pathMatchesGlob(Path path, String glob) {
-        return path.getFileSystem().getPathMatcher("glob:" + glob).matches(path);
     }
 }

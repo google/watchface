@@ -16,7 +16,6 @@
 
 package com.google.wear.watchface.dfx.memory;
 
-import static com.google.wear.watchface.dfx.memory.InputPackage.pathMatchesGlob;
 import static java.lang.Math.abs;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
@@ -37,9 +36,6 @@ import javax.imageio.stream.ImageInputStream;
 
 /** Details about a drawable resource that are relevant for the memory footprint calculation. */
 class DrawableResourceDetails {
-    private static final int CHANNEL_MASK_R = 0xff;
-    private static final int CHANNEL_MASK_G = 0xff00;
-    private static final int CHANNEL_MASK_B = 0xff0000;
     private static final int CHANNEL_MASK_A = 0xff000000;
 
     /**
@@ -120,108 +116,6 @@ class DrawableResourceDetails {
                     + bottom
                     + '}';
         }
-    }
-
-    /**
-     * Evaluates the memory footprint of a drawable asset. The memory footprint is defined as
-     * number_of_frames * width * height * 4 bytes, or how much memory does storing that resource
-     * take in its uncompressed format.
-     *
-     * @param packageFile the file from a watch face package.
-     * @return the memory footprint of that asset file or {@code Optional.empty()} if the file is
-     *     not a drawable asset.
-     * @throws java.lang.IllegalArgumentException when the image cannot be processed.
-     */
-    static Optional<DrawableResourceDetails> fromPackageFile(InputPackage.PackageFile packageFile) {
-        // For fonts we assume the raw size of the resource is the MCU footprint.
-        if (pathMatchesGlob(packageFile.getFilePath(), "**/font/**")) {
-            return Optional.of(
-                    new Builder()
-                            .setName(getResourceName(packageFile))
-                            .setNumberOfImages(1)
-                            .setBiggestFrameFootprintBytes(packageFile.getData().length)
-                            .build());
-        }
-
-        boolean isPossibleImage =
-                pathMatchesGlob(packageFile.getFilePath(), "**/drawable*/*")
-                        || pathMatchesGlob(packageFile.getFilePath(), "**/assets/**")
-                        || pathMatchesGlob(packageFile.getFilePath(), "**/raw/*");
-
-        if (!isPossibleImage) {
-            return Optional.empty();
-        }
-
-        String sha1;
-        try {
-            MessageDigest md = MessageDigest.getInstance("SHA-1");
-            sha1 = byteArray2Hex(md.digest(packageFile.getData()));
-        } catch (Exception e) {
-            throw new IllegalArgumentException(
-                    String.format("Error while processing image %s", packageFile.getFilePath()), e);
-        }
-
-        try (ImageInputStream imageInputStream =
-                     ImageIO.createImageInputStream(new ByteArrayInputStream(packageFile.getData()))) {
-            Iterator<ImageReader> imageReaders = ImageIO.getImageReaders(imageInputStream);
-            if (!imageReaders.hasNext()) {
-                return Optional.empty();
-            }
-            ImageReader reader = imageReaders.next();
-            reader.setInput(imageInputStream);
-            // allowSearch forces the reader to return the true number of images even if the file
-            // format does not specify it, requiring an exhaustive search.
-            int numberOfImages = reader.getNumImages(/* allowSearch= */ true);
-            int maxWidth = 0;
-            int maxHeight = 0;
-            double maxQuantizationError = 0.0;
-            DrawableResourceDetails.Bounds accumulatedBounds = null;
-            for (int i = 0; i < numberOfImages; i++) {
-                // If an asset such as a GIF or a WEBP has more than 1 frame, then find the
-                // maximum size for any frame and multiply that by the number of frames.
-                maxWidth = max(maxWidth, reader.getWidth(i));
-                maxHeight = max(maxHeight, reader.getHeight(i));
-
-                BufferedImage image = reader.read(i);
-                Bounds bounds = computeBounds(image);
-
-                if (bounds != null) {
-                    if (accumulatedBounds == null) {
-                        accumulatedBounds = bounds;
-                    } else {
-                        accumulatedBounds = accumulatedBounds.computeUnion(bounds);
-                    }
-                }
-
-                QualtizationStats stats = computeQualtizationStats(image);
-                maxQuantizationError = max(maxQuantizationError, stats.getVisibleError());
-            }
-            long biggestFrameMemoryFootprint = ((long) maxWidth) * maxHeight * 4;
-            boolean canBeQuantized = (maxQuantizationError < MAX_ACCEPTIABLE_QUANTIZATION_ERROR);
-            return Optional.of(
-                    new Builder()
-                            .setName(getResourceName(packageFile))
-                            .setNumberOfImages(numberOfImages)
-                            .setBiggestFrameFootprintBytes(biggestFrameMemoryFootprint)
-                            .setBounds(accumulatedBounds)
-                            .setWidth(maxWidth)
-                            .setHeight(maxHeight)
-                            .setSha1(sha1)
-                            .setCanUseRGB565(canBeQuantized)
-                            .build());
-        } catch (IOException e) {
-            throw new IllegalArgumentException(
-                    String.format("Error while processing image %s", packageFile.getFilePath()), e);
-        }
-    }
-
-    private static String getResourceName(InputPackage.PackageFile packageFile) {
-        String resourceNameWithExtension = packageFile.getFilePath().getFileName().toString();
-        int dotIndex = resourceNameWithExtension.lastIndexOf('.');
-        if (dotIndex != -1) {
-            return resourceNameWithExtension.substring(0, dotIndex);
-        }
-        return resourceNameWithExtension;
     }
 
     /**

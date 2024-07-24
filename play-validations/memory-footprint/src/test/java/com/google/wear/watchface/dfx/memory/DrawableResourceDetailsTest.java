@@ -1,7 +1,6 @@
 package com.google.wear.watchface.dfx.memory;
 
 import static com.google.common.truth.Truth.assertThat;
-import static com.google.wear.watchface.dfx.memory.DrawableResourceDetails.fromPackageFile;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.jimfs.Configuration;
@@ -11,7 +10,6 @@ import org.junit.Test;
 
 import java.io.InputStream;
 import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -238,10 +236,9 @@ public class DrawableResourceDetailsTest {
     Optional<DrawableResourceDetails> getDrawableResourceDetails(String name) throws Exception {
         String path = String.format("/res/drawable/%s", name);
         try (InputStream is = getClass().getResourceAsStream(path)) {
-            return fromPackageFile(
-                    new InputPackage.PackageFile(
-                            FileSystems.getDefault().getPath("res", "drawable", name),
-                            AndroidResourceLoader.readAllBytes(is)));
+            return DrawableResourceDetails.fromPackageResource(
+                AndroidResource.fromPath(path, AndroidResourceLoader.readAllBytes(is))
+            );
         }
     }
 }

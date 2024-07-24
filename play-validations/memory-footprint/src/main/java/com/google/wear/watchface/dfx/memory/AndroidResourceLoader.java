@@ -173,7 +173,7 @@ public class AndroidResourceLoader {
 
     /**
      * Creates a resource stream from an APK zip file.
-     *
+     * <p>
      * APK files can have their resources obfuscated, so it is necessary to extract the mapping
      * between the original path and the path in the obfuscated zip.
      *
