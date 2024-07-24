@@ -16,10 +16,6 @@
 
 package com.google.wear.watchface.dfx.memory;
 
-import static com.google.wear.watchface.dfx.memory.InputPackage.pathMatchesGlob;
-
-import com.google.wear.watchface.dfx.memory.InputPackage.PackageFile;
-
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -89,21 +85,21 @@ class WatchFaceData {
         }
     }
 
-    /** Creates a WatchFaceData object from a stream of watch face package files. */
+    /** Creates a WatchFaceData object from a stream of watch face package resources. */
     static WatchFaceData fromResourcesStream(
-            Stream<PackageFile> resources, EvaluationSettings evaluationSettings) {
+            Stream<AndroidResource> resources, EvaluationSettings evaluationSettings) {
         WatchFaceData watchFaceData = new WatchFaceData();
 
         resources.forEach(
                 resource -> {
-                    if (pathMatchesGlob(resource.getFilePath(), "**/raw/*.xml")) {
+                    if (resource.isWatchFaceXml()) {
                         Document document = parseXmlResource(resource.getData());
                         if (isWatchFaceDocument(document, evaluationSettings)) {
                             watchFaceData.watchFaceDocuments.add(document);
                             return;
                         }
                     }
-                    DrawableResourceDetails.fromPackageFile(resource)
+                    DrawableResourceDetails.fromPackageResource(resource)
                             .ifPresent(watchFaceData::recordResourceDetails);
                 });
 

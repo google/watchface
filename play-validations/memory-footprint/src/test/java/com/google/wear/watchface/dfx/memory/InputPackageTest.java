@@ -3,7 +3,6 @@ package com.google.wear.watchface.dfx.memory;
 import static com.google.common.truth.Truth.assertThat;
 
 import com.google.common.truth.Correspondence;
-import com.google.wear.watchface.dfx.memory.InputPackage.PackageFile;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,7 +15,7 @@ import java.util.stream.Collectors;
 @RunWith(JUnit4.class)
 public class InputPackageTest {
 
-    private static final Correspondence<PackageFile, String> VERIFY_PACKAGE_NAME_ONLY =
+    private static final Correspondence<AndroidResource, String> VERIFY_PACKAGE_NAME_ONLY =
             Correspondence.transforming(
                     packageFile -> packageFile.getFilePath().toString(),
                     "has the same file path as");
@@ -29,7 +28,7 @@ public class InputPackageTest {
                         .toAbsolutePath()
                         .toString();
 
-        List<PackageFile> packageFiles;
+        List<AndroidResource> packageFiles;
         try (InputPackage inputPackage = InputPackage.open(testAabDirectory)) {
             packageFiles =
                     inputPackage

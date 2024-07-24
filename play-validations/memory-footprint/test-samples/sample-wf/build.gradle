@@ -54,6 +54,10 @@ afterEvaluate {
 
     // create a zip that follows the structure used internally, for tests
     tasks.register('zipApk', Zip) {
+        duplicatesStrategy DuplicatesStrategy.INCLUDE
+        dependsOn 'assembleDebug'
+        from 'build/outputs/apk/debug'
+        include 'sample-wf-debug.apk'
         dependsOn 'assembleRelease'
         from 'build/outputs/apk/release'
         include 'sample-wf-release.apk'

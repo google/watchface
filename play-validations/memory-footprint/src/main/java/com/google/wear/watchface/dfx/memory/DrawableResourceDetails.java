@@ -16,8 +16,6 @@
 
 package com.google.wear.watchface.dfx.memory;
 
-import static com.google.wear.watchface.dfx.memory.InputPackage.pathMatchesGlob;
-
 import static java.lang.Math.abs;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
@@ -38,9 +36,6 @@ import javax.imageio.stream.ImageInputStream;
 
 /** Details about a drawable resource that are relevant for the memory footprint calculation. */
 class DrawableResourceDetails {
-    private static final int CHANNEL_MASK_R = 0xff;
-    private static final int CHANNEL_MASK_G = 0xff00;
-    private static final int CHANNEL_MASK_B = 0xff0000;
     private static final int CHANNEL_MASK_A = 0xff000000;
 
     /**
@@ -128,26 +123,24 @@ class DrawableResourceDetails {
      * number_of_frames * width * height * 4 bytes, or how much memory does storing that resource
      * take in its uncompressed format.
      *
-     * @param packageFile the file from a watch face package.
+     * @param resource the resource from a watch face package.
      * @return the memory footprint of that asset file or {@code Optional.empty()} if the file is
      *     not a drawable asset.
      * @throws java.lang.IllegalArgumentException when the image cannot be processed.
      */
-    static Optional<DrawableResourceDetails> fromPackageFile(InputPackage.PackageFile packageFile) {
+    static Optional<DrawableResourceDetails> fromPackageResource(AndroidResource resource) {
         // For fonts we assume the raw size of the resource is the MCU footprint.
-        if (pathMatchesGlob(packageFile.getFilePath(), "**/font/**")) {
+        if (resource.isFont()) {
             return Optional.of(
                     new Builder()
-                            .setName(getResourceName(packageFile))
+                            .setName(resource.getResourceName())
                             .setNumberOfImages(1)
-                            .setBiggestFrameFootprintBytes(packageFile.getData().length)
+                            .setBiggestFrameFootprintBytes(resource.getData().length)
                             .build());
         }
 
         boolean isPossibleImage =
-                pathMatchesGlob(packageFile.getFilePath(), "**/drawable*/*")
-                        || pathMatchesGlob(packageFile.getFilePath(), "**/assets/**")
-                        || pathMatchesGlob(packageFile.getFilePath(), "**/raw/*");
+                resource.isAsset() || resource.isDrawable() || resource.isRaw();
 
         if (!isPossibleImage) {
             return Optional.empty();
@@ -156,14 +149,14 @@ class DrawableResourceDetails {
         String sha1;
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-1");
-            sha1 = byteArray2Hex(md.digest(packageFile.getData()));
+            sha1 = byteArray2Hex(md.digest(resource.getData()));
         } catch (Exception e) {
             throw new IllegalArgumentException(
-                    String.format("Error while processing image %s", packageFile.getFilePath()), e);
+                    String.format("Error while processing image %s", resource.getFilePath()), e);
         }
 
         try (ImageInputStream imageInputStream =
-                ImageIO.createImageInputStream(new ByteArrayInputStream(packageFile.getData()))) {
+                ImageIO.createImageInputStream(new ByteArrayInputStream(resource.getData()))) {
             Iterator<ImageReader> imageReaders = ImageIO.getImageReaders(imageInputStream);
             if (!imageReaders.hasNext()) {
                 return Optional.empty();
@@ -201,7 +194,7 @@ class DrawableResourceDetails {
             boolean canBeQuantized = (maxQuantizationError < MAX_ACCEPTIABLE_QUANTIZATION_ERROR);
             return Optional.of(
                     new Builder()
-                            .setName(getResourceName(packageFile))
+                            .setName(resource.getResourceName())
                             .setNumberOfImages(numberOfImages)
                             .setBiggestFrameFootprintBytes(biggestFrameMemoryFootprint)
                             .setBounds(accumulatedBounds)
@@ -212,17 +205,8 @@ class DrawableResourceDetails {
                             .build());
         } catch (IOException e) {
             throw new IllegalArgumentException(
-                    String.format("Error while processing image %s", packageFile.getFilePath()), e);
+                    String.format("Error while processing image %s", resource.getFilePath()), e);
         }
-    }
-
-    private static String getResourceName(InputPackage.PackageFile packageFile) {
-        String resourceNameWithExtension = packageFile.getFilePath().getFileName().toString();
-        int dotIndex = resourceNameWithExtension.lastIndexOf('.');
-        if (dotIndex != -1) {
-            return resourceNameWithExtension.substring(0, dotIndex);
-        }
-        return resourceNameWithExtension;
     }
 
     private final String name;
