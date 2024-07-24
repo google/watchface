@@ -16,7 +16,6 @@
 
 package com.google.wear.watchface.dfx.memory;
 
-import static com.google.wear.watchface.dfx.memory.DrawableResourceDetails.findInMap;
 import static com.google.wear.watchface.dfx.memory.UserConfigValue.SupportedConfigs.isValidUserConfigNode;
 import static com.google.wear.watchface.dfx.memory.WatchFaceDocuments.childrenStream;
 import static com.google.wear.watchface.dfx.memory.WatchFaceDocuments.findSceneNode;
@@ -30,8 +29,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.LongStream;
 
 /**
@@ -45,7 +44,6 @@ import java.util.stream.LongStream;
  */
 class DynamicNodePerConfigurationFootprintCalculator {
     private final Document document;
-    private final Map<String, DrawableResourceDetails> resourceMemoryMap;
     private final EvaluationSettings evaluationSettings;
     private final Node sceneNode;
     private final WatchFaceResourceCollector resourceCollector;
@@ -53,16 +51,17 @@ class DynamicNodePerConfigurationFootprintCalculator {
     private final DrawableNodeConfigTable drawableNodeConfigTable;
     private final Set<Node> dynamicNodesToConsider;
 
+    private final Function<String, Long> evaluator;
+
     DynamicNodePerConfigurationFootprintCalculator(
             Document document,
-            Map<String, DrawableResourceDetails> resourceMemoryMap,
             EvaluationSettings evaluationSettings,
             VariantConfigValue variant,
             WatchFaceResourceCollector resourceCollector,
-            DrawableNodeConfigTable drawableNodeConfigTable) {
+            DrawableNodeConfigTable drawableNodeConfigTable,
+            Function<String, Long> evaluator) {
         this.document = document;
         this.sceneNode = findSceneNode(document);
-        this.resourceMemoryMap = resourceMemoryMap;
         this.evaluationSettings = evaluationSettings;
         this.variant = variant;
         this.resourceCollector = resourceCollector;
@@ -71,6 +70,7 @@ class DynamicNodePerConfigurationFootprintCalculator {
                 drawableNodeConfigTable.getAllEntries().stream()
                         .map(entry -> entry.node)
                         .collect(toSet());
+        this.evaluator = evaluator;
     }
 
     long calculateMaxFootprintBytes() {
@@ -120,10 +120,7 @@ class DynamicNodePerConfigurationFootprintCalculator {
         }
         if (isDrawableNode(currentNode) && dynamicNodesToConsider.contains(currentNode)) {
             return resourceCollector.collectResources(currentNode, variant).stream()
-                    .mapToLong(
-                            resourceName ->
-                                    findInMap(resourceMemoryMap, resourceName)
-                                            .getTotalFootprintBytes())
+                    .mapToLong(evaluator::apply)
                     .sum();
         }
         LongStream childrenFootprints = childrenStream(currentNode).mapToLong(this::greedyEvaluate);
@@ -173,9 +170,7 @@ class DynamicNodePerConfigurationFootprintCalculator {
         return drawableNodeConfigTable.getIndependentDrawableNodes().stream()
                 .flatMap(entry -> resourceCollector.collectResources(entry.node, variant).stream())
                 .distinct()
-                .mapToLong(
-                        resourceName ->
-                                findInMap(resourceMemoryMap, resourceName).getTotalFootprintBytes())
+                .mapToLong(evaluator::apply)
                 .sum();
     }
 
@@ -204,10 +199,7 @@ class DynamicNodePerConfigurationFootprintCalculator {
                                                     .collectResources(entry.node, variant)
                                                     .stream())
                             .distinct()
-                            .mapToLong(
-                                    resourceName ->
-                                            findInMap(resourceMemoryMap, resourceName)
-                                                    .getTotalFootprintBytes())
+                            .mapToLong(evaluator::apply)
                             .sum();
             maxFootprint = max(footprintForConfig, maxFootprint);
         }

@@ -1,5 +1,6 @@
 package com.google.wear.watchface.dfx.memory;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.wear.watchface.dfx.memory.WatchFaceDocuments.findSceneNode;
 
@@ -211,6 +212,45 @@ public class DrawableNodeConfigTableTest {
         assertFalse(entryWithEmptyConfig.matchesConfigSet(configSetOf("l1", "l1-2")));
     }
 
+    @Test
+    public void withConfig_appendsTheGivenUserConfigKey() throws Exception {
+        Node testNode1 = createTestNode("TestNode1");
+        Node testNode2 = createTestNode("TestNode2");
+        DrawableNodeConfigTable testDrawableNodeConfigTable =
+                new DrawableNodeConfigTable(
+                        newArrayList(
+                                new Entry(testNode1, configSetOf("l1", "l1-1")),
+                                new Entry(testNode2, configSetOf())));
+
+        DrawableNodeConfigTable newDrawableNodeConfigTable =
+                testDrawableNodeConfigTable.withConfig(
+                        new UserConfigKey("l2"), new UserConfigValue("l2-2"));
+
+        assertThat(newDrawableNodeConfigTable.getAllEntries())
+                .containsExactly(
+                        new Entry(testNode1, configSetOf("l1", "l1-1", "l2", "l2-2")),
+                        new Entry(testNode2, configSetOf("l2", "l2-2")));
+    }
+
+    @Test
+    public void withConfig_filtersOutNodeWhereTheNewConfigConflictsWithExistingConfigSet()
+            throws Exception {
+        Node testNode1 = createTestNode("TestNode1");
+        Node testNode2 = createTestNode("TestNode2");
+        DrawableNodeConfigTable testDrawableNodeConfigTable =
+                new DrawableNodeConfigTable(
+                        newArrayList(
+                                new Entry(testNode1, configSetOf("l1", "l1-1")),
+                                new Entry(testNode2, configSetOf("l2", "l2-1"))));
+
+        DrawableNodeConfigTable newDrawableNodeConfigTable =
+                testDrawableNodeConfigTable.withConfig(
+                        new UserConfigKey("l2"), new UserConfigValue("l2-2"));
+
+        assertThat(newDrawableNodeConfigTable.getAllEntries())
+                .containsExactly(new Entry(testNode1, configSetOf("l1", "l1-1", "l2", "l2-2")));
+    }
+
     private Node readSceneNode(String documentPath) throws Exception {
         try (InputStream is = getClass().getResourceAsStream(documentPath)) {
             Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(is);
@@ -239,5 +279,10 @@ public class DrawableNodeConfigTableTest {
                     new UserConfigKey(keyValues[i]), new UserConfigValue(keyValues[i + 1]));
         }
         return new UserConfigSet(configSetMap);
+    }
+
+    private Node createTestNode(String name) throws Exception {
+        Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+        return document.createElement(name);
     }
 }

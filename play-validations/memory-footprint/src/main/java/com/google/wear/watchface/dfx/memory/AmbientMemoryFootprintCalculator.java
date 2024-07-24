@@ -20,6 +20,7 @@ import static com.google.wear.watchface.dfx.memory.WatchFaceDocuments.findSceneN
 import static com.google.wear.watchface.dfx.memory.WatchFaceDocuments.getNodeAttribute;
 
 import static java.lang.Math.min;
+import static java.util.stream.Collectors.toSet;
 
 import com.google.common.collect.ImmutableList;
 
@@ -28,9 +29,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -47,9 +46,6 @@ class AmbientMemoryFootprintCalculator {
     private final VariantConfigValue ambientConfigValue;
     private final Document document;
     private final Map<String, DrawableResourceDetails> resourceMemoryMap;
-
-    /** Maps a resource to the first resource found with the same sha-1. */
-    private final Map<String, String> resourceDedupMap = new HashMap<>();
 
     private final WatchFaceResourceCollector resourceCollector;
     private final EvaluationSettings evaluationSettings;
@@ -78,17 +74,37 @@ class AmbientMemoryFootprintCalculator {
         this.ambientConfigValue = VariantConfigValue.ambient(evaluationSettings);
         this.document = document;
         this.resourceMemoryMap = resourceMemoryMap;
-        this.resourceCollector =
-                new WatchFaceResourceCollector(document, resourceMemoryMap, evaluationSettings);
         this.evaluationSettings = evaluationSettings;
-
-        if (evaluationSettings.deduplicateAmbient()) {
-            computeResourceDedupMap();
-        }
+        this.resourceCollector = createResourceCollector();
     }
 
-    private void computeResourceDedupMap() {
-        HashMap<String, String> sha1ToResource = new HashMap<>();
+    private WatchFaceResourceCollector createResourceCollector() {
+        if (!evaluationSettings.deduplicateAmbient()) {
+            return new WatchFaceResourceCollector(document, resourceMemoryMap, evaluationSettings);
+        }
+        Map<String, String> dedupMap =
+                computeResourceDedupMap(resourceMemoryMap, evaluationSettings);
+        return new WatchFaceResourceCollector(document, resourceMemoryMap, evaluationSettings) {
+
+            @Override
+            Set<String> collectResources(Node currentNode, VariantConfigValue variant) {
+                return super.collectResources(currentNode, variant).stream()
+                        .map(dedupMap::get)
+                        .collect(toSet());
+            }
+
+            @Override
+            Set<String> collectResources(Node node) {
+                return super.collectResources(node).stream().map(dedupMap::get).collect(toSet());
+            }
+        };
+    }
+
+    private static Map<String, String> computeResourceDedupMap(
+            Map<String, DrawableResourceDetails> resourceMemoryMap,
+            EvaluationSettings evaluationSettings) {
+        Map<String, String> sha1ToResource = new HashMap<>();
+        Map<String, String> dedupMap = new HashMap<>();
         for (Map.Entry<String, DrawableResourceDetails> entry : resourceMemoryMap.entrySet()) {
             String dedupedResource = sha1ToResource.get(entry.getValue().getSha1());
             if (dedupedResource == null) {
@@ -98,8 +114,9 @@ class AmbientMemoryFootprintCalculator {
                 System.out.printf(
                         "Resource %s is a duplicate of: %s\n", entry.getKey(), dedupedResource);
             }
-            resourceDedupMap.put(entry.getKey(), dedupedResource);
+            dedupMap.put(entry.getKey(), dedupedResource);
         }
+        return dedupMap;
     }
 
     /**
@@ -108,18 +125,18 @@ class AmbientMemoryFootprintCalculator {
      * and the memory needed for all the full screen layers.
      */
     long computeAmbientMemoryFootprint(long screenWidth, long screenHeight) {
-        PerConfigurationDynamicResources perConfigurationDynamicResources =
-                new PerConfigurationDynamicResources();
-        Visitor visitor =
-                new Visitor(
-                        perConfigurationDynamicResources,
-                        /* prevNodeIsDrawnDynamically= */ true,
-                        /* numClocks= */ 0);
+        Visitor visitor = new Visitor(/* prevNodeIsDrawnDynamically= */ true, /* numClocks= */ 0);
         visitor.visitNodes(findSceneNode(document));
 
         long maximumResourceUsage =
-                perConfigurationDynamicResources.computeMaximumResourceUsage(
-                        visitor.optionResources);
+                new DynamicNodePerConfigurationFootprintCalculator(
+                                document,
+                                evaluationSettings,
+                                ambientConfigValue,
+                                resourceCollector,
+                                visitor.drawableNodeConfigTable,
+                                this::evaluateResource)
+                        .calculateMaxFootprintBytes();
 
         // In V1 we support a maximum of 2 layers and 2 clocks.
         if (evaluationSettings.applyV1OffloadLimitations()) {
@@ -135,90 +152,32 @@ class AmbientMemoryFootprintCalculator {
         return (screenWidth * screenHeight * visitor.numLayers * 4) + maximumResourceUsage;
     }
 
-    /** Collects the set of resources each option uses in each configuration. */
-    private class PerConfigurationDynamicResources {
-        private final List<List<Set<String>>> resourcesPerConfigurationPerOption =
-                new ArrayList<>();
+    private long evaluateResource(String resource) {
+        DrawableResourceDetails details =
+                DrawableResourceDetails.findInMap(resourceMemoryMap, resource);
+        long imageBytes = details.getBiggestFrameFootprintBytes();
 
-        void addConfigurationResources(List<Set<String>> perOptionResources) {
-            resourcesPerConfigurationPerOption.add(perOptionResources);
+        // If this image can be downsampled then the size is halved.
+        if (details.canUseRGB565()) {
+            imageBytes /= 2;
         }
 
-        /**
-         * Given the resources used outside of a configuration, computes the maximum memory used by
-         * the resources for any permutation of options.
-         */
-        long computeMaximumResourceUsage(Set<String> topLevelResources) {
-            List<Set<String>> sets = new ArrayList<>();
-            sets.add(topLevelResources);
-
-            // Compute all combinations of resources for every setting.
-            for (List<Set<String>> optionSets : resourcesPerConfigurationPerOption) {
-                List<Set<String>> combinedSets = new ArrayList<>();
-
-                for (Set<String> setA : sets) {
-                    for (Set<String> setB : optionSets) {
-                        Set<String> combined = new HashSet<>(setA);
-                        combined.addAll(setB);
-                        combinedSets.add(combined);
-                    }
-                }
-
-                sets = combinedSets;
-            }
-
-            // Compute the maximum memory needed by any set of resources.
-            long maxTotal = 0;
-            int numResources = 0;
-            long maxResourceSize = 0;
-            for (Set<String> set : sets) {
-                long total = 0;
-                for (String resource : set) {
-                    DrawableResourceDetails details =
-                            DrawableResourceDetails.findInMap(resourceMemoryMap, resource);
-                    long imageBytes = details.getBiggestFrameFootprintBytes();
-
-                    // If this image can be downsampled then the size is halved.
-                    if (details.canUseRGB565()) {
-                        imageBytes /= 2;
-                    }
-
-                    if (evaluationSettings.isVerbose()) {
-                        System.out.printf(
-                                "Counting resource %s; %s bytes, %s mb, %s x %s %s%n",
-                                resource,
-                                details.getBiggestFrameFootprintBytes(),
-                                ((double) imageBytes) / 1024 / 1024,
-                                details.getWidth(),
-                                details.getHeight(),
-                                details.canUseRGB565() ? "RGB565" : "ARGB8888");
-                    }
-                    total += imageBytes;
-                    if (maxResourceSize < imageBytes) {
-                        maxResourceSize = imageBytes;
-                    }
-                }
-                if (maxTotal < total) {
-                    maxTotal = total;
-                }
-                if (numResources < set.size()) {
-                    numResources = set.size();
-                }
-            }
-
-            if (evaluationSettings.isVerbose()) {
-                long average = (numResources > 0) ? (maxTotal / numResources) : 0;
-                System.out.printf(
-                        "Resource count %s average size %s max size %s\n",
-                        numResources, average, maxResourceSize);
-            }
-
-            return maxTotal;
+        if (evaluationSettings.isVerbose()) {
+            System.out.printf(
+                    "Counting resource %s; %s bytes, %s mb, %s x %s %s%n",
+                    resource,
+                    details.getBiggestFrameFootprintBytes(),
+                    ((double) imageBytes) / 1024 / 1024,
+                    details.getWidth(),
+                    details.getHeight(),
+                    details.canUseRGB565() ? "RGB565" : "ARGB8888");
         }
+        return imageBytes;
     }
 
     private class Visitor {
-        private final PerConfigurationDynamicResources perConfigurationDynamicResources;
+        private final DrawableNodeConfigTable drawableNodeConfigTable =
+                new DrawableNodeConfigTable();
 
         /**
          * The number of layers needed so far. A layer is needed to render anything underneath,
@@ -227,22 +186,12 @@ class AmbientMemoryFootprintCalculator {
         private int numLayers = 0;
 
         /** The number of clocks found so far. */
-        private int numClocks = 0;
+        private int numClocks;
 
         /** Used for detecting layers. */
         private boolean prevNodeIsDrawnDynamically;
 
-        /**
-         * Resources for the current option. NB the top level is deemed to be a (degenerate) setting
-         * with only one option.
-         */
-        private final Set<String> optionResources = new HashSet<>();
-
-        Visitor(
-                PerConfigurationDynamicResources perConfigurationDynamicResources,
-                boolean prevNodeIsDrawnDynamically,
-                int numClocks) {
-            this.perConfigurationDynamicResources = perConfigurationDynamicResources;
+        Visitor(boolean prevNodeIsDrawnDynamically, int numClocks) {
             this.prevNodeIsDrawnDynamically = prevNodeIsDrawnDynamically;
             this.numClocks = numClocks;
         }
@@ -287,7 +236,7 @@ class AmbientMemoryFootprintCalculator {
                 }
 
                 endsLayer = true;
-                collectResources(node);
+                drawableNodeConfigTable.addNodeWithEmptyConfig(node);
             }
 
             if (nodeName.equals("ComplicationSlot")) {
@@ -297,7 +246,7 @@ class AmbientMemoryFootprintCalculator {
                 }
 
                 endsLayer = true;
-                collectResources(node);
+                drawableNodeConfigTable.addNodeWithEmptyConfig(node);
             }
 
             if (endsLayer) {
@@ -315,28 +264,18 @@ class AmbientMemoryFootprintCalculator {
             return true;
         }
 
-        /** Collects the resources under node, deduplicating if required. */
-        private void collectResources(Node node) {
-            for (String resource : resourceCollector.collectResources(node, ambientConfigValue)) {
-                if (evaluationSettings.deduplicateAmbient()) {
-                    optionResources.add(resourceDedupMap.get(resource));
-                } else {
-                    optionResources.add(resource);
-                }
-            }
-        }
-
         /**
          * Process a <BooleanConfiguration> or a <ListConfiguration> recursively. For layers the
          * maximum number added by any option is recorded. It is expected this computation will work
          * for hierarchical configurations, but this has not been tested since the XML format has
          * not been finalized.
          *
-         * <p>Resources are added to {@link Visitor#perConfigurationDynamicResources}
+         * <p>Nodes that are drawn dynamically are added to {@link Visitor#drawableNodeConfigTable}
          */
         private void processConfiguration(Node node) {
-            long maxConfigNumLayers = 0;
-            List<Set<String>> perOptionResources = new ArrayList<>();
+            int maxConfigNumLayers = 0;
+
+            UserConfigKey userConfigKey = UserConfigKey.fromNode(node);
 
             NodeList childNodes = node.getChildNodes();
             for (int i = 0; i < childNodes.getLength(); i++) {
@@ -350,27 +289,20 @@ class AmbientMemoryFootprintCalculator {
                         continue;
                 }
 
-                Visitor visitor =
-                        new Visitor(
-                                perConfigurationDynamicResources,
-                                prevNodeIsDrawnDynamically,
-                                numClocks);
+                UserConfigValue userConfigValue = UserConfigValue.fromNode(child);
+
+                Visitor visitor = new Visitor(prevNodeIsDrawnDynamically, numClocks);
                 visitor.visitNodes(childNodes.item(i));
+
+                drawableNodeConfigTable.addAll(
+                        visitor.drawableNodeConfigTable.withConfig(userConfigKey, userConfigValue));
 
                 if (maxConfigNumLayers < visitor.numLayers) {
                     maxConfigNumLayers = visitor.numLayers;
                 }
 
-                if (!visitor.optionResources.isEmpty()) {
-                    perOptionResources.add(visitor.optionResources);
-                }
-
                 // Make sure a layer is generated if we subsequently visit a Part* node.
                 prevNodeIsDrawnDynamically = visitor.prevNodeIsDrawnDynamically;
-            }
-
-            if (!perOptionResources.isEmpty()) {
-                perConfigurationDynamicResources.addConfigurationResources(perOptionResources);
             }
 
             numLayers += maxConfigNumLayers;

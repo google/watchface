@@ -16,6 +16,8 @@
 
 package com.google.wear.watchface.dfx.memory;
 
+import static com.google.wear.watchface.dfx.memory.WatchFaceDocuments.getNodeAttribute;
+
 import org.w3c.dom.Node;
 
 import java.util.Arrays;
@@ -38,6 +40,13 @@ import java.util.Optional;
  * <p>The UserConfigValues are: - for dateDisplayed: TRUE, FALSE, - for icon-id-option: 0, and 1.
  */
 class UserConfigValue {
+
+    public static UserConfigValue fromNode(Node node) {
+        return new UserConfigValue(
+                getNodeAttribute(node, "id")
+                        .orElseThrow(
+                                () -> new IllegalArgumentException("Node does not contain an id")));
+    }
 
     /**
      * The UserConfiguration children node names that are treated as configuration values. We ignore
