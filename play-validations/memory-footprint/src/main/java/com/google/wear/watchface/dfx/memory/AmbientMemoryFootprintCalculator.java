@@ -174,13 +174,8 @@ class AmbientMemoryFootprintCalculator {
             for (Set<String> set : sets) {
                 long total = 0;
                 for (String resource : set) {
-                    DrawableResourceDetails details = resourceMemoryMap.get(resource);
-                    if (details == null) {
-                        throw new TestFailedException(
-                                String.format(
-                                        "Asset %s was not found in the watch face package",
-                                        resource));
-                    }
+                    DrawableResourceDetails details =
+                            DrawableResourceDetails.findInMap(resourceMemoryMap, resource);
                     long imageBytes = details.getBiggestFrameFootprintBytes();
 
                     // If this image can be downsampled then the size is halved.

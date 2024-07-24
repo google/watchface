@@ -16,16 +16,11 @@
 
 package com.google.wear.watchface.dfx.memory;
 
-import static com.google.wear.watchface.dfx.memory.FootprintResourceReference.sumDrawableResourceFootprintBytes;
+import static com.google.wear.watchface.dfx.memory.DrawableResourceDetails.findInMap;
 import static com.google.wear.watchface.dfx.memory.UserConfigValue.SupportedConfigs.isValidUserConfigNode;
 import static com.google.wear.watchface.dfx.memory.WatchFaceDocuments.childrenStream;
 import static com.google.wear.watchface.dfx.memory.WatchFaceDocuments.findSceneNode;
-import static com.google.wear.watchface.dfx.memory.WatchFaceDocuments.isBitmapFont;
-import static com.google.wear.watchface.dfx.memory.WatchFaceDocuments.isClock;
 import static com.google.wear.watchface.dfx.memory.WatchFaceDocuments.isDrawableNode;
-import static com.google.wear.watchface.dfx.memory.WatchFaceDocuments.isFont;
-import static com.google.wear.watchface.dfx.memory.WatchFaceDocuments.isPartAnimatedImage;
-import static com.google.wear.watchface.dfx.memory.WatchFaceDocuments.isPartImage;
 
 import static java.lang.Math.max;
 import static java.util.stream.Collectors.toList;
@@ -34,42 +29,51 @@ import static java.util.stream.Collectors.toSet;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.LongStream;
 
-/** Computes the memory footprint of a watch face for a single variant. */
-class VariantMemoryFootprintCalculator {
+/**
+ * Calculates the maximum memory footprint needed to render the given dynamic nodes for any user
+ * style combination. The dynamic nodes, ie. the nodes that contain drawable resources and need to
+ * be re-drawn on each render, are provided via the {@code drawableNodeConfigTable} constructor
+ * argument, together with the user style configurations that cause them to be drawn. In active,
+ * this contains all the nodes that have drawable resource references. In ambient however, where the
+ * watch face interactivity is restricted, only a sub-set of the dynamic nodes are calculated (the
+ * clocks and complication slots).
+ */
+class DynamicNodePerConfigurationFootprintCalculator {
     private final Document document;
     private final Map<String, DrawableResourceDetails> resourceMemoryMap;
     private final EvaluationSettings evaluationSettings;
     private final Node sceneNode;
     private final WatchFaceResourceCollector resourceCollector;
+    private final VariantConfigValue variant;
+    private final DrawableNodeConfigTable drawableNodeConfigTable;
+    private final Set<Node> dynamicNodesToConsider;
 
-    VariantMemoryFootprintCalculator(
+    DynamicNodePerConfigurationFootprintCalculator(
             Document document,
             Map<String, DrawableResourceDetails> resourceMemoryMap,
-            EvaluationSettings evaluationSettings) {
+            EvaluationSettings evaluationSettings,
+            VariantConfigValue variant,
+            WatchFaceResourceCollector resourceCollector,
+            DrawableNodeConfigTable drawableNodeConfigTable) {
         this.document = document;
         this.sceneNode = findSceneNode(document);
         this.resourceMemoryMap = resourceMemoryMap;
         this.evaluationSettings = evaluationSettings;
-        this.resourceCollector =
-                new WatchFaceResourceCollector(document, resourceMemoryMap, evaluationSettings);
+        this.variant = variant;
+        this.resourceCollector = resourceCollector;
+        this.drawableNodeConfigTable = drawableNodeConfigTable;
+        this.dynamicNodesToConsider =
+                drawableNodeConfigTable.getAllEntries().stream()
+                        .map(entry -> entry.node)
+                        .collect(toSet());
     }
 
-    /**
-     * Evaluates the watch face layout document under the given variant.
-     *
-     * @param variant the variant to consider when traversing and evaluating the watch face.
-     * @return the memory footprint, in bytes, that the watch face consumes under the given variant.
-     */
-    long evaluateBytes(VariantConfigValue variant) {
-        DrawableNodeConfigTable drawableNodeConfigTable =
-                DrawableNodeConfigTable.create(sceneNode, variant);
+    long calculateMaxFootprintBytes() {
         // find the user config keys that are mutually exclusive, meaning that no two keys from
         // different sets are parents of the same resource.
         List<Set<UserConfigKey>> userConfigSplit =
@@ -94,10 +98,10 @@ class VariantMemoryFootprintCalculator {
             if (evaluationSettings.isVerbose()) {
                 System.out.println("Using greedy evaluation%n");
             }
-            return greedyEvaluate(variant);
+            return greedyEvaluate();
         }
 
-        return lazyEvaluate(variant, configIterators, drawableNodeConfigTable);
+        return lazyEvaluate(configIterators);
     }
 
     /**
@@ -106,21 +110,23 @@ class VariantMemoryFootprintCalculator {
      * This approach is only used when the watch face has too many user configs and cannot be
      * accurately evaluated in a reasonable amount of time.
      */
-    private long greedyEvaluate(VariantConfigValue variant) {
-        return greedyEvaluate(sceneNode, variant);
+    long greedyEvaluate() {
+        return greedyEvaluate(sceneNode);
     }
 
-    private long greedyEvaluate(Node currentNode, VariantConfigValue variant) {
+    private long greedyEvaluate(Node currentNode) {
         if (variant.isNodeSkipped(currentNode)) {
             return 0;
         }
-        if (isDrawableNode(currentNode)) {
-            return sumDrawableResourceFootprintBytes(
-                    resourceMemoryMap, collectDrawableNodeResourceReferences(currentNode, variant));
+        if (isDrawableNode(currentNode) && dynamicNodesToConsider.contains(currentNode)) {
+            return resourceCollector.collectResources(currentNode, variant).stream()
+                    .mapToLong(
+                            resourceName ->
+                                    findInMap(resourceMemoryMap, resourceName)
+                                            .getTotalFootprintBytes())
+                    .sum();
         }
-        LongStream childrenFootprints =
-                childrenStream(currentNode)
-                        .mapToLong(childNode -> greedyEvaluate(childNode, variant));
+        LongStream childrenFootprints = childrenStream(currentNode).mapToLong(this::greedyEvaluate);
         if (isValidUserConfigNode(currentNode)) {
             return childrenFootprints.max().orElse(0);
         }
@@ -139,14 +145,9 @@ class VariantMemoryFootprintCalculator {
      * <p>We use a lazy iterator because we can still have too many configs to store in memory,
      * hence we are * producing and evaluating them lazily.
      *
-     * @param variant the variant under which the layout is evaluated
      * @param configIterators the list of iterators producing mutually-exclusive config sets.
      */
-    private long lazyEvaluate(
-            VariantConfigValue variant,
-            List<SizedIterator<UserConfigSet>> configIterators,
-            DrawableNodeConfigTable drawableNodeConfigTable) {
-
+    private long lazyEvaluate(List<SizedIterator<UserConfigSet>> configIterators) {
         long footprintOfResourcesWithConfigs =
                 configIterators.stream()
                         .mapToLong(
@@ -169,15 +170,13 @@ class VariantMemoryFootprintCalculator {
      */
     private long evaluateIndependentDrawableNodesBytes(
             VariantConfigValue variant, DrawableNodeConfigTable drawableNodeConfigTable) {
-        Set<FootprintResourceReference> topLevelResourceReferences =
-                drawableNodeConfigTable.getIndependentDrawableNodes().stream()
-                        .flatMap(
-                                drawable ->
-                                        collectDrawableNodeResourceReferences(
-                                                drawable.node, variant)
-                                                .stream())
-                        .collect(toSet());
-        return sumDrawableResourceFootprintBytes(resourceMemoryMap, topLevelResourceReferences);
+        return drawableNodeConfigTable.getIndependentDrawableNodes().stream()
+                .flatMap(entry -> resourceCollector.collectResources(entry.node, variant).stream())
+                .distinct()
+                .mapToLong(
+                        resourceName ->
+                                findInMap(resourceMemoryMap, resourceName).getTotalFootprintBytes())
+                .sum();
     }
 
     /**
@@ -197,70 +196,21 @@ class VariantMemoryFootprintCalculator {
                             .filter(entry -> entry.matchesConfigSet(next))
                             .collect(toList());
 
-            Set<FootprintResourceReference> resourcesForConfigSet =
+            long footprintForConfig =
                     nodesMatchingConfigSet.stream()
                             .flatMap(
-                                    leafAndConfig ->
-                                            collectDrawableNodeResourceReferences(
-                                                    leafAndConfig.node, variant)
+                                    entry ->
+                                            resourceCollector
+                                                    .collectResources(entry.node, variant)
                                                     .stream())
-                            .collect(toSet());
-            long footprintForConfig =
-                    sumDrawableResourceFootprintBytes(resourceMemoryMap, resourcesForConfigSet);
+                            .distinct()
+                            .mapToLong(
+                                    resourceName ->
+                                            findInMap(resourceMemoryMap, resourceName)
+                                                    .getTotalFootprintBytes())
+                            .sum();
             maxFootprint = max(footprintForConfig, maxFootprint);
         }
         return maxFootprint;
-    }
-
-    /**
-     * Collect the footprint resource references from a node that renders images. It is important to
-     * work with nodes (PartAnimatedImage, PartImage etc) because there are differences in the logic
-     * for computing memory footprint between ambient and active depending on the node.
-     */
-    private Set<FootprintResourceReference> collectDrawableNodeResourceReferences(
-            Node currentNode, VariantConfigValue variant) {
-        if (isPartAnimatedImage(currentNode)) {
-            return collectPartAnimatedImageResources(currentNode, variant);
-        } else if (isPartImage(currentNode)
-                || isBitmapFont(currentNode)
-                || isFont(currentNode)
-                || isClock(currentNode)) {
-            return collectTotalOfResources(currentNode);
-        }
-        // explicitly check for the expected nodes and throw if we forget one of them to make it
-        // easier to add more cases
-        throw new IllegalArgumentException(
-                String.format("Drawable node %s was not handled", currentNode.getNodeName()));
-    }
-
-    private Set<FootprintResourceReference> collectPartAnimatedImageResources(
-            Node currentNode, VariantConfigValue variant) {
-        Set<String> resourceNamesUnderAnimatedImage =
-                resourceCollector.collectResources(currentNode);
-        // Animated images are counted differently in ambient and active.
-        if (variant.isAmbient()) {
-            // If we're evaluating the watch face in ambient, then we want the biggest frame
-            // of the resources referenced by the animation.
-            String resourceNameWithBiggestFrame =
-                    Collections.max(
-                            resourceNamesUnderAnimatedImage,
-                            Comparator.comparingLong(
-                                    resourceName ->
-                                            resourceMemoryMap
-                                                    .get(resourceName)
-                                                    .getBiggestFrameFootprintBytes()));
-            return Collections.singleton(
-                    FootprintResourceReference.biggestFrameOf(resourceNameWithBiggestFrame));
-        } else {
-            return resourceNamesUnderAnimatedImage.stream()
-                    .map(FootprintResourceReference::totalOf)
-                    .collect(toSet());
-        }
-    }
-
-    private Set<FootprintResourceReference> collectTotalOfResources(Node currentNode) {
-        return resourceCollector.collectResources(currentNode).stream()
-                .map(FootprintResourceReference::totalOf)
-                .collect(toSet());
     }
 }
