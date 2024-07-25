@@ -19,10 +19,9 @@ package com.google.wear.watchface.dfx.memory;
 import static com.google.wear.watchface.dfx.memory.DrawableResourceDetails.findInMap;
 import static com.google.wear.watchface.dfx.memory.WatchFaceDocuments.findSceneNode;
 
-import org.w3c.dom.Document;
-
 import java.util.Map;
 import java.util.Set;
+import org.w3c.dom.Document;
 
 class WatchFaceLayoutEvaluator {
 

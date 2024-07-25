@@ -5,9 +5,6 @@ import static com.google.common.truth.Truth.assertThat;
 import com.google.common.collect.ImmutableList;
 import com.google.common.jimfs.Configuration;
 import com.google.common.jimfs.Jimfs;
-
-import org.junit.Test;
-
 import java.io.InputStream;
 import java.nio.file.FileSystem;
 import java.nio.file.Files;
@@ -15,6 +12,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Optional;
+import org.junit.Test;
 
 public class DrawableResourceDetailsTest {
     private static final String TEST_PACKAGE_FILES_ROOT =
@@ -95,8 +93,7 @@ public class DrawableResourceDetailsTest {
     public void fromPackageFile_parsesPngFromDifferentQualifierDrawable() throws Exception {
         ImmutableList<String> testFilePaths =
                 ImmutableList.of("base/res/drawable-xhdpi/dial.png", "base/res/drawable/dial.png");
-        AndroidResource originalPackageFile =
-                readPackageFile("base/res/drawable-nodpi/dial.png");
+        AndroidResource originalPackageFile = readPackageFile("base/res/drawable-nodpi/dial.png");
         for (String testFilePath : testFilePaths) {
             AndroidResource testPackageFile =
                     changePath(originalPackageFile, Paths.get(testFilePath));
@@ -135,12 +132,13 @@ public class DrawableResourceDetailsTest {
         // first component) and APK-style paths, where the module name does not exist
         try (FileSystem windowsFileSystem = Jimfs.newFileSystem(Configuration.windows())) {
             ImmutableList<String> testFilePaths =
-                ImmutableList.of(
-                     "base/res/font/roboto_regular.ttf", "base/res/drawable-nodpi/dial.png");
+                    ImmutableList.of(
+                            "base/res/font/roboto_regular.ttf", "base/res/drawable-nodpi/dial.png");
             for (String testFilePath : testFilePaths) {
                 AndroidResource testPackageFile =
-                    changePath(readPackageFile(testFilePath),
-                    makeWindowsPath(testFilePath, windowsFileSystem));
+                        changePath(
+                                readPackageFile(testFilePath),
+                                makeWindowsPath(testFilePath, windowsFileSystem));
 
                 Optional<DrawableResourceDetails> testDrawableDetails =
                         DrawableResourceDetails.fromPackageResource(testPackageFile);
@@ -156,8 +154,7 @@ public class DrawableResourceDetailsTest {
                 ImmutableList.of("base/res/drawable-xhdpi/dial.png", "base/res/drawable/dial.png");
         AndroidResource originalFile = readPackageFile("base/res/drawable-nodpi/dial.png");
         for (String testFilePath : testFilePaths) {
-            AndroidResource testPackageFile =
-                    changePath(originalFile, Paths.get(testFilePath));
+            AndroidResource testPackageFile = changePath(originalFile, Paths.get(testFilePath));
 
             Optional<DrawableResourceDetails> testDrawableDetails =
                     DrawableResourceDetails.fromPackageResource(testPackageFile);
@@ -216,7 +213,7 @@ public class DrawableResourceDetailsTest {
     private AndroidResource readPackageFile(String originFilePath) throws Exception {
         Path filePath = Paths.get(TEST_PACKAGE_FILES_ROOT, originFilePath);
         byte[] bytes = Files.readAllBytes(filePath);
-        return  AndroidResource.fromPath(filePath, bytes);
+        return AndroidResource.fromPath(filePath, bytes);
     }
 
     private AndroidResource changePath(AndroidResource origin, Path newPath) {
@@ -237,8 +234,7 @@ public class DrawableResourceDetailsTest {
         String path = String.format("/res/drawable/%s", name);
         try (InputStream is = getClass().getResourceAsStream(path)) {
             return DrawableResourceDetails.fromPackageResource(
-                AndroidResource.fromPath(path, AndroidResourceLoader.readAllBytes(is))
-            );
+                    AndroidResource.fromPath(path, AndroidResourceLoader.readAllBytes(is)));
         }
     }
 }

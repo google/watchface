@@ -19,20 +19,18 @@ package com.google.wear.watchface.dfx.memory;
 import static com.google.wear.watchface.dfx.memory.WatchFaceDocuments.findBitmapFontsNode;
 import static com.google.wear.watchface.dfx.memory.WatchFaceDocuments.findSceneNode;
 import static com.google.wear.watchface.dfx.memory.WatchFaceDocuments.getNodeAttribute;
-
 import static java.lang.Math.ceil;
 import static java.lang.Math.floor;
 import static java.lang.Math.max;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /** Estimates the effects of optimizing the DWF. */
 class OptimizationEstimator {
@@ -91,7 +89,7 @@ class OptimizationEstimator {
                     break;
                 }
 
-            // TODO(b/308123875): Support PartAnimatedImage
+                // TODO(b/308123875): Support PartAnimatedImage
             case "PartImage":
                 {
                     DrawableResourceDetails drawable = findImageNodeDrawableResourceDetails(node);
@@ -180,7 +178,8 @@ class OptimizationEstimator {
 
         if (maxHeight == 0) {
             if (evaluationSettings.isVerbose()) {
-                System.out.printf("BitmapFont: %s unused. Saving %s\n", fontFamily, unoptimizedSize);
+                System.out.printf(
+                        "BitmapFont: %s unused. Saving %s\n", fontFamily, unoptimizedSize);
             }
             return unoptimizedSize;
         }

@@ -19,12 +19,9 @@ package com.google.wear.watchface.dfx.memory;
 import static com.google.wear.watchface.dfx.memory.UserConfigValue.SupportedConfigs.isValidUserConfigNode;
 import static com.google.wear.watchface.dfx.memory.WatchFaceDocuments.childrenStream;
 import static com.google.wear.watchface.dfx.memory.WatchFaceDocuments.isDrawableNode;
-
 import static java.util.Collections.emptyMap;
 import static java.util.stream.Collectors.*;
 import static java.util.stream.Collectors.toList;
-
-import org.w3c.dom.Node;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -33,6 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
+import org.w3c.dom.Node;
 
 /**
  * A container class that holds, for each drawable node of the watch face, the user config set that

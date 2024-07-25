@@ -7,7 +7,6 @@ import com.google.devrel.gmscore.tools.apk.arsc.Chunk;
 import com.google.devrel.gmscore.tools.apk.arsc.ResourceTableChunk;
 import com.google.devrel.gmscore.tools.apk.arsc.StringPoolChunk;
 import com.google.devrel.gmscore.tools.apk.arsc.TypeChunk;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,23 +26,25 @@ import java.util.zip.ZipInputStream;
 
 /**
  * Represents all the resources of interest in the Android package.
- * <p>
- * Where obfuscation has been applied, the mapping is derived, for the creation of the
- * AndroidResource objects. For example, for a logical resource res/raw/watchface.xml, an APK
- * may in fact store this as res/aB.xml. The resources.arsc file contains this mapping, and the
+ *
+ * <p>Where obfuscation has been applied, the mapping is derived, for the creation of the
+ * AndroidResource objects. For example, for a logical resource res/raw/watchface.xml, an APK may in
+ * fact store this as res/aB.xml. The resources.arsc file contains this mapping, and the
  * AndroidResourceLoader provides a stream of resources with their logical types, names and data.
- * <p>
- * Note that more than one AndroidResource object can exist for the given dimensions. For example,
- * if there is a drawable and a drawable-fr folder, then there may be multiple AndroidResource
- * entries for drawables with the same type, name and extension. The configuration detail, e.g.
- * "fr" or "default", is not currently exposed in the AndroidResource objects as it isn't used.
+ *
+ * <p>Note that more than one AndroidResource object can exist for the given dimensions. For
+ * example, if there is a drawable and a drawable-fr folder, then there may be multiple
+ * AndroidResource entries for drawables with the same type, name and extension. The configuration
+ * detail, e.g. "fr" or "default", is not currently exposed in the AndroidResource objects as it
+ * isn't used.
  */
 public class AndroidResourceLoader {
     // Only certain resource types are of interest to the evaluator, notably, not string resources.
-    private static final Set<String> RESOURCE_TYPES = Set.of("raw", "xml", "drawable", "font", "asset");
+    private static final Set<String> RESOURCE_TYPES =
+            Set.of("raw", "xml", "drawable", "font", "asset");
     private static final String RESOURCES_FILE_NAME = "resources.arsc";
 
-    private AndroidResourceLoader() { }
+    private AndroidResourceLoader() {}
 
     /**
      * Creates a resource stream from a path to an AAB structure on the file system.
@@ -57,34 +58,38 @@ public class AndroidResourceLoader {
         int relativePathOffset = aabPath.toString().length() + 1;
 
         return childrenFilesStream
-            .map(
-                filePath -> {
-                    AndroidResource resource = null;
-                    if (AndroidResource.isValidResourcePath(filePath)) {
-                        try {
-                            resource = AndroidResource.fromPath(
-                                Paths.get(filePath.toString().substring(relativePathOffset)),
-                                java.nio.file.Files.readAllBytes(filePath)
-                            );
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
-                    } else if (filePath.endsWith("manifest/AndroidManifest.xml")) {
-                        try {
-                            resource = new AndroidResource(
-                                "xml",
-                                "AndroidManifest",
-                                "xml",
-                                Paths.get(filePath.toString().substring(relativePathOffset)),
-                                java.nio.file.Files.readAllBytes(filePath)
-                            );
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
-                    }
-                    return resource;
-                }
-            ).filter(Objects::nonNull);
+                .map(
+                        filePath -> {
+                            AndroidResource resource = null;
+                            if (AndroidResource.isValidResourcePath(filePath)) {
+                                try {
+                                    resource =
+                                            AndroidResource.fromPath(
+                                                    Paths.get(
+                                                            filePath.toString()
+                                                                    .substring(relativePathOffset)),
+                                                    java.nio.file.Files.readAllBytes(filePath));
+                                } catch (IOException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            } else if (filePath.endsWith("manifest/AndroidManifest.xml")) {
+                                try {
+                                    resource =
+                                            new AndroidResource(
+                                                    "xml",
+                                                    "AndroidManifest",
+                                                    "xml",
+                                                    Paths.get(
+                                                            filePath.toString()
+                                                                    .substring(relativePathOffset)),
+                                                    java.nio.file.Files.readAllBytes(filePath));
+                                } catch (IOException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            }
+                            return resource;
+                        })
+                .filter(Objects::nonNull);
     }
 
     /**
@@ -95,35 +100,40 @@ public class AndroidResourceLoader {
      */
     static Stream<AndroidResource> streamFromAabFile(ZipFile aabZipFile) {
         return aabZipFile.stream()
-            .map(
-                zipEntry -> {
-                    Path zipEntryPath = Paths.get(zipEntry.getName());
-                    AndroidResource resource = null;
-                    if (AndroidResource.isValidResourcePath(zipEntryPath)) {
-                        try {
-                            resource = AndroidResource.fromPath(
-                                zipEntryPath,
-                                aabZipFile.getInputStream(zipEntry).readAllBytes()
-                            );
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
-                    } else if (zipEntry.getName().endsWith("manifest/AndroidManifest.xml")) {
-                        try {
-                            resource = new AndroidResource(
-                                "xml",
-                                "AndroidManifest",
-                                "xml",
-                                Paths.get(zipEntry.getName()),
-                                aabZipFile.getInputStream(zipEntry).readAllBytes()
-                            );
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
-                    }
-                    return resource;
-                }
-            ).filter(Objects::nonNull);
+                .map(
+                        zipEntry -> {
+                            Path zipEntryPath = Paths.get(zipEntry.getName());
+                            AndroidResource resource = null;
+                            if (AndroidResource.isValidResourcePath(zipEntryPath)) {
+                                try {
+                                    resource =
+                                            AndroidResource.fromPath(
+                                                    zipEntryPath,
+                                                    aabZipFile
+                                                            .getInputStream(zipEntry)
+                                                            .readAllBytes());
+                                } catch (IOException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            } else if (zipEntry.getName()
+                                    .endsWith("manifest/AndroidManifest.xml")) {
+                                try {
+                                    resource =
+                                            new AndroidResource(
+                                                    "xml",
+                                                    "AndroidManifest",
+                                                    "xml",
+                                                    Paths.get(zipEntry.getName()),
+                                                    aabZipFile
+                                                            .getInputStream(zipEntry)
+                                                            .readAllBytes());
+                                } catch (IOException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            }
+                            return resource;
+                        })
+                .filter(Objects::nonNull);
     }
 
     /**
@@ -133,51 +143,52 @@ public class AndroidResourceLoader {
      * @return A stream of resource objects.
      * @throws IOException when the resources file cannot be found, or other IO errors occur.
      */
-    static Stream<AndroidResource> streamFromMokkaZip(ZipInputStream baseSplitZipStream) throws IOException {
+    static Stream<AndroidResource> streamFromMokkaZip(ZipInputStream baseSplitZipStream)
+            throws IOException {
 
         Iterator<AndroidResource> iterator =
-            new Iterator<AndroidResource>() {
-                private ZipEntry zipEntry;
+                new Iterator<AndroidResource>() {
+                    private ZipEntry zipEntry;
 
-                @Override
-                public boolean hasNext() {
-                    try {
-                        zipEntry = baseSplitZipStream.getNextEntry();
-                        // Advance over entries in the zip that aren't relevant.
-                        while (zipEntry != null && !AndroidResource.isValidResourcePath(zipEntry.getName())) {
+                    @Override
+                    public boolean hasNext() {
+                        try {
                             zipEntry = baseSplitZipStream.getNextEntry();
+                            // Advance over entries in the zip that aren't relevant.
+                            while (zipEntry != null
+                                    && !AndroidResource.isValidResourcePath(zipEntry.getName())) {
+                                zipEntry = baseSplitZipStream.getNextEntry();
+                            }
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
                         }
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
+                        return zipEntry != null;
                     }
-                    return zipEntry != null;
-                }
 
-                @Override
-                public AndroidResource next() {
-                    System.out.println(zipEntry);
-                    byte[] entryData;
-                    try {
-                        entryData = readAllBytes(baseSplitZipStream);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
+                    @Override
+                    public AndroidResource next() {
+                        System.out.println(zipEntry);
+                        byte[] entryData;
+                        try {
+                            entryData = readAllBytes(baseSplitZipStream);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                        return AndroidResource.fromPath(zipEntry.getName(), entryData);
                     }
-                    return AndroidResource.fromPath(zipEntry.getName(), entryData);
-                }
-            };
+                };
 
         return StreamSupport.stream(
-            Spliterators.spliteratorUnknownSize(iterator, Spliterator.ORDERED),
-            false);
+                Spliterators.spliteratorUnknownSize(iterator, Spliterator.ORDERED), false);
     }
 
     /**
      * Creates a resource stream from an APK zip file.
-     * <p>
-     * APK files can have their resources obfuscated, so it is necessary to extract the mapping
+     *
+     * <p>APK files can have their resources obfuscated, so it is necessary to extract the mapping
      * between the original path and the path in the obfuscated zip.
      *
-     * @param zipFile          The APK zip file
+     * @param zipFile The APK zip file
      * @return A stream of resource objects.
      * @throws IOException when errors loading resources occur.
      */
@@ -196,32 +207,32 @@ public class AndroidResourceLoader {
         ResourceTableChunk table = (ResourceTableChunk) chunks.get(0);
         StringPoolChunk stringPool = table.getStringPool();
 
-        List<TypeChunk> typeChunks = table.getPackages()
-            .stream()
-            .flatMap(p -> p.getTypeChunks().stream())
-            .toList();
+        List<TypeChunk> typeChunks =
+                table.getPackages().stream().flatMap(p -> p.getTypeChunks().stream()).toList();
 
         return typeChunks.stream()
-            .flatMap(c -> c.getEntries().values().stream())
-            .filter(t -> RESOURCE_TYPES.contains(t.typeName()))
-            .filter(t -> t.value().type() == BinaryResourceValue.Type.STRING)
-            .map(entry -> {
-                Path path = Path.of(stringPool.getString(entry.value().data()));
-                byte[] data = null;
-                try {
-                    data = zipFile.getInputStream(new ZipEntry(path.toString())).readAllBytes();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+                .flatMap(c -> c.getEntries().values().stream())
+                .filter(t -> RESOURCE_TYPES.contains(t.typeName()))
+                .filter(t -> t.value().type() == BinaryResourceValue.Type.STRING)
+                .map(
+                        entry -> {
+                            Path path = Path.of(stringPool.getString(entry.value().data()));
+                            byte[] data = null;
+                            try {
+                                data =
+                                        zipFile.getInputStream(new ZipEntry(path.toString()))
+                                                .readAllBytes();
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
 
-                return new AndroidResource(
-                        entry.parent().getTypeName(),
-                        entry.key(),
-                        Files.getFileExtension(path.toString()),
-                        path,
-                        data
-                );
-            });
+                            return new AndroidResource(
+                                    entry.parent().getTypeName(),
+                                    entry.key(),
+                                    Files.getFileExtension(path.toString()),
+                                    path,
+                                    data);
+                        });
     }
 
     /** Read all bytes from an input stream to a new byte array. */

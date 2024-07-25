@@ -17,7 +17,12 @@
 package com.google.wear.watchface.dfx.memory;
 
 import com.google.common.collect.ImmutableList;
-
+import java.io.IOException;
+import java.net.URL;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Optional;
+import java.util.jar.Manifest;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -26,20 +31,14 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
-import java.io.IOException;
-import java.net.URL;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Optional;
-import java.util.jar.Manifest;
-
 /** Contains the CLI arguments that the script was invoked with. */
 final class EvaluationSettings {
 
     private static final String HONEYFACE_VERSION = "honeyface";
 
     // Match versions supported by the XML validator
-    private static final List<String> SUPPORTED_VERSIONS = ImmutableList.of(HONEYFACE_VERSION, "1", "2");
+    private static final List<String> SUPPORTED_VERSIONS =
+            ImmutableList.of(HONEYFACE_VERSION, "1", "2");
 
     private static final int GREEDY_DEFAULT_LIMIT = 10_000_000;
 

@@ -103,14 +103,14 @@ open class ImageLoader(val settings: Settings) {
 }
 
 /**
- * A lookup table used for computing the loss of precision when an 8bit value is quantized to a
- * 5bit value.
+ * A lookup table used for computing the loss of precision when an 8bit value is quantized to a 5bit
+ * value.
  */
 private val QUANTIZATION_ERROR_LUT5 = create8bppToNbppQuantizationErrorLookUpTable(5)
 
 /**
- * A lookup table used for computing the loss of precision when an 8bit value is quantized to a
- * 6bit value.
+ * A lookup table used for computing the loss of precision when an 8bit value is quantized to a 6bit
+ * value.
  */
 private val QUANTIZATION_ERROR_LUT6 = create8bppToNbppQuantizationErrorLookUpTable(6)
 
@@ -199,7 +199,17 @@ open class Image(
                 BufferedImage(image.width, image.height, BufferedImage.TYPE_USHORT_565_RGB)
             val graphics = quantizedImage.createGraphics()
             graphics.drawImage(
-                image, 0, 0, image.width, image.height, 0, 0, image.width, image.height, null)
+                image,
+                0,
+                0,
+                image.width,
+                image.height,
+                0,
+                0,
+                image.width,
+                image.height,
+                null
+            )
             graphics.dispose()
 
             optimizedImage = quantizedImage

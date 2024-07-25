@@ -16,14 +16,13 @@
 
 package com.google.wear.watchface.dfx.memory;
 
+import java.util.Optional;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import java.util.Optional;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 /** A set of operations performed on a watch face document or on nodes of a watch face document. */
 class WatchFaceDocuments {

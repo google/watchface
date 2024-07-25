@@ -6,7 +6,6 @@ import static com.google.wear.watchface.dfx.memory.ResourceMemoryEvaluator.evalu
 import static com.google.wear.watchface.dfx.memory.WatchFaceData.SYSTEM_DEFAULT_FONT;
 import static com.google.wear.watchface.dfx.memory.WatchFaceData.SYSTEM_DEFAULT_FONT_SIZE;
 import static junit.framework.TestCase.assertEquals;
-
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.junit.runners.Parameterized.Parameter;
@@ -14,16 +13,6 @@ import static org.junit.runners.Parameterized.Parameter;
 import com.google.common.base.Charsets;
 import com.google.common.hash.Hashing;
 import com.samsung.watchface.WatchFaceXmlValidator;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.runners.Enclosed;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
-import org.w3c.dom.Document;
-
 import java.io.File;
 import java.io.InputStream;
 import java.nio.file.Paths;
@@ -36,8 +25,15 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import javax.xml.parsers.DocumentBuilderFactory;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.experimental.runners.Enclosed;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
+import org.w3c.dom.Document;
 
 @RunWith(Enclosed.class)
 public class ResourceMemoryEvaluatorTest {

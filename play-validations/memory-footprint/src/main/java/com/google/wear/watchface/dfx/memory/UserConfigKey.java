@@ -17,21 +17,18 @@
 package com.google.wear.watchface.dfx.memory;
 
 import static com.google.wear.watchface.dfx.memory.WatchFaceDocuments.childrenStream;
-
 import static java.util.Collections.emptyIterator;
 import static java.util.Collections.emptyList;
 
 import com.google.wear.watchface.dfx.memory.UserConfigValue.SupportedConfigs;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 
 /** Represents the key of a UserConfiguration ie a ListConfiguration or a BooleanConfiguration. */
 class UserConfigKey {

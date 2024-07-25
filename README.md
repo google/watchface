@@ -42,6 +42,13 @@ optimizing aspects of your WFF XML and your resources.
 
 For WFF samples, please see the [Wear OS Samples repository][samples] on GitHub.
 
+## Developer Considerations
+
+### Formatting
+
+This codebase is automatically formatted using [spotless](https://github.com/diffplug/spotless) To
+reformat, from the project root directory, run `./gradlew spotlessApply`.
+
 ## License
 
 Watch Face Format is distributed under the Apache 2.0 license, see the

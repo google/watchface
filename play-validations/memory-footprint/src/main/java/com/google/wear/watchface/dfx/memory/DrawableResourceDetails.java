@@ -29,7 +29,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
@@ -139,8 +138,7 @@ class DrawableResourceDetails {
                             .build());
         }
 
-        boolean isPossibleImage =
-                resource.isAsset() || resource.isDrawable() || resource.isRaw();
+        boolean isPossibleImage = resource.isAsset() || resource.isDrawable() || resource.isRaw();
 
         if (!isPossibleImage) {
             return Optional.empty();

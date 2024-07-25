@@ -37,6 +37,11 @@ jobs:
         run: |
           git_hash=$(git rev-parse --short "$GITHUB_SHA")
           echo "git_hash=$git_hash" >> $GITHUB_ENV
+      - name: Check format
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          build-root-directory: play-validations
+          arguments: spotlessCheck
       - name: Build memory-footprint.jar
         uses: gradle/actions/setup-gradle@v3
         with:
@@ -84,6 +89,11 @@ jobs:
         run: |
           git_hash=$(git rev-parse --short "$GITHUB_SHA")
           echo "git_hash=$git_hash" >> $GITHUB_ENV
+      - name: Check format
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          build-root-directory: tools
+          arguments: spotlessCheck
       - name: Build wff-optimizer.jar
         uses: gradle/actions/setup-gradle@v3
         with:

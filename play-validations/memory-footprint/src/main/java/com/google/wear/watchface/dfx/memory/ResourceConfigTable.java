@@ -28,13 +28,11 @@ import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.MutableGraph;
 import com.google.common.graph.Traverser;
 import com.google.mu.util.stream.BiStream;
-
-import org.w3c.dom.Document;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.w3c.dom.Document;
 
 /**
  * A container class that holds, for each resource referenced by the watch face, the {@link

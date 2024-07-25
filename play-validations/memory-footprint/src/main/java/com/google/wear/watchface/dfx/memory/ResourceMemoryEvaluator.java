@@ -22,9 +22,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.samsung.watchface.WatchFaceXmlValidator;
-
-import org.w3c.dom.Document;
-
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -32,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.w3c.dom.Document;
 
 /** Computes the asset memory footprint for a given watch face. */
 public class ResourceMemoryEvaluator {
@@ -150,12 +148,12 @@ public class ResourceMemoryEvaluator {
     private static void validateFormat(WatchFaceData watchFaceData, String watchFaceFormatVersion) {
         WatchFaceXmlValidator xmlValidator = new WatchFaceXmlValidator();
         for (Document watchFaceDocument : watchFaceData.watchFaceDocuments) {
-           boolean documentHasValidSchema =
-                   xmlValidator.validate(watchFaceDocument, watchFaceFormatVersion);
-           if (!documentHasValidSchema) {
-               throw new TestFailedException(
-                       "Watch Face has syntactic errors and cannot be parsed.");
-           }
+            boolean documentHasValidSchema =
+                    xmlValidator.validate(watchFaceDocument, watchFaceFormatVersion);
+            if (!documentHasValidSchema) {
+                throw new TestFailedException(
+                        "Watch Face has syntactic errors and cannot be parsed.");
+            }
         }
     }
 

@@ -1,16 +1,14 @@
 package com.google.wear.watchface.dfx.memory;
 
 import static com.google.wear.watchface.dfx.memory.EvaluationSettings.parseFromArguments;
-
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertTrue;
 
+import java.util.Optional;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-
-import java.util.Optional;
 
 @RunWith(JUnit4.class)
 public class EvaluationSettingsTest {

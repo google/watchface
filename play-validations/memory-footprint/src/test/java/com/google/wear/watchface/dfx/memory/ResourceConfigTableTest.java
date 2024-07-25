@@ -3,25 +3,21 @@ package com.google.wear.watchface.dfx.memory;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.wear.watchface.dfx.memory.ResourceConfigTable.fromDrawableNodeConfigTable;
 import static com.google.wear.watchface.dfx.memory.WatchFaceDocuments.findSceneNode;
-
 import static org.junit.Assert.assertEquals;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
-import org.w3c.dom.Document;
-
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import javax.xml.parsers.DocumentBuilderFactory;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.w3c.dom.Document;
 
 @RunWith(JUnit4.class)
 public class ResourceConfigTableTest {

@@ -18,11 +18,10 @@ package com.google.wear.watchface.dfx.memory;
 
 import static com.google.wear.watchface.dfx.memory.WatchFaceDocuments.getNodeAttribute;
 
-import org.w3c.dom.Node;
-
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
+import org.w3c.dom.Node;
 
 /**
  * Represents a UserConfiguration value. For example, in the following XML:

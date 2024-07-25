@@ -21,26 +21,22 @@ import static com.google.wear.watchface.dfx.memory.WatchFaceDocuments.childrenSt
 import static com.google.wear.watchface.dfx.memory.WatchFaceDocuments.getNodeAttribute;
 import static com.google.wear.watchface.dfx.memory.WatchFaceDocuments.isBitmapFont;
 import static com.google.wear.watchface.dfx.memory.WatchFaceDocuments.isFont;
-
 import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toSet;
 
 import com.google.common.collect.ImmutableMap;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
-
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 class WatchFaceResourceCollector {
     private final Map<String, Node> bitmapFontDefinitions;
