@@ -27,7 +27,6 @@
       <xs:element ref="PartImage"/>
       <xs:element ref="PartAnimatedImage"/>
       <xs:element ref="PartDraw"/>
-      <xs:element ref="PartVectorImage"/>
     </xs:choice>
   </xs:group>
 </xs:schema>
