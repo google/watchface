@@ -20,7 +20,6 @@ import com.google.common.truth.Truth.assertThat
 import java.awt.image.BufferedImage
 import java.io.File
 import java.io.StringWriter
-import java.nio.file.Files
 import java.util.HashSet
 import javax.xml.parsers.DocumentBuilderFactory
 import javax.xml.transform.TransformerFactory
@@ -50,10 +49,11 @@ class ImageLoaderTest {
 
     @Test
     fun bitmapFontImageDeduplication() {
-        val fixture = load(
-            "src/test/resources/duplicateImageTest",
-            "src/test/resources/duplicateImageTest/res/raw/watchface.xml"
-        )
+        val fixture =
+            load(
+                "src/test/resources/duplicateImageTest",
+                "src/test/resources/duplicateImageTest/res/raw/watchface.xml"
+            )
 
         fixture.optimizer.bitmapFonts.optimize(fixture.imageLoader)
         assertTrue(fixture.imageLoader.dedupeAndWriteOptimizedImages())
@@ -62,15 +62,17 @@ class ImageLoaderTest {
         // and file_b2 are the same.
         assertEquals(
             getResource("duplicateImageTest/res/raw/watchface_expected.xml"),
-            fixture. document.transformToString())
+            fixture.document.transformToString()
+        )
     }
 
     @Test
     fun partImageDeduplication() {
-        val fixture = load(
-            "src/test/resources/duplicateImageTest",
-            "src/test/resources/duplicateImageTest/res/raw/watchface2.xml"
-        )
+        val fixture =
+            load(
+                "src/test/resources/duplicateImageTest",
+                "src/test/resources/duplicateImageTest/res/raw/watchface2.xml"
+            )
 
         fixture.optimizer.partImages.optimize(fixture.imageLoader)
         assertTrue(fixture.imageLoader.dedupeAndWriteOptimizedImages())
@@ -79,15 +81,17 @@ class ImageLoaderTest {
         // and file_b2 are the same.
         assertEquals(
             getResource("duplicateImageTest/res/raw/watchface2_expected.xml"),
-            fixture.document.transformToString())
+            fixture.document.transformToString()
+        )
     }
 
     @Test
     fun bitmapFontCropAndMargins() {
-        val fixture = load(
-            "src/test/resources/bitmapFontCropTest",
-            "src/test/resources/bitmapFontCropTest/res/raw/watchface.xml"
-        )
+        val fixture =
+            load(
+                "src/test/resources/bitmapFontCropTest",
+                "src/test/resources/bitmapFontCropTest/res/raw/watchface.xml"
+            )
 
         fixture.optimizer.bitmapFonts.optimize(fixture.imageLoader)
         fixture.imageLoader.dedupeAndWriteOptimizedImages()
@@ -95,17 +99,19 @@ class ImageLoaderTest {
         // The bitmap fonts should be cropped with margins added to correctly place the image.
         assertEquals(
             getResource("bitmapFontCropTest/res/raw/watchface_expected.xml"),
-            fixture.document.transformToString())
+            fixture.document.transformToString()
+        )
         assertThat(fixture.imageLoader.optimizedImagesSummary())
             .containsExactly("a 40 x 44", "b 28 x 44")
     }
 
     @Test
     fun tooLargeBitmapFontCropAndMargins() {
-        val fixture = load(
-            "src/test/resources/bitmapFontCropTest",
-            "src/test/resources/bitmapFontCropTest/res/raw/too_large.xml"
-        )
+        val fixture =
+            load(
+                "src/test/resources/bitmapFontCropTest",
+                "src/test/resources/bitmapFontCropTest/res/raw/too_large.xml"
+            )
 
         fixture.optimizer.bitmapFonts.optimize(fixture.imageLoader)
         fixture.imageLoader.dedupeAndWriteOptimizedImages()
@@ -114,17 +120,19 @@ class ImageLoaderTest {
         // them down as well as crop to the visible pixels.
         assertEquals(
             getResource("bitmapFontCropTest/res/raw/too_large_expected.xml"),
-            fixture.document.transformToString())
+            fixture.document.transformToString()
+        )
         assertThat(fixture.imageLoader.optimizedImagesSummary())
             .containsExactly("a 40 x 44", "b 28 x 44")
     }
 
     @Test
     fun tooSmallBitmapFontCropAndMargins() {
-        val fixture = load(
-            "src/test/resources/bitmapFontCropTest",
-            "src/test/resources/bitmapFontCropTest/res/raw/too_small.xml"
-        )
+        val fixture =
+            load(
+                "src/test/resources/bitmapFontCropTest",
+                "src/test/resources/bitmapFontCropTest/res/raw/too_small.xml"
+            )
 
         fixture.optimizer.bitmapFonts.optimize(fixture.imageLoader)
 
@@ -134,17 +142,19 @@ class ImageLoaderTest {
         // increace runtime memory usage so we should crop but not scale.
         assertEquals(
             getResource("bitmapFontCropTest/res/raw/too_small_expected.xml"),
-            fixture.document.transformToString())
+            fixture.document.transformToString()
+        )
         assertThat(fixture.imageLoader.optimizedImagesSummary())
             .containsExactly("a 20 x 22", "b 14 x 22")
     }
 
     @Test
     fun partImageCrop() {
-        val fixture = load(
-            "src/test/resources/partImageCropTest",
-            "src/test/resources/partImageCropTest/res/raw/watchface.xml"
-        )
+        val fixture =
+            load(
+                "src/test/resources/partImageCropTest",
+                "src/test/resources/partImageCropTest/res/raw/watchface.xml"
+            )
 
         fixture.optimizer.partImages.optimize(fixture.imageLoader)
 
@@ -153,17 +163,19 @@ class ImageLoaderTest {
         // We should update the PartImages to apply the crop.
         assertEquals(
             getResource("partImageCropTest/res/raw/watchface_expected.xml"),
-            fixture.document.transformToString())
+            fixture.document.transformToString()
+        )
         assertThat(fixture.imageLoader.optimizedImagesSummary())
             .containsExactly("a 40 x 44", "b 28 x 44")
     }
 
     @Test
     fun partImageCropAfectsPivot() {
-        val fixture = load(
-            "src/test/resources/watchHandTest",
-            "src/test/resources/watchHandTest/res/raw/watchface.xml"
-        )
+        val fixture =
+            load(
+                "src/test/resources/watchHandTest",
+                "src/test/resources/watchHandTest/res/raw/watchface.xml"
+            )
 
         fixture.optimizer.partImages.optimize(fixture.imageLoader)
 
@@ -172,9 +184,9 @@ class ImageLoaderTest {
         // We should update the PartImages to apply the crop.
         assertEquals(
             getResource("watchHandTest/res/raw/watchface_expected.xml"),
-            fixture.document.transformToString())
-        assertThat(fixture.imageLoader.optimizedImagesSummary())
-            .containsExactly("hand 33 x 183")
+            fixture.document.transformToString()
+        )
+        assertThat(fixture.imageLoader.optimizedImagesSummary()).containsExactly("hand 33 x 183")
     }
 
     private class TestFixture(
@@ -182,8 +194,8 @@ class ImageLoaderTest {
         val document: Document,
         val optimizer: Optimizer
     )
-    
-    private fun load(settings: String, watchFace: String) : TestFixture {
+
+    private fun load(settings: String, watchFace: String): TestFixture {
         val builder = DocumentBuilderFactory.newInstance().newDocumentBuilder()
         val settings = Settings(File(settings).getAbsolutePath())
         val document = builder.parse(File(watchFace))

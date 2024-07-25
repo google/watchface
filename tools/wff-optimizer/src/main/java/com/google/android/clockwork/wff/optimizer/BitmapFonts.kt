@@ -93,21 +93,25 @@ class BitmapFont(val name: String, val characters: Map<String, Character>) {
 
             // Crop if needed.
             var croppedImage = image.bufferedImage
-            if (nonTransparentBounds.width() != croppedImage.width ||
-                nonTransparentBounds.height() != croppedImage.height) {
+            if (
+                nonTransparentBounds.width() != croppedImage.width ||
+                    nonTransparentBounds.height() != croppedImage.height
+            ) {
                 croppedImage =
                     croppedImage.getSubimage(
                         nonTransparentBounds.left,
                         nonTransparentBounds.top,
                         nonTransparentBounds.width(),
-                        nonTransparentBounds.height())
+                        nonTransparentBounds.height()
+                    )
                 optimizationApplied = true
 
                 if (imageLoader.settings.verbose) {
                     System.out.println(
                         "Cropping image ${character.resourceId}: " +
-                          "${image.bufferedImage.width}x${image.bufferedImage.height} -> " +
-                          "${nonTransparentBounds.width()}x${nonTransparentBounds.height()}")
+                            "${image.bufferedImage.width}x${image.bufferedImage.height} -> " +
+                            "${nonTransparentBounds.width()}x${nonTransparentBounds.height()}"
+                    )
                 }
             }
 
@@ -130,19 +134,23 @@ class BitmapFont(val name: String, val characters: Map<String, Character>) {
             var marginBottom = image.bufferedImage.height - nonTransparentBounds.bottom
 
             // If the resized area is smaller, then scale image and bounds.
-            if (newWidth * newHeight <
-                nonTransparentBounds.width() * nonTransparentBounds.height()) {
+            if (
+                newWidth * newHeight < nonTransparentBounds.width() * nonTransparentBounds.height()
+            ) {
                 if (imageLoader.settings.verbose) {
                     System.out.println(
                         "Scaling image ${character.resourceId}: " +
-                          "${croppedImage.getWidth()}x${croppedImage.getHeight()} -> " +
-                          "${newWidth}x${newHeight}")
+                            "${croppedImage.getWidth()}x${croppedImage.getHeight()} -> " +
+                            "${newWidth}x${newHeight}"
+                    )
                 }
 
                 val scaledImage = BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_ARGB)
                 val graphics = scaledImage.createGraphics()
                 graphics.setRenderingHint(
-                    RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR)
+                    RenderingHints.KEY_INTERPOLATION,
+                    RenderingHints.VALUE_INTERPOLATION_BILINEAR
+                )
                 graphics.drawImage(
                     croppedImage,
                     0,
@@ -153,7 +161,8 @@ class BitmapFont(val name: String, val characters: Map<String, Character>) {
                     0,
                     croppedImage.getWidth(),
                     croppedImage.getHeight(),
-                    null)
+                    null
+                )
                 graphics.dispose()
 
                 marginLeft = (marginLeft.toDouble() * scaleX).toInt()
@@ -162,9 +171,13 @@ class BitmapFont(val name: String, val characters: Map<String, Character>) {
                 marginBottom = (marginBottom.toDouble() * scaleY).toInt()
                 croppedImage = scaledImage
                 character.element.setAttribute(
-                    "width", (newWidth + marginLeft + marginRight).toString())
+                    "width",
+                    (newWidth + marginLeft + marginRight).toString()
+                )
                 character.element.setAttribute(
-                    "height", (newHeight + marginTop + marginBottom).toString())
+                    "height",
+                    (newHeight + marginTop + marginBottom).toString()
+                )
                 optimizationApplied = true
             }
 
@@ -208,7 +221,8 @@ class BitmapFont(val name: String, val characters: Map<String, Character>) {
                 element.getIntAttribute("marginLeft") ?: 0,
                 element.getIntAttribute("marginTop") ?: 0,
                 element.getIntAttribute("marginRight") ?: 0,
-                element.getIntAttribute("marginBottom") ?: 0)
+                element.getIntAttribute("marginBottom") ?: 0
+            )
         }
     }
 }

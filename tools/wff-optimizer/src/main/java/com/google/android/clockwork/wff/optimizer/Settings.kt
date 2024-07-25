@@ -35,10 +35,11 @@ class Settings(val sourcePath: String, val verbose: Boolean = false) {
                     .required()
                     .build()
 
-            val verboseOption = Option.builder()
-                .longOpt("verbose")
-                .desc("Verbose logging, default is false.")
-                .build()
+            val verboseOption =
+                Option.builder()
+                    .longOpt("verbose")
+                    .desc("Verbose logging, default is false.")
+                    .build()
 
             val options = Options()
             options.addOption(sourcePathOption)

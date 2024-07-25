@@ -79,15 +79,11 @@ interface InputPackage extends AutoCloseable {
             }
 
             @Override
-            public void close() {
-
-            }
+            public void close() {}
         };
     }
 
-    /**
-     * Creates an input package from a declarative watch face APK.
-     */
+    /** Creates an input package from a declarative watch face APK. */
     static InputPackage openFromApkFile(String apkPath) throws IOException {
         final ZipFile zipFile = new ZipFile(apkPath);
         return new InputPackage() {

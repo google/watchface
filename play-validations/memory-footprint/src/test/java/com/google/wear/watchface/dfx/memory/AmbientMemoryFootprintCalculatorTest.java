@@ -4,14 +4,11 @@ import static com.google.common.truth.Truth.assertThat;
 import static com.google.wear.watchface.dfx.memory.EvaluationSettings.parseFromArguments;
 
 import com.google.common.collect.ImmutableMap;
-
-import org.junit.Test;
-import org.w3c.dom.Document;
-
 import java.io.InputStream;
 import java.util.Map;
-
 import javax.xml.parsers.DocumentBuilderFactory;
+import org.junit.Test;
+import org.w3c.dom.Document;
 
 public class AmbientMemoryFootprintCalculatorTest {
 

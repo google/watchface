@@ -5,11 +5,10 @@ import java.nio.file.Paths;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * Represents a resource, from an AAB or APK.
- */
+/** Represents a resource, from an AAB or APK. */
 public class AndroidResource {
-    private static final Pattern VALID_RESOURCE_PATH = Pattern.compile(".*res/([^-/]+).*/([^.]+)(\\.|)(.*|)$");
+    private static final Pattern VALID_RESOURCE_PATH =
+            Pattern.compile(".*res/([^-/]+).*/([^.]+)(\\.|)(.*|)$");
     private static final int VALID_RESOURCE_GROUPS = 4;
 
     // Resource type, for example "raw", "asset", "drawable" etc.
@@ -33,8 +32,7 @@ public class AndroidResource {
             String resourceName,
             String extension,
             Path filePath,
-            byte[] data
-    ) {
+            byte[] data) {
         this.resourceType = resourceType;
         this.resourceName = resourceName;
         this.extension = extension;
@@ -60,13 +58,21 @@ public class AndroidResource {
         return "xml".equals(extension) && "raw".equals(resourceType);
     }
 
-    public Boolean isDrawable() { return "drawable".equals(resourceType); }
+    public Boolean isDrawable() {
+        return "drawable".equals(resourceType);
+    }
 
-    public Boolean isFont() { return "font".equals(resourceType); }
+    public Boolean isFont() {
+        return "font".equals(resourceType);
+    }
 
-    public Boolean isAsset() { return "asset".equals(resourceType); }
+    public Boolean isAsset() {
+        return "asset".equals(resourceType);
+    }
 
-    public Boolean isRaw() { return "raw".equals(resourceType); }
+    public Boolean isRaw() {
+        return "raw".equals(resourceType);
+    }
 
     static AndroidResource fromPath(Path filePath, byte[] data) {
         String pathWithFwdSlashes = filePath.toString().replace('\\', '/');
@@ -75,13 +81,7 @@ public class AndroidResource {
             String resType = m.group(1);
             String resName = m.group(2);
             String ext = m.group(4);
-            return new AndroidResource(
-                    resType,
-                    resName,
-                    ext,
-                    filePath,
-                    data
-            );
+            return new AndroidResource(resType, resName, ext, filePath, data);
         }
         throw new RuntimeException("Not a valid resource file: " + m.matches());
     }

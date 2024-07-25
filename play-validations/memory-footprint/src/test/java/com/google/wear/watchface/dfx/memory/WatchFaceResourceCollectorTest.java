@@ -1,21 +1,18 @@
 package com.google.wear.watchface.dfx.memory;
 
 import static com.google.common.truth.Truth.assertThat;
-
 import static org.junit.Assert.assertThrows;
-
-import org.junit.Test;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
 
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Set;
-
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
+import org.junit.Test;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 
 public class WatchFaceResourceCollectorTest {
 

@@ -2,12 +2,6 @@ package com.google.wear.watchface.dfx.memory;
 
 import static org.junit.Assert.assertEquals;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -16,8 +10,12 @@ import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
-
 import javax.xml.parsers.DocumentBuilderFactory;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 @RunWith(JUnit4.class)
 public class UserConfigKeyTest {

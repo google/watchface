@@ -18,21 +18,18 @@ package com.google.wear.watchface.dfx.memory;
 
 import static com.google.wear.watchface.dfx.memory.WatchFaceDocuments.findSceneNode;
 import static com.google.wear.watchface.dfx.memory.WatchFaceDocuments.getNodeAttribute;
-
 import static java.lang.Math.min;
 import static java.util.stream.Collectors.toSet;
 
 import com.google.common.collect.ImmutableList;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * Computes the memory footprint of a watch face in ambient.

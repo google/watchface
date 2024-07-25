@@ -19,11 +19,10 @@ package com.google.wear.watchface.dfx.memory;
 import static com.google.wear.watchface.dfx.memory.WatchFaceDocuments.childrenStream;
 import static com.google.wear.watchface.dfx.memory.WatchFaceDocuments.getNodeAttribute;
 
+import java.util.Optional;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import java.util.Optional;
 
 /** Represents a single value of a mode variant. */
 class VariantConfigValue {

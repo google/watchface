@@ -6,9 +6,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.jimfs.Configuration;
 import com.google.common.jimfs.Jimfs;
-
-import org.junit.Test;
-
 import java.io.IOException;
 import java.nio.file.FileSystem;
 import java.nio.file.Files;
@@ -17,6 +14,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
+import org.junit.Test;
 
 public class WatchFaceDataTest {
     private static final EvaluationSettings TEST_EVALUATION_SETTINGS =
@@ -61,8 +59,7 @@ public class WatchFaceDataTest {
 
     @Test
     public void fromResourcesStream_createsPackageFromLinuxPaths() {
-        Stream<AndroidResource> packageFileStream =
-                TEST_FILES.stream().map(this::readPackageFile);
+        Stream<AndroidResource> packageFileStream = TEST_FILES.stream().map(this::readPackageFile);
 
         WatchFaceData watchFaceData =
                 WatchFaceData.fromResourcesStream(packageFileStream, TEST_EVALUATION_SETTINGS);
@@ -94,9 +91,7 @@ public class WatchFaceDataTest {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        return AndroidResource.fromPath(
-                rootPath.relativize(filePath),
-                bytes);
+        return AndroidResource.fromPath(rootPath.relativize(filePath), bytes);
     }
 
     private AndroidResource readWindowsPackageFile(String path, FileSystem fileSystem) {
@@ -111,8 +106,6 @@ public class WatchFaceDataTest {
         Path windowsPath =
                 fileSystem.getPath(
                         pathSplits[0], Arrays.copyOfRange(pathSplits, 1, pathSplits.length));
-        return AndroidResource.fromPath(
-                windowsPath,
-                bytes);
+        return AndroidResource.fromPath(windowsPath, bytes);
     }
 }

@@ -20,18 +20,16 @@ import static com.google.wear.watchface.dfx.memory.UserConfigValue.SupportedConf
 import static com.google.wear.watchface.dfx.memory.WatchFaceDocuments.childrenStream;
 import static com.google.wear.watchface.dfx.memory.WatchFaceDocuments.findSceneNode;
 import static com.google.wear.watchface.dfx.memory.WatchFaceDocuments.isDrawableNode;
-
 import static java.lang.Math.max;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
 
 import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.LongStream;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 
 /**
  * Calculates the maximum memory footprint needed to render the given dynamic nodes for any user

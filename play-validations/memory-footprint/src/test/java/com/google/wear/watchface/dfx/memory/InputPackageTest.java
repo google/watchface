@@ -3,14 +3,12 @@ package com.google.wear.watchface.dfx.memory;
 import static com.google.common.truth.Truth.assertThat;
 
 import com.google.common.truth.Correspondence;
-
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
-
 import java.io.File;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 @RunWith(JUnit4.class)
 public class InputPackageTest {

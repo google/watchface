@@ -51,7 +51,9 @@ class PartImages {
                         element.getDoubleAttribute("x")!!,
                         element.getDoubleAttribute("y")!!,
                         element.getDoubleAttribute("width")!!,
-                        element.getDoubleAttribute("height")!!))
+                        element.getDoubleAttribute("height")!!
+                    )
+                )
         }
     }
 
@@ -66,7 +68,8 @@ class PartImages {
                 maxWidth = Math.max(maxWidth, partImage.width.toInt())
                 maxHeight = Math.max(maxHeight, partImage.height.toInt())
                 image.referencingElements.add(
-                    partImage.element.getElementsByTagName("Image").item(0) as Element)
+                    partImage.element.getElementsByTagName("Image").item(0) as Element
+                )
             }
 
             var nonTransparentBounds = image.nonTransparentBounds
@@ -77,21 +80,25 @@ class PartImages {
 
             // Crop if needed.
             var croppedImage = image.bufferedImage
-            if (nonTransparentBounds.width() != croppedImage.width ||
-                nonTransparentBounds.height() != croppedImage.height) {
+            if (
+                nonTransparentBounds.width() != croppedImage.width ||
+                    nonTransparentBounds.height() != croppedImage.height
+            ) {
                 croppedImage =
                     croppedImage.getSubimage(
                         nonTransparentBounds.left,
                         nonTransparentBounds.top,
                         nonTransparentBounds.width(),
-                        nonTransparentBounds.height())
+                        nonTransparentBounds.height()
+                    )
                 optimizationApplied = true
 
                 if (imageLoader.settings.verbose) {
                     System.out.println(
                         "Cropping image ${resourceId}: " +
-                          "${image.bufferedImage.width}x${image.bufferedImage.height} -> " +
-                          "${nonTransparentBounds.width()}x${nonTransparentBounds.height()}")
+                            "${image.bufferedImage.width}x${image.bufferedImage.height} -> " +
+                            "${nonTransparentBounds.width()}x${nonTransparentBounds.height()}"
+                    )
                 }
             }
 
@@ -105,19 +112,23 @@ class PartImages {
             var scaledUncroppedHeight = image.bufferedImage.height.toDouble()
 
             // If the resized area is smaller, then scale image and bounds.
-            if (maxWidth * maxHeight <
-                nonTransparentBounds.width() * nonTransparentBounds.height()) {
+            if (
+                maxWidth * maxHeight < nonTransparentBounds.width() * nonTransparentBounds.height()
+            ) {
                 if (imageLoader.settings.verbose) {
                     System.out.println(
                         "Scaling image ${resourceId}: " +
-                          "${croppedImage.getWidth()}x${croppedImage.getHeight()} -> " +
-                          "${maxWidth}x${maxHeight}")
+                            "${croppedImage.getWidth()}x${croppedImage.getHeight()} -> " +
+                            "${maxWidth}x${maxHeight}"
+                    )
                 }
 
                 val scaledImage = BufferedImage(maxWidth, maxHeight, BufferedImage.TYPE_INT_ARGB)
                 val graphics = scaledImage.createGraphics()
                 graphics.setRenderingHint(
-                    RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR)
+                    RenderingHints.KEY_INTERPOLATION,
+                    RenderingHints.VALUE_INTERPOLATION_BILINEAR
+                )
                 graphics.drawImage(
                     croppedImage,
                     0,
@@ -128,7 +139,8 @@ class PartImages {
                     0,
                     croppedImage.getWidth(),
                     croppedImage.getHeight(),
-                    null)
+                    null
+                )
                 graphics.dispose()
 
                 nonTransparentBounds =
@@ -160,15 +172,13 @@ class PartImages {
 
                 partImage.element.getDoubleAttribute("pivotX")?.let {
                     val oldPivotXPixel = partImage.x + partImage.width.toDouble() * it
-                    val newPivotXFraction =
-                        (oldPivotXPixel - newX) / newWidth
+                    val newPivotXFraction = (oldPivotXPixel - newX) / newWidth
                     partImage.element.setAttribute("pivotX", newPivotXFraction.toString())
                 }
 
                 partImage.element.getDoubleAttribute("pivotY")?.let {
                     val oldPivotYPixel = partImage.y + partImage.height.toDouble() * it
-                    val newPivotYFraction =
-                        (oldPivotYPixel - newY) / newHeight
+                    val newPivotYFraction = (oldPivotYPixel - newY) / newHeight
                     partImage.element.setAttribute("pivotY", newPivotYFraction.toString())
                 }
             }
