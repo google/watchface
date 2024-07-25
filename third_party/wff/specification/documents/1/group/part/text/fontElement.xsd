@@ -65,6 +65,7 @@
             <xs:enumeration value="NORMAL"/>
             <xs:enumeration value="MEDIUM"/>
             <xs:enumeration value="SEMI_BOLD"/>
+            <xs:enumeration value="BOLD"/>
             <xs:enumeration value="ULTRA_BOLD"/>
             <xs:enumeration value="EXTRA_BOLD"/>
             <xs:enumeration value="BLACK"/>
