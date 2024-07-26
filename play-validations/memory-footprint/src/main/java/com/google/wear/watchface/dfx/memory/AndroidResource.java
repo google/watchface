@@ -91,7 +91,8 @@ public class AndroidResource {
     }
 
     static Boolean isValidResourcePath(Path filePath) {
-        Matcher m = VALID_RESOURCE_PATH.matcher(filePath.toString());
+        String pathWithFwdSlashes = filePath.toString().replace('\\', '/');
+        Matcher m = VALID_RESOURCE_PATH.matcher(pathWithFwdSlashes);
         return m.matches() && m.groupCount() == VALID_RESOURCE_GROUPS;
     }
 
