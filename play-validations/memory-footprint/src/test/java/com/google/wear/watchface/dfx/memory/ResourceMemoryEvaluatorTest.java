@@ -1,5 +1,6 @@
 package com.google.wear.watchface.dfx.memory;
 
+import static com.google.common.truth.Truth.assertThat;
 import static com.google.wear.watchface.dfx.memory.EvaluationSettings.parseFromArguments;
 import static com.google.wear.watchface.dfx.memory.ResourceMemoryEvaluator.evaluateMemoryFootprint;
 import static com.google.wear.watchface.dfx.memory.ResourceMemoryEvaluator.evaluateWatchFaceForLayout;
@@ -12,9 +13,12 @@ import static org.junit.runners.Parameterized.Parameter;
 
 import com.google.common.base.Charsets;
 import com.google.common.hash.Hashing;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.samsung.watchface.WatchFaceXmlValidator;
-import java.io.File;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.io.PrintStream;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collection;
@@ -1266,6 +1270,26 @@ public class ResourceMemoryEvaluatorTest {
             }
         }
 
+        @Test
+        public void main_writesJsonInReportMode() {
+            ByteArrayOutputStream outStreamCaptor = new ByteArrayOutputStream();
+            PrintStream old = System.out;
+            System.setOut(new PrintStream(outStreamCaptor));
+            String watchFacePath =
+                    Paths.get(SAMPLE_WF_BASE_ARTIFACTS_PATH, "bundle/release/sample-wf-release.aab")
+                            .toString();
+
+            ResourceMemoryEvaluator.main(
+                    new String[] {
+                        "--watch-face", watchFacePath, "--schema-version", "1", "--report"
+                    });
+            System.out.flush();
+            System.setOut(old);
+
+            JsonElement jsonElement = JsonParser.parseString(outStreamCaptor.toString());
+            assertThat(jsonElement.isJsonObject()).isTrue();
+        }
+
         private static void putSimpleResource(
                 Map<String, DrawableResourceDetails> map, String resourceName, long size) {
             map.put(
@@ -1280,22 +1304,6 @@ public class ResourceMemoryEvaluatorTest {
                                             .toString())
                             .build());
         }
-    }
-
-    /**
-     * Utility function that resolves the given watch face module name to its path in the built
-     * artifacts. These artifacts are built in gradle by making the "test" task depend on the watch
-     * face module's "assembleRelease" task.
-     */
-    private static String resolveWatchFaceModuleAabPath(String watchFaceModule) {
-        return new File("")
-                .getAbsoluteFile()
-                .toPath()
-                .resolve(
-                        String.format(
-                                "../../samples/%1$s/build/outputs/bundle/release/%1$s-release.aab",
-                                watchFaceModule))
-                .toString();
     }
 
     private static EvaluationSettings getTestEvaluationSettings() {

@@ -167,7 +167,6 @@ public class AndroidResourceLoader {
 
                     @Override
                     public AndroidResource next() {
-                        System.out.println(zipEntry);
                         byte[] entryData;
                         try {
                             entryData = readAllBytes(baseSplitZipStream);
