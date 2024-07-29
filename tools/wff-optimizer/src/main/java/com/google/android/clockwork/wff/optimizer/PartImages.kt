@@ -60,7 +60,12 @@ class PartImages {
     fun optimize(imageLoader: ImageLoader): Boolean {
         var optimizationApplied = false
         for ((resourceId, partImages) in imageUsage) {
-            val image = imageLoader.loadImage(resourceId)
+            val image = try {
+                imageLoader.loadImage(resourceId)
+            } catch (e: Exception) {
+                System.out.println("Skipping image $resourceId which could not be loaded")
+                continue
+            }
 
             var maxWidth = 0
             var maxHeight = 0
