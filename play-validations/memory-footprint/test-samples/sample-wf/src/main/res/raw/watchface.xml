@@ -54,5 +54,10 @@
                 <Font color="#ffffffff" family="roboto_regular" size="50" slant="NORMAL" weight="NORMAL" />
             </TimeText>
         </DigitalClock>
+        <DigitalClock alpha="255" width="190" height="174" x="120" y="180">
+            <TimeText align="CENTER" alpha="255" format="hh:mm" height="174" hourFormat="SYNC_TO_DEVICE" width="190" x="0" y="0">
+                <Font color="#ffffffff" family="open_sans_regular" size="50" slant="NORMAL" weight="NORMAL" />
+            </TimeText>
+        </DigitalClock>
     </Scene>
 </WatchFace>
