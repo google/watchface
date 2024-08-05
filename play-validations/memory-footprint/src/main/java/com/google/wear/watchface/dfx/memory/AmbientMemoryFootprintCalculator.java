@@ -103,15 +103,19 @@ class AmbientMemoryFootprintCalculator {
         Map<String, String> sha1ToResource = new HashMap<>();
         Map<String, String> dedupMap = new HashMap<>();
         for (Map.Entry<String, DrawableResourceDetails> entry : resourceMemoryMap.entrySet()) {
-            String dedupedResource = sha1ToResource.get(entry.getValue().getSha1());
-            if (dedupedResource == null) {
-                sha1ToResource.put(entry.getValue().getSha1(), entry.getKey());
-                dedupedResource = entry.getKey();
-            } else if (evaluationSettings.isVerbose()) {
-                System.out.printf(
-                        "Resource %s is a duplicate of: %s\n", entry.getKey(), dedupedResource);
+            if (entry.getValue().getSha1() == null) {
+                dedupMap.put(entry.getKey(), entry.getKey());
+            } else {
+                String dedupedResource = sha1ToResource.get(entry.getValue().getSha1());
+                if (dedupedResource == null) {
+                    sha1ToResource.put(entry.getValue().getSha1(), entry.getKey());
+                    dedupedResource = entry.getKey();
+                } else if (evaluationSettings.isVerbose()) {
+                    System.out.printf(
+                            "Resource %s is a duplicate of: %s\n", entry.getKey(), dedupedResource);
+                }
+                dedupMap.put(entry.getKey(), dedupedResource);
             }
-            dedupMap.put(entry.getKey(), dedupedResource);
         }
         return dedupMap;
     }

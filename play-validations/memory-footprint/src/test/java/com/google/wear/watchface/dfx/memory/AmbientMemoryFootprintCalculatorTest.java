@@ -442,11 +442,11 @@ public class AmbientMemoryFootprintCalculatorTest {
     public void resourceDeduplication() throws Exception {
         Map<String, DrawableResourceDetails> map =
                 ImmutableMap.<String, DrawableResourceDetails>builder()
-                        .put("image1", resDetails("image1", 12))
-                        .put("image2", resDetails("image1", 12))
-                        .put("digital-clock-1", resDetails("digital-clock-1", 300))
-                        .put("digital-clock-2", resDetails("digital-clock-2", 200))
-                        .put("digital-clock-3", resDetails("digital-clock-3", 100))
+                        .put("image1", resDetails("image1", 12, "sha"))
+                        .put("image2", resDetails("image1", 12, "sha"))
+                        .put("digital-clock-1", resDetails("digital-clock-1", 300, "sha"))
+                        .put("digital-clock-2", resDetails("digital-clock-2", 200, "sha"))
+                        .put("digital-clock-3", resDetails("digital-clock-3", 100, "sha"))
                         .build();
         Document document = readDocument("DigitalClocksWithOverlappingResources");
 
@@ -456,6 +456,23 @@ public class AmbientMemoryFootprintCalculatorTest {
 
         // 2 layers + one image since all of them share the same sha-1.
         assertThat(result).isEqualTo(2 * TEST_LAYER_SIZE + 12);
+    }
+
+    @Test
+    public void resourceDeduplication_doesNotDeduplicateResourcesWithNullSha() throws Exception {
+        Map<String, DrawableResourceDetails> map =
+                ImmutableMap.<String, DrawableResourceDetails>builder()
+                        .put("open_sans_regular", resDetails("open_sans_regular", 8, null))
+                        .put("roboto_regular", resDetails("roboto_regular", 2, null))
+                        .put("open_sans_regular_2", resDetails("open_sans_regular_2", 4, null))
+                        .build();
+        Document document = readDocument("DigitalClockFontDeduplication");
+
+        long result =
+                new AmbientMemoryFootprintCalculator(document, map, TEST_SETTINGS_DEDUPLICATE)
+                        .computeAmbientMemoryFootprint(TEST_WIDTH, TEST_HEIGHT);
+
+        assertThat(result).isEqualTo(14);
     }
 
     @Test
@@ -476,6 +493,15 @@ public class AmbientMemoryFootprintCalculatorTest {
         return DrawableResourceDetails.builder()
                 .setName(name)
                 .setNumberOfImages(1)
+                .setBiggestFrameFootprintBytes(size)
+                .build();
+    }
+
+    DrawableResourceDetails resDetails(String name, long size, String sha1) {
+        return DrawableResourceDetails.builder()
+                .setName(name)
+                .setNumberOfImages(1)
+                .setSha1(sha1)
                 .setBiggestFrameFootprintBytes(size)
                 .build();
     }

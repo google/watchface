@@ -52,6 +52,7 @@ public class InputPackageTest {
                         "base/res/drawable-nodpi/hand_1.png",
                         "base/res/drawable-nodpi/hand_2.png",
                         "base/res/font/roboto_regular.ttf",
+                        "base/res/font/open_sans_regular.ttf",
                         "base/res/raw/watchface.xml",
                         "base/res/values/strings.xml",
                         "base/res/xml/watch_face_info.xml",
