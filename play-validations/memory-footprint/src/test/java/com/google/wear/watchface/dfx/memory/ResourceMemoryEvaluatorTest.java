@@ -97,9 +97,9 @@ public class ResourceMemoryEvaluatorTest {
                                                             SAMPLE_WF_BASE_ARTIFACTS_PATH,
                                                             artifactRelativePath)
                                                     .toString(),
-                                            /* expectedActiveFootprintBytes= */ 4565100
+                                            /* expectedActiveFootprintBytes= */ 4712628
                                                     + SYSTEM_DEFAULT_FONT_SIZE,
-                                            /* expectedAmbientFootprintBytes= */ 2540100,
+                                            /* expectedAmbientFootprintBytes= */ 2687628,
                                             /* expectedLayouts= */ 1))
                     .collect(Collectors.toList());
         }
@@ -1087,8 +1087,8 @@ public class ResourceMemoryEvaluatorTest {
                                             "--estimate-optimization")
                                     .get());
 
-            assertEquals(4575388, multiShapesFootprint.get(0).getMaxActiveBytes());
-            assertEquals(2179278, multiShapesFootprint.get(0).getMaxAmbientBytes());
+            assertEquals(4722916, multiShapesFootprint.get(0).getMaxActiveBytes());
+            assertEquals(2326806, multiShapesFootprint.get(0).getMaxAmbientBytes());
         }
 
         @Test

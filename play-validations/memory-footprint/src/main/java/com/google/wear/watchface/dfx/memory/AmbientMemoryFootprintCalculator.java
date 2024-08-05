@@ -104,7 +104,9 @@ class AmbientMemoryFootprintCalculator {
         Map<String, String> dedupMap = new HashMap<>();
         for (Map.Entry<String, DrawableResourceDetails> entry : resourceMemoryMap.entrySet()) {
             String dedupedResource = sha1ToResource.get(entry.getValue().getSha1());
-            if (dedupedResource == null) {
+            if (entry.getValue().getSha1() == null) {
+                dedupedResource = entry.getKey();
+            } else if (dedupedResource == null) {
                 sha1ToResource.put(entry.getValue().getSha1(), entry.getKey());
                 dedupedResource = entry.getKey();
             } else if (evaluationSettings.isVerbose()) {
