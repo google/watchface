@@ -1,0 +1,41 @@
+<!-- Tests that mutually exclusive assets are not counted. Here, the same list-->
+<!-- configuration id is used in two different nodes. A naive calculator would-->
+<!-- find the maximum footprint to be the sum of digital-clock-16 and-->
+<!-- digital-clock-32 (48 bytes). However, these two are mutually exclusive because-->
+<!-- they are rendered under different options for the same l1 key. Instead, the-->
+<!-- true maximum footprint is computed when l1 takes the value l1-2, and it is-->
+<!-- digital-clock-2 + digital-clock-32 = 34-->
+<WatchFace width="450" height="450">
+    <UserConfigurations>
+        <ListConfiguration id="l1" displayName="list1" defaultValue="l1-1">
+            <ListOption id="l1-1" />
+            <ListOption id="l1-2" />
+        </ListConfiguration>
+    </UserConfigurations>
+    <Scene>
+        <ListConfiguration id="l1">
+            <ListOption id="l1-1">
+                <DigitalClock>
+                    <Image resource="digital-clock-16" />
+                </DigitalClock>
+            </ListOption>
+            <ListOption id="l1-2">
+                <DigitalClock>
+                    <Image resource="digital-clock-2" />
+                </DigitalClock>
+            </ListOption>
+        </ListConfiguration>
+        <ListConfiguration id="l1">
+            <ListOption id="l1-1">
+                <DigitalClock>
+                    <Image resource="digital-clock-8" />
+                </DigitalClock>
+            </ListOption>
+            <ListOption id="l1-2">
+                <DigitalClock>
+                    <Image resource="digital-clock-32" />
+                </DigitalClock>
+            </ListOption>
+        </ListConfiguration>
+    </Scene>
+</WatchFace>

@@ -417,6 +417,28 @@ public class AmbientMemoryFootprintCalculatorTest {
     }
 
     @Test
+    public void understandsMutuallyExclusiveResources() throws Exception {
+        int digitalClock1Size = 16;
+        int digitalClock2Size = 2;
+        int digitalClock3Size = 8;
+        int digitalClock4Size = 32;
+        Map<String, DrawableResourceDetails> map =
+                ImmutableMap.<String, DrawableResourceDetails>builder()
+                        .put("digital-clock-16", resDetails("digital-clock-16", digitalClock1Size))
+                        .put("digital-clock-2", resDetails("digital-clock-2", digitalClock2Size))
+                        .put("digital-clock-8", resDetails("digital-clock-8", digitalClock3Size))
+                        .put("digital-clock-32", resDetails("digital-clock-32", digitalClock4Size))
+                        .build();
+        Document document = readDocument("MutuallyExclusiveBySameListId");
+
+        long result =
+                new AmbientMemoryFootprintCalculator(document, map, TEST_SETTINGS_V1_LIMITATIONS)
+                        .computeAmbientMemoryFootprint(TEST_WIDTH, TEST_HEIGHT);
+
+        assertThat(result).isEqualTo(digitalClock2Size + digitalClock4Size);
+    }
+
+    @Test
     public void resourceDeduplication() throws Exception {
         Map<String, DrawableResourceDetails> map =
                 ImmutableMap.<String, DrawableResourceDetails>builder()
