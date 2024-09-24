@@ -23,7 +23,10 @@ public class ActiveMemoryFootprintCalculator {
         this.evaluationSettings = evaluationSettings;
     }
 
-    long computeAmbientMemoryFootprint() {
+    long computeActiveMemoryFootprint() {
+        if (evaluationSettings.isVerbose()) {
+            System.out.println(">> Starting active evaluation");
+        }
         DrawableNodeConfigTable drawableNodeConfigTable =
                 DrawableNodeConfigTable.create(findSceneNode(document), activeConfigValue);
         WatchFaceResourceCollector resourceCollector =
@@ -34,7 +37,23 @@ public class ActiveMemoryFootprintCalculator {
                         activeConfigValue,
                         resourceCollector,
                         drawableNodeConfigTable,
-                        (res) -> findInMap(resourceMemoryMap, res).getTotalFootprintBytes())
+                        this::evaluateResource)
                 .calculateMaxFootprintBytes();
+    }
+
+    private long evaluateResource(String resource) {
+        DrawableResourceDetails details = findInMap(resourceMemoryMap, resource);
+        long imageBytes = details.getTotalFootprintBytes();
+        if (evaluationSettings.isVerbose()) {
+            System.out.printf(
+                    "Counting resource %s; %s bytes, %s mb, %s x %s %s%n",
+                    resource,
+                    details.getBiggestFrameFootprintBytes(),
+                    ((double) imageBytes) / 1024 / 1024,
+                    details.getWidth(),
+                    details.getHeight(),
+                    details.canUseRGB565() ? "RGB565" : "ARGB8888");
+        }
+        return imageBytes;
     }
 }
