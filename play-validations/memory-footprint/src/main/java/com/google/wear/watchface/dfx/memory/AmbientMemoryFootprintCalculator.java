@@ -126,6 +126,9 @@ class AmbientMemoryFootprintCalculator {
      * and the memory needed for all the full screen layers.
      */
     long computeAmbientMemoryFootprint(long screenWidth, long screenHeight) {
+        if (evaluationSettings.isVerbose()) {
+            System.out.println(">> Starting ambient evaluation");
+        }
         Visitor visitor = new Visitor(/* prevNodeIsDrawnDynamically= */ true, /* numClocks= */ 0);
         visitor.visitNodes(findSceneNode(document));
 

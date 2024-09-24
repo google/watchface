@@ -53,7 +53,7 @@ class WatchFaceLayoutEvaluator {
 
         long maxInActive =
                 new ActiveMemoryFootprintCalculator(document, resourceMemoryMap, settings)
-                        .computeAmbientMemoryFootprint();
+                        .computeActiveMemoryFootprint();
         long maxInAmbient =
                 new AmbientMemoryFootprintCalculator(document, resourceMemoryMap, settings)
                         .computeAmbientMemoryFootprint(450, 450);
