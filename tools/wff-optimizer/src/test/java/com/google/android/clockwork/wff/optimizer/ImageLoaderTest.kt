@@ -106,6 +106,22 @@ class ImageLoaderTest {
     }
 
     @Test
+    fun bitmapFontCropAndMargins_minimumWidth() {
+        val fixture =
+            load(
+                "src/test/resources/narrowBitmapFont",
+                "src/test/resources/narrowBitmapFont/res/raw/watchface.xml"
+            )
+
+        fixture.optimizer.bitmapFonts.optimize(fixture.imageLoader)
+        fixture.imageLoader.dedupeAndWriteOptimizedImages()
+
+        // Check that we don't create a zero width image when downsizeing.
+        assertThat(fixture.imageLoader.optimizedImagesSummary())
+            .containsExactly("wfs_sec_decorative_3e6538b4_6b9c_4b20_9c09_0e7ae4babb1c 1 x 13")
+    }
+
+    @Test
     fun tooLargeBitmapFontCropAndMargins() {
         val fixture =
             load(

@@ -1,0 +1,44 @@
+<WatchFace
+    clipShape="CIRCLE"
+    height="450"
+    width="450">
+    <Metadata
+        key="CLOCK_TYPE"
+        value="ANALOG" />
+    <BitmapFonts>
+        <BitmapFont name="Bitmap font 1">
+            <Character
+                name="2"
+                height="450"
+                resource="wfs_sec_decorative_3e6538b4_6b9c_4b20_9c09_0e7ae4babb1c"
+                width="50" />
+        </BitmapFont>
+    </BitmapFonts>
+    <Scene backgroundColor="#ff000000">
+        <PartText
+            name="Text1_cb10"
+            alpha="255"
+            height="92"
+            pivotX="0.5"
+            pivotY="0.5"
+            width="265"
+            x="79"
+            y="172">
+            <Transform
+                target="width"
+                value="265 + ([SECOND])" />
+            <Transform
+                target="x"
+                value="79 + ([SECOND])" />
+            <Text
+                align="CENTER"
+                ellipsis="FALSE">
+                <BitmapFont
+                    color="#ffffffff"
+                    family="Bitmap font 1"
+                    size="24">2
+                </BitmapFont>
+            </Text>
+        </PartText>
+    </Scene>
+</WatchFace>

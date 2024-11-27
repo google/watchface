@@ -126,8 +126,8 @@ class BitmapFont(val name: String, val characters: Map<String, Character>) {
             val maxWidth = maxHeight.toDouble() * aspectRatio
             val scaleX = maxWidth / image.bufferedImage.width.toDouble()
             val scaleY = maxHeight.toDouble() / image.bufferedImage.height.toDouble()
-            val newWidth = (nonTransparentBounds.width().toDouble() * scaleX).toInt()
-            val newHeight = (nonTransparentBounds.height().toDouble() * scaleY).toInt()
+            val newWidth = Math.ceil(nonTransparentBounds.width().toDouble() * scaleX).toInt()
+            val newHeight = Math.ceil(nonTransparentBounds.height().toDouble() * scaleY).toInt()
             var marginLeft = nonTransparentBounds.left
             var marginTop = nonTransparentBounds.top
             var marginRight = image.bufferedImage.width - nonTransparentBounds.right
