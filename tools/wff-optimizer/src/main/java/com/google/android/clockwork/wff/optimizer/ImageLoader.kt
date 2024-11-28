@@ -143,6 +143,8 @@ open class Image(
 ) {
     val referencingElements = ArrayList<Element>()
     var optimizedImage: BufferedImage? = null
+    var cropped = false
+    var scaled = false
 
     open fun maybeWriteOptimizedImage() {
         optimizedImage?.let { ImageIO.write(it, "png", file) }
