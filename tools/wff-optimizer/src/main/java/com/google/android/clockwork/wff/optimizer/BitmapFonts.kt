@@ -104,6 +104,7 @@ class BitmapFont(val name: String, val characters: Map<String, Character>) {
                         nonTransparentBounds.width(),
                         nonTransparentBounds.height()
                     )
+                image.cropped = true
                 optimizationApplied = true
 
                 if (imageLoader.settings.verbose) {
@@ -119,66 +120,69 @@ class BitmapFont(val name: String, val characters: Map<String, Character>) {
             val aspectRatio =
                 image.bufferedImage.width.toDouble() / image.bufferedImage.height.toDouble()
 
-            if (maxHeight > image.bufferedImage.height) {
-                maxHeight = image.bufferedImage.height
-            }
-
-            val maxWidth = maxHeight.toDouble() * aspectRatio
-            val scaleX = maxWidth / image.bufferedImage.width.toDouble()
-            val scaleY = maxHeight.toDouble() / image.bufferedImage.height.toDouble()
-            val newWidth = (nonTransparentBounds.width().toDouble() * scaleX).toInt()
-            val newHeight = (nonTransparentBounds.height().toDouble() * scaleY).toInt()
             var marginLeft = nonTransparentBounds.left
             var marginTop = nonTransparentBounds.top
             var marginRight = image.bufferedImage.width - nonTransparentBounds.right
             var marginBottom = image.bufferedImage.height - nonTransparentBounds.bottom
 
-            // If the resized area is smaller, then scale image and bounds.
-            if (
-                newWidth * newHeight < nonTransparentBounds.width() * nonTransparentBounds.height()
-            ) {
-                if (imageLoader.settings.verbose) {
-                    System.out.println(
-                        "Scaling image ${character.resourceId}: " +
-                            "${croppedImage.getWidth()}x${croppedImage.getHeight()} -> " +
-                            "${newWidth}x${newHeight}"
+            // If maxHeight is smaller, then down scale the image.
+            if (maxHeight < image.bufferedImage.height) {
+                val maxWidth = maxHeight.toDouble() * aspectRatio
+                val scaleX = maxWidth / image.bufferedImage.width.toDouble()
+                val scaleY = maxHeight.toDouble() / image.bufferedImage.height.toDouble()
+
+                val newWidth = Math.ceil(nonTransparentBounds.width().toDouble() * scaleX).toInt()
+                val newHeight = Math.ceil(nonTransparentBounds.height().toDouble() * scaleY).toInt()
+
+                // If the resized area is smaller, then scale image and bounds.
+                if (newWidth * newHeight <
+                    nonTransparentBounds.width() * nonTransparentBounds.height()
+                ) {
+                    if (imageLoader.settings.verbose) {
+                        System.out.println(
+                            "Scaling image ${character.resourceId}: " +
+                                    "${croppedImage.getWidth()}x${croppedImage.getHeight()} -> " +
+                                    "${newWidth}x${newHeight}"
+                        )
+                    }
+
+                    val scaledImage =
+                        BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_ARGB)
+                    val graphics = scaledImage.createGraphics()
+                    graphics.setRenderingHint(
+                        RenderingHints.KEY_INTERPOLATION,
+                        RenderingHints.VALUE_INTERPOLATION_BILINEAR
                     )
+                    graphics.drawImage(
+                        croppedImage,
+                        0,
+                        0,
+                        newWidth,
+                        newHeight,
+                        0,
+                        0,
+                        croppedImage.getWidth(),
+                        croppedImage.getHeight(),
+                        null
+                    )
+                    graphics.dispose()
+
+                    marginLeft = (marginLeft.toDouble() * scaleX).toInt()
+                    marginTop = (marginTop.toDouble() * scaleY).toInt()
+                    marginRight = (marginRight.toDouble() * scaleX).toInt()
+                    marginBottom = (marginBottom.toDouble() * scaleY).toInt()
+                    croppedImage = scaledImage
+                    image.scaled = true
+                    character.element.setAttribute(
+                        "width",
+                        (newWidth + marginLeft + marginRight).toString()
+                    )
+                    character.element.setAttribute(
+                        "height",
+                        (newHeight + marginTop + marginBottom).toString()
+                    )
+                    optimizationApplied = true
                 }
-
-                val scaledImage = BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_ARGB)
-                val graphics = scaledImage.createGraphics()
-                graphics.setRenderingHint(
-                    RenderingHints.KEY_INTERPOLATION,
-                    RenderingHints.VALUE_INTERPOLATION_BILINEAR
-                )
-                graphics.drawImage(
-                    croppedImage,
-                    0,
-                    0,
-                    newWidth,
-                    newHeight,
-                    0,
-                    0,
-                    croppedImage.getWidth(),
-                    croppedImage.getHeight(),
-                    null
-                )
-                graphics.dispose()
-
-                marginLeft = (marginLeft.toDouble() * scaleX).toInt()
-                marginTop = (marginTop.toDouble() * scaleY).toInt()
-                marginRight = (marginRight.toDouble() * scaleX).toInt()
-                marginBottom = (marginBottom.toDouble() * scaleY).toInt()
-                croppedImage = scaledImage
-                character.element.setAttribute(
-                    "width",
-                    (newWidth + marginLeft + marginRight).toString()
-                )
-                character.element.setAttribute(
-                    "height",
-                    (newHeight + marginTop + marginBottom).toString()
-                )
-                optimizationApplied = true
             }
 
             // Save margins.

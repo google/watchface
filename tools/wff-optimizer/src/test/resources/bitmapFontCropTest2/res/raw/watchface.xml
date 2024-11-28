@@ -1,0 +1,138 @@
+<WatchFace
+    clipShape="CIRCLE"
+    height="450"
+    width="450">
+    <Metadata
+        key="CLOCK_TYPE"
+        value="ANALOG" />
+    <BitmapFonts>
+        <BitmapFont name="Bitmap font 1">
+            <Character
+                name=":"
+                height="100"
+                resource="wfs__bcea73dd_7a37_467f_94c8_f57f413c1618"
+                width="100" />
+            <Character
+                name="0"
+                height="110"
+                resource="wfs_0_84beb937_1dd8_4ca7_afc6_9d52ee68188b"
+                width="60" />
+            <Character
+                name="1"
+                height="110"
+                resource="wfs_1_7fd1e3ba_f9e5_4114_95d0_404fd95b0f1c"
+                width="60" />
+            <Character
+                name="2"
+                height="110"
+                resource="wfs_2_1cd08553_4def_4929_ae79_e4e95dc8e7d2"
+                width="60" />
+            <Character
+                name="3"
+                height="110"
+                resource="wfs_3_f50b11ef_1120_43f1_8c23_ae8f4d968b77"
+                width="60" />
+            <Character
+                name="4"
+                height="110"
+                resource="wfs_4_478cdc4e_a2d3_4a0b_a363_0141236a4fb2"
+                width="60" />
+            <Character
+                name="5"
+                height="110"
+                resource="wfs_5_6060f0fa_b314_403c_8ef3_8b2127cdf8a5"
+                width="60" />
+            <Character
+                name="6"
+                height="110"
+                resource="wfs_6_82227af2_ab99_4635_a282_f18e61f6a4e5"
+                width="60" />
+            <Character
+                name="7"
+                height="110"
+                resource="wfs_7_3bc978df_2037_4d89_b3bd_a52b01f702f0"
+                width="60" />
+            <Character
+                name="8"
+                height="110"
+                resource="wfs_8_f5b0994f_24cc_43d3_823c_b4d12dbea6f8"
+                width="60" />
+            <Character
+                name="9"
+                height="110"
+                resource="wfs_9_142c8d9c_ac84_4358_8512_a0a23bafa6bc"
+                width="60" />
+        </BitmapFont>
+    </BitmapFonts>
+    <Scene backgroundColor="#ff000000">
+        <DigitalClock
+            alpha="255"
+            height="134"
+            pivotX="0.5"
+            pivotY="0.5"
+            width="420"
+            x="12"
+            y="106">
+            <TimeText
+                align="CENTER"
+                alpha="255"
+                format="hh:mm"
+                height="134"
+                hourFormat="SYNC_TO_DEVICE"
+                width="420"
+                x="0"
+                y="0">
+                <BitmapFont
+                    color="#ffffffff"
+                    family="Bitmap font 1"
+                    size="120" />
+            </TimeText>
+        </DigitalClock>
+        <DigitalClock
+            alpha="255"
+            height="134"
+            pivotX="0.5"
+            pivotY="0.5"
+            width="420"
+            x="12"
+            y="234">
+            <TimeText
+                align="CENTER"
+                alpha="255"
+                format="hh:mm"
+                height="134"
+                hourFormat="SYNC_TO_DEVICE"
+                width="420"
+                x="0"
+                y="0">
+                <BitmapFont
+                    color="#ffffffff"
+                    family="Bitmap font 1"
+                    size="110" />
+            </TimeText>
+        </DigitalClock>
+        <DigitalClock
+            alpha="255"
+            height="134"
+            pivotX="0.5"
+            pivotY="0.5"
+            width="420"
+            x="12"
+            y="0">
+            <TimeText
+                align="CENTER"
+                alpha="255"
+                format="hh:mm"
+                height="134"
+                hourFormat="SYNC_TO_DEVICE"
+                width="420"
+                x="0"
+                y="0">
+                <BitmapFont
+                    color="#ffffffff"
+                    family="Bitmap font 1"
+                    size="40" />
+            </TimeText>
+        </DigitalClock>
+    </Scene>
+</WatchFace>
