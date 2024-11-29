@@ -135,14 +135,15 @@ class BitmapFont(val name: String, val characters: Map<String, Character>) {
                 val newHeight = Math.ceil(nonTransparentBounds.height().toDouble() * scaleY).toInt()
 
                 // If the resized area is smaller, then scale image and bounds.
-                if (newWidth * newHeight <
-                    nonTransparentBounds.width() * nonTransparentBounds.height()
+                if (
+                    newWidth * newHeight <
+                        nonTransparentBounds.width() * nonTransparentBounds.height()
                 ) {
                     if (imageLoader.settings.verbose) {
                         System.out.println(
                             "Scaling image ${character.resourceId}: " +
-                                    "${croppedImage.getWidth()}x${croppedImage.getHeight()} -> " +
-                                    "${newWidth}x${newHeight}"
+                                "${croppedImage.getWidth()}x${croppedImage.getHeight()} -> " +
+                                "${newWidth}x${newHeight}"
                         )
                     }
 
