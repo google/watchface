@@ -210,7 +210,12 @@ final class EvaluationSettings {
                         .desc("Show the script's version and quit.")
                         .hasArg(false)
                         .build();
-
+        Option helpOption =
+                Option.builder()
+                        .longOpt("help")
+                        .desc("Display this help message.")
+                        .hasArg(false)
+                        .build();
         Option estimateOptimizationOption =
                 Option.builder()
                         .longOpt("estimate-optimization")
@@ -258,6 +263,7 @@ final class EvaluationSettings {
         options.addOption(disableAmbientDeduplicationOption);
         options.addOption(verboseOption);
         options.addOption(versionOption);
+        options.addOption(helpOption);
         options.addOption(applyV1OffloadLimitationsOption);
         options.addOption(estimateOptimizationOption);
         options.addOption(greedyEvaluationSwitchOption);
@@ -267,12 +273,19 @@ final class EvaluationSettings {
 
         CommandLineParser parser = new DefaultParser();
         try {
+
+            for (String arg : arguments) {
+                if ("--version".equals(arg)) {
+                    printVersion();
+                    System.exit(0);
+                } else if ("--help".equals(arg)) {
+                    new HelpFormatter().printHelp(cliInvokeCommand, options, true);
+                    System.exit(0);
+                }
+            }
+
             CommandLine line = parser.parse(options, arguments);
 
-            if (line.hasOption(versionOption)) {
-                printVersion();
-                System.exit(0);
-            }
             validateSchemaVersion(line.getOptionValue(schemaVersionOption));
             EvaluationSettings evaluationSettings =
                     new EvaluationSettings(
