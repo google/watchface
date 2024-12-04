@@ -48,7 +48,7 @@ final class EvaluationSettings {
 
     private long ambientLimitBytes = MemoryFootprint.toBytes(10);
 
-    private long activeLimitBytes = MemoryFootprint.toBytes(10);
+    private long activeLimitBytes = MemoryFootprint.toBytes(100);
 
     private int greedyEvaluationSwitch = GREEDY_DEFAULT_LIMIT;
 
@@ -60,9 +60,9 @@ final class EvaluationSettings {
 
     private boolean deduplicateAmbient = true;
 
-    private boolean applyV1OffloadLimitations = false;
+    private boolean applyV1OffloadLimitations = true;
 
-    private boolean estimateOptimization = false;
+    private boolean estimateOptimization = true;
 
     EvaluationSettings(String watchFacePath, String schemaVersion) {
         this.watchFacePath = watchFacePath;
