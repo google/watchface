@@ -46,9 +46,9 @@ final class EvaluationSettings {
 
     private final String schemaVersion;
 
-    private long ambientLimitBytes = MemoryFootprint.toBytes(10);
+    private long ambientLimitBytes = MemoryFootprint.toBytes(/* megaBytes= */ 10);
 
-    private long activeLimitBytes = MemoryFootprint.toBytes(100);
+    private long activeLimitBytes = MemoryFootprint.toBytes(/* megaBytes= */ 100);
 
     private int greedyEvaluationSwitch = GREEDY_DEFAULT_LIMIT;
 

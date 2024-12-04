@@ -13,8 +13,9 @@ import org.junit.runners.JUnit4;
 @RunWith(JUnit4.class)
 public class EvaluationSettingsTest {
 
-    // 10 MB
+    // 100 MB
     private static final long DEFAULT_ACTIVE_MEMORY_LIMIT_BYTES = 100 * 1024 * 1024;
+    // 10 MB
     private static final long DEFAULT_AMBIENT_MEMORY_LIMIT_BYTES = 10 * 1024 * 1024;
 
     @Test
