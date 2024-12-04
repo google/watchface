@@ -14,7 +14,8 @@ import org.junit.runners.JUnit4;
 public class EvaluationSettingsTest {
 
     // 10 MB
-    private static final long DEFAULT_MEMORY_LIMIT_BYTES = 10 * 1024 * 1024;
+    private static final long DEFAULT_ACTIVE_MEMORY_LIMIT_BYTES = 100 * 1024 * 1024;
+    private static final long DEFAULT_AMBIENT_MEMORY_LIMIT_BYTES = 10 * 1024 * 1024;
 
     @Test
     public void parseFromArguments_parsesRequiredArgs() {
@@ -27,8 +28,8 @@ public class EvaluationSettingsTest {
         assertEquals("1", evaluationSettings.get().getSchemaVersion());
         // assert default values
         assertFalse(evaluationSettings.get().isVerbose());
-        assertEquals(DEFAULT_MEMORY_LIMIT_BYTES, evaluationSettings.get().getAmbientLimitBytes());
-        assertEquals(DEFAULT_MEMORY_LIMIT_BYTES, evaluationSettings.get().getActiveLimitBytes());
+        assertEquals(DEFAULT_AMBIENT_MEMORY_LIMIT_BYTES, evaluationSettings.get().getAmbientLimitBytes());
+        assertEquals(DEFAULT_ACTIVE_MEMORY_LIMIT_BYTES, evaluationSettings.get().getActiveLimitBytes());
     }
 
     @Test

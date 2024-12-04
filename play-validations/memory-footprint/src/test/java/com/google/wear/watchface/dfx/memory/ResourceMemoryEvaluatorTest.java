@@ -1307,6 +1307,6 @@ public class ResourceMemoryEvaluatorTest {
     }
 
     private static EvaluationSettings getTestEvaluationSettings() {
-        return new EvaluationSettings("", "");
+        return new EvaluationSettings("", "", false, false);
     }
 }

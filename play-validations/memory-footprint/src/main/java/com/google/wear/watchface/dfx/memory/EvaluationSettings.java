@@ -60,9 +60,9 @@ final class EvaluationSettings {
 
     private boolean deduplicateAmbient = true;
 
-    private boolean applyV1OffloadLimitations = true;
+    private boolean applyV1OffloadLimitations = false;
 
-    private boolean estimateOptimization = true;
+    private boolean estimateOptimization = false;
 
     EvaluationSettings(String watchFacePath, String schemaVersion) {
         this.watchFacePath = watchFacePath;
@@ -73,6 +73,18 @@ final class EvaluationSettings {
         this.watchFacePath = watchFacePath;
         this.schemaVersion = schemaVersion;
         this.greedyEvaluationSwitch = greedyEvaluationSwitch;
+    }
+
+    EvaluationSettings(
+            String watchFacePath,
+            String schemaVersion,
+            boolean applyV1OffloadLimitations,
+            boolean estimateOptimization
+    ) {
+        this.watchFacePath = watchFacePath;
+        this.schemaVersion = schemaVersion;
+        this.applyV1OffloadLimitations = applyV1OffloadLimitations;
+        this.estimateOptimization = estimateOptimization;
     }
 
     /** Path to the watch face package to be evaluated. */
