@@ -79,8 +79,7 @@ final class EvaluationSettings {
             String watchFacePath,
             String schemaVersion,
             boolean applyV1OffloadLimitations,
-            boolean estimateOptimization
-    ) {
+            boolean estimateOptimization) {
         this.watchFacePath = watchFacePath;
         this.schemaVersion = schemaVersion;
         this.applyV1OffloadLimitations = applyV1OffloadLimitations;

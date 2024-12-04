@@ -28,8 +28,11 @@ public class EvaluationSettingsTest {
         assertEquals("1", evaluationSettings.get().getSchemaVersion());
         // assert default values
         assertFalse(evaluationSettings.get().isVerbose());
-        assertEquals(DEFAULT_AMBIENT_MEMORY_LIMIT_BYTES, evaluationSettings.get().getAmbientLimitBytes());
-        assertEquals(DEFAULT_ACTIVE_MEMORY_LIMIT_BYTES, evaluationSettings.get().getActiveLimitBytes());
+        assertEquals(
+                DEFAULT_AMBIENT_MEMORY_LIMIT_BYTES,
+                evaluationSettings.get().getAmbientLimitBytes());
+        assertEquals(
+                DEFAULT_ACTIVE_MEMORY_LIMIT_BYTES, evaluationSettings.get().getActiveLimitBytes());
     }
 
     @Test
