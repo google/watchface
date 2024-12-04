@@ -46,9 +46,9 @@ final class EvaluationSettings {
 
     private final String schemaVersion;
 
-    private long ambientLimitBytes = MemoryFootprint.toBytes(10);
+    private long ambientLimitBytes = MemoryFootprint.toBytes(/* megaBytes= */ 10);
 
-    private long activeLimitBytes = MemoryFootprint.toBytes(10);
+    private long activeLimitBytes = MemoryFootprint.toBytes(/* megaBytes= */ 100);
 
     private int greedyEvaluationSwitch = GREEDY_DEFAULT_LIMIT;
 
@@ -73,6 +73,17 @@ final class EvaluationSettings {
         this.watchFacePath = watchFacePath;
         this.schemaVersion = schemaVersion;
         this.greedyEvaluationSwitch = greedyEvaluationSwitch;
+    }
+
+    EvaluationSettings(
+            String watchFacePath,
+            String schemaVersion,
+            boolean applyV1OffloadLimitations,
+            boolean estimateOptimization) {
+        this.watchFacePath = watchFacePath;
+        this.schemaVersion = schemaVersion;
+        this.applyV1OffloadLimitations = applyV1OffloadLimitations;
+        this.estimateOptimization = estimateOptimization;
     }
 
     /** Path to the watch face package to be evaluated. */
