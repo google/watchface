@@ -17,8 +17,7 @@ import java.util.stream.Stream;
 import org.junit.Test;
 
 public class WatchFaceDataTest {
-    private static final EvaluationSettings TEST_EVALUATION_SETTINGS =
-            new EvaluationSettings("", "");
+    private static final EvaluationSettings TEST_EVALUATION_SETTINGS = new EvaluationSettings("");
 
     private static final String TEST_PACKAGE_FILES_ROOT =
             "test-samples/sample-wf/build/outputs/unpackedBundle/release";

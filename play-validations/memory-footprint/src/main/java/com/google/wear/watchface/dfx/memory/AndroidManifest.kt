@@ -10,8 +10,6 @@ import com.android.tools.build.bundletool.model.utils.xmlproto.XmlProtoNode
 import com.android.tools.build.bundletool.xml.XPathResolver
 import com.android.tools.build.bundletool.xml.XmlNamespaceContext
 import com.android.tools.build.bundletool.xml.XmlProtoToXmlConverter
-import com.google.common.primitives.Shorts
-import com.google.devrel.gmscore.tools.apk.arsc.Chunk
 import org.w3c.dom.Document
 import java.io.ByteArrayInputStream
 import java.io.InputStream
@@ -22,11 +20,20 @@ import java.util.zip.ZipFile
 import java.util.zip.ZipInputStream
 import javax.xml.namespace.NamespaceContext
 import javax.xml.parsers.DocumentBuilderFactory
-import javax.xml.xpath.XPath
 import javax.xml.xpath.XPathExpressionException
 import javax.xml.xpath.XPathFactory
 
-class AndyManifest private constructor(val wffVersion: Int, val minSdkVersion: Int, val targetSdkVersion: Int) {
+const val ANDROID_MANIFEST_FILE_NAME = "AndroidManifest.xml"
+
+/**
+ * Class that represents important properties of the AndroidManifest.xml file, for use in working
+ * with watch face packages.
+ */
+class AndyManifest private constructor(
+    val wffVersion: Int,
+    val minSdkVersion: Int,
+    val targetSdkVersion: Int
+) {
     companion object {
         @JvmStatic
         fun loadFromAab(zipFile: ZipFile): AndyManifest {
@@ -42,9 +49,18 @@ class AndyManifest private constructor(val wffVersion: Int, val minSdkVersion: I
             val doc = XmlProtoToXmlConverter.convert(manifestProto)
 
             try {
-                val minSdk = getAttribute(doc, manifestProto,"//uses-sdk/@android:minSdkVersion").toIntOrNull() ?: 1
-                val targetSdk = getAttribute(doc, manifestProto,"//uses-sdk/@android:targetSdkVersion").toIntOrNull() ?: minSdk
-                val wffVersion = getAttribute(doc, manifestProto,"//property/@android:value").toInt()
+                val minSdk = getAttribute(
+                    doc,
+                    manifestProto,
+                    "//uses-sdk/@android:minSdkVersion"
+                ).toIntOrNull() ?: 1
+                val targetSdk = getAttribute(
+                    doc,
+                    manifestProto,
+                    "//uses-sdk/@android:targetSdkVersion"
+                ).toIntOrNull() ?: minSdk
+                val wffVersion =
+                    getAttribute(doc, manifestProto, "//property/@android:value").toInt()
                 return AndyManifest(wffVersion, minSdk, targetSdk)
             } catch (e: XPathExpressionException) {
                 throw RuntimeException(e)
@@ -54,8 +70,6 @@ class AndyManifest private constructor(val wffVersion: Int, val minSdkVersion: I
         @JvmStatic
         private fun loadFromBinaryXml(inputStream: InputStream): AndyManifest {
             val manifestBytes = inputStream.readAllBytes()
-            val code = Shorts.fromBytes(manifestBytes[1], manifestBytes[0])
-            val isBinaryXml = code == Chunk.Type.XML.code()
             val xmlBytes = BinaryXmlParser.decodeXml(manifestBytes)
             return loadFromPlainXml(xmlBytes)
         }
@@ -70,7 +84,8 @@ class AndyManifest private constructor(val wffVersion: Int, val minSdkVersion: I
 
             val doc = docBuilder.parse(ByteArrayInputStream(bytes))
             val minSdk = getAttribute(doc, "//uses-sdk/@android:minSdkVersion").toIntOrNull() ?: 1
-            val targetSdk = getAttribute(doc, "//uses-sdk/@android:targetSdkVersion").toIntOrNull() ?: minSdk
+            val targetSdk =
+                getAttribute(doc, "//uses-sdk/@android:targetSdkVersion").toIntOrNull() ?: minSdk
             val wffVersion = getAttribute(doc, "//property/@android:value").toInt()
             return AndyManifest(wffVersion, minSdk, targetSdk)
         }
@@ -78,7 +93,7 @@ class AndyManifest private constructor(val wffVersion: Int, val minSdkVersion: I
         @JvmStatic
         fun loadFromApk(zipFile: ZipFile): AndyManifest {
             val manifestEntry = zipFile.stream()
-                .filter { f: ZipEntry -> f.name.endsWith("AndroidManifest.xml") }
+                .filter { f: ZipEntry -> f.name.endsWith(ANDROID_MANIFEST_FILE_NAME) }
                 .findFirst()
                 .get()
 
@@ -90,7 +105,7 @@ class AndyManifest private constructor(val wffVersion: Int, val minSdkVersion: I
         fun loadFromAabDirectory(aabPath: Path): AndyManifest {
             val childrenFilesStream = Files.walk(aabPath)
             val manifestPath = childrenFilesStream
-                .filter { p: Path -> p.endsWith("AndroidManifest.xml") }.findFirst().get()
+                .filter { p: Path -> p.endsWith(ANDROID_MANIFEST_FILE_NAME) }.findFirst().get()
             val inputStream = Files.newInputStream(manifestPath)
             return loadFromPlainXml(inputStream.readAllBytes())
         }
@@ -99,26 +114,13 @@ class AndyManifest private constructor(val wffVersion: Int, val minSdkVersion: I
         fun loadFromMokkaZip(baseSplitZipStream: ZipInputStream): AndyManifest {
             var entry = baseSplitZipStream.nextEntry
             while (entry != null) {
-                if (entry.name.endsWith("AndroidManifest.xml")) {
+                if (entry.name.endsWith(ANDROID_MANIFEST_FILE_NAME)) {
                     return loadFromBinaryXml(baseSplitZipStream)
                 }
                 entry = baseSplitZipStream.nextEntry
             }
             throw java.lang.RuntimeException("Android Manifest not found")
         }
-
-        private fun extractMinSdkVersion(doc: Document, manifestProto: XmlProtoNode) = getAttribute(
-            doc, manifestProto, "//uses-sdk/@android:minSdkVersion"
-        ).toInt()
-
-        private fun extractTargetSdkVersion(doc: Document, manifestProto: XmlProtoNode) =
-            getAttribute(
-                doc, manifestProto, "//uses-sdk/@android:targetSdkVersion"
-            ).toInt()
-
-        private fun extractWffVersion(doc: Document, manifestProto: XmlProtoNode) = getAttribute(
-            doc, manifestProto, "//property/@android:value"
-        ).toInt()
 
         private fun getAttribute(doc: Document, pathSpec: String): String {
             val xPath = XPathFactory.newInstance().newXPath()
@@ -142,7 +144,10 @@ class AndyManifest private constructor(val wffVersion: Int, val minSdkVersion: I
     }
 }
 
-val androidNamespace = object: NamespaceContext {
+/**
+ * Android namespace used for XPath querying.
+ */
+val androidNamespace = object : NamespaceContext {
     val namespaces = mapOf("android" to "http://schemas.android.com/apk/res/android")
 
     override fun getNamespaceURI(prefix: String?) = namespaces[prefix]

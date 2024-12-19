@@ -21,12 +21,10 @@ public class EvaluationSettingsTest {
     @Test
     public void parseFromArguments_parsesRequiredArgs() {
         Optional<EvaluationSettings> evaluationSettings =
-                parseFromArguments(
-                        "--watch-face", "path/to/watchface.apk", "--schema-version", "1");
+                parseFromArguments("--watch-face", "path/to/watchface.apk");
 
         assertTrue(evaluationSettings.isPresent());
         assertEquals("path/to/watchface.apk", evaluationSettings.get().getWatchFacePath());
-        assertEquals("1", evaluationSettings.get().getSchemaVersion());
         // assert default values
         assertFalse(evaluationSettings.get().isVerbose());
         assertEquals(
@@ -42,8 +40,6 @@ public class EvaluationSettingsTest {
                 parseFromArguments(
                         "--watch-face",
                         "path/to/watchface.apk",
-                        "--schema-version",
-                        "1",
                         "--ambient-limit-mb",
                         "50",
                         "--active-limit-mb",
@@ -55,7 +51,6 @@ public class EvaluationSettingsTest {
 
         assertTrue(evaluationSettings.isPresent());
         assertEquals("path/to/watchface.apk", evaluationSettings.get().getWatchFacePath());
-        assertEquals("1", evaluationSettings.get().getSchemaVersion());
         assertTrue(evaluationSettings.get().isVerbose());
         assertEquals(50 * 1024 * 1024, evaluationSettings.get().getAmbientLimitBytes());
         assertEquals(100 * 1024 * 1024, evaluationSettings.get().getActiveLimitBytes());
@@ -68,12 +63,7 @@ public class EvaluationSettingsTest {
     public void parseFromArguments_returnsNoneWhenLimitIsNotNumber() {
         Optional<EvaluationSettings> evaluationSettings =
                 parseFromArguments(
-                        "--watch-face",
-                        "path/to/watchface.apk",
-                        "--schema-version",
-                        "1",
-                        "--ambient-limit-mb",
-                        "lorem");
+                        "--watch-face", "path/to/watchface.apk", "--ambient-limit-mb", "lorem");
 
         assertFalse(evaluationSettings.isPresent());
     }

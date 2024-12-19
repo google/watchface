@@ -27,6 +27,7 @@ public class InputPackageTest {
                         .toString();
 
         List<AndroidResource> packageFiles;
+        AndyManifest manifest;
         try (InputPackage inputPackage = InputPackage.open(testAabDirectory)) {
             packageFiles =
                     inputPackage
@@ -39,6 +40,8 @@ public class InputPackageTest {
                                                     .toString()
                                                     .equals(".DS_Store"))
                             .collect(Collectors.toList());
+
+            manifest = inputPackage.getManifest();
         }
 
         assertThat(packageFiles)
@@ -57,5 +60,10 @@ public class InputPackageTest {
                         "base/res/values/strings.xml",
                         "base/res/xml/watch_face_info.xml",
                         "base/manifest/AndroidManifest.xml");
+
+        assertThat(manifest.getWffVersion()).isEqualTo(1);
+        // Unpacked bundle doesn't specify min or target sdk, these default to 1 according to specs.
+        assertThat(manifest.getMinSdkVersion()).isEqualTo(1);
+        assertThat(manifest.getTargetSdkVersion()).isEqualTo(1);
     }
 }

@@ -112,11 +112,14 @@ public class ResourceMemoryEvaluator {
      */
     static List<MemoryFootprint> evaluateMemoryFootprint(EvaluationSettings evaluationSettings) {
         try (InputPackage inputPackage = InputPackage.open(evaluationSettings.getWatchFacePath())) {
+
+            AndyManifest manifest = inputPackage.getManifest();
+
             WatchFaceData watchFaceData =
                     WatchFaceData.fromResourcesStream(
                             inputPackage.getWatchFaceFiles(), evaluationSettings);
             if (!evaluationSettings.isHoneyfaceMode()) {
-                validateFormat(watchFaceData, evaluationSettings.getSchemaVersion());
+                validateFormat(watchFaceData, String.valueOf(manifest.getWffVersion()));
             }
             return watchFaceData.watchFaceDocuments.stream()
                     .map(

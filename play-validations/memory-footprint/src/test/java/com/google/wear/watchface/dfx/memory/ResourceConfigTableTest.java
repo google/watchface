@@ -22,7 +22,7 @@ import org.w3c.dom.Document;
 @RunWith(JUnit4.class)
 public class ResourceConfigTableTest {
 
-    private static final EvaluationSettings evaluationSettings = new EvaluationSettings("", "");
+    private static final EvaluationSettings evaluationSettings = new EvaluationSettings("");
     private static final VariantConfigValue TEST_VARIANT =
             VariantConfigValue.active(evaluationSettings);
 
