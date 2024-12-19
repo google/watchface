@@ -165,6 +165,6 @@ public class WatchFaceResourceCollectorTest {
     }
 
     private static EvaluationSettings getTestEvaluationSettings() {
-        return new EvaluationSettings("", "");
+        return new EvaluationSettings("");
     }
 }

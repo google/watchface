@@ -16,7 +16,6 @@
 
 package com.google.wear.watchface.dfx.memory
 
-import com.google.common.collect.ImmutableList
 import java.util.Optional
 import java.util.jar.Manifest
 import kotlin.system.exitProcess
@@ -24,32 +23,34 @@ import org.apache.commons.cli.DefaultParser
 import org.apache.commons.cli.HelpFormatter
 import org.apache.commons.cli.Option
 import org.apache.commons.cli.Options
-import org.apache.commons.cli.ParseException
 
 /**
  * Contains the CLI arguments that the script was invoked with.
  *
  * @property watchFacePath Path to the watch face package to be evaluated.
- * @property schemaVersion Watch Face Format schema version that the evaluation should use.
  */
 class EvaluationSettings(
-    val watchFacePath: String,
-    val schemaVersion: String,
+    val watchFacePath: String
 ) {
     constructor(
         watchFacePath: String,
-        schemaVersion: String,
         greedyEvaluationSwitch: Int,
-    ) : this(watchFacePath, schemaVersion) {
+    ) : this(watchFacePath) {
         this.greedyEvaluationSwitch = greedyEvaluationSwitch
     }
 
     constructor(
         watchFacePath: String,
-        schemaVersion: String,
+        isHoneyFace: Boolean,
+    ) : this(watchFacePath) {
+        this.isHoneyfaceMode = isHoneyFace
+    }
+
+    constructor(
+        watchFacePath: String,
         applyV1OffloadLimitations: Boolean,
         estimateOptimization: Boolean,
-    ) : this(watchFacePath, schemaVersion) {
+    ) : this(watchFacePath) {
         this.applyV1OffloadLimitations = applyV1OffloadLimitations
         this.estimateOptimization = estimateOptimization
     }
@@ -102,8 +103,9 @@ class EvaluationSettings(
     var estimateOptimization: Boolean = false
         private set
 
-    val isHoneyfaceMode
-        get() = schemaVersion == HONEYFACE_VERSION
+    @get:JvmName("isHoneyfaceMode")
+    var isHoneyfaceMode: Boolean = false
+        private set
 
     private object CliParserOptions {
         val options = Options()
@@ -112,13 +114,6 @@ class EvaluationSettings(
             options.createOption {
                 longOpt("watch-face")
                     .desc("Path to the watch face package to be evaluated. Required.")
-                    .hasArg()
-                    .required()
-            }
-        val schemaVersionOption =
-            options.createOption {
-                longOpt("schema-version")
-                    .desc("Watch Face Format schema version of the watch face. Required.")
                     .hasArg()
                     .required()
             }
@@ -198,15 +193,21 @@ class EvaluationSettings(
                     .hasArg(false)
             }
 
+        val honeyfaceOption =
+            options.createOption {
+                longOpt("honeyface-package")
+                    .desc(
+                        "The package is in legacy Honeyface format."
+                    )
+                    .hasArg(false)
+            }
+
         private fun Options.createOption(block: Option.Builder.() -> Option.Builder): Option =
             Option.builder().block().build().also { this.addOption(it) }
     }
 
     companion object {
-        private const val HONEYFACE_VERSION = "honeyface"
         private const val GREEDY_DEFAULT_LIMIT = 10_000_000
-
-        private val SUPPORTED_VERSIONS: List<String> = ImmutableList.of(HONEYFACE_VERSION, "1", "2")
 
         @JvmStatic
         fun parseFromArguments(vararg arguments: String): Optional<EvaluationSettings> =
@@ -222,11 +223,9 @@ class EvaluationSettings(
                         exitProcess(0)
                     }
 
-                    validateSchemaVersion(line.getOptionValue(schemaVersionOption))
                     val evaluationSettings =
                         EvaluationSettings(
-                            line.getOptionValue(watchFacePathOption),
-                            line.getOptionValue(schemaVersionOption)
+                            line.getOptionValue(watchFacePathOption)
                         )
 
                     if (line.hasOption(activeLimitOption)) {
@@ -268,6 +267,9 @@ class EvaluationSettings(
                     if (line.hasOption(reportModeOption)) {
                         evaluationSettings.reportMode = true
                     }
+                    if (line.hasOption(honeyfaceOption)) {
+                        evaluationSettings.isHoneyfaceMode = true
+                    }
                     Optional.of(evaluationSettings)
                 } catch (e: Exception) {
                     println("Error: " + e.localizedMessage)
@@ -286,15 +288,6 @@ class EvaluationSettings(
                 val hash = manifest.mainAttributes.getValue("Git-Hash")
                 println(
                     "memory-footprint version: " + (version ?: "n/a") + " hash: " + (hash ?: "n/a")
-                )
-            }
-        }
-
-        private fun validateSchemaVersion(schemaVersionOption: String) {
-            if (!SUPPORTED_VERSIONS.contains(schemaVersionOption)) {
-                throw ParseException(
-                    "Argument --schema-version has a wrong value. Supported values are " +
-                        SUPPORTED_VERSIONS.joinToString(", "),
                 )
             }
         }

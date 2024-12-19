@@ -107,7 +107,7 @@ public class ResourceMemoryEvaluatorTest {
         @Test
         public void validate_hasExpectedFootprint() {
             List<MemoryFootprint> multiShapesFootprint =
-                    evaluateMemoryFootprint(new EvaluationSettings(testParams.watchFace, "1"));
+                    evaluateMemoryFootprint(new EvaluationSettings(testParams.watchFace));
 
             assertEquals(testParams.expectedLayouts, multiShapesFootprint.size());
             assertEquals(
@@ -1082,8 +1082,6 @@ public class ResourceMemoryEvaluatorTest {
                             parseFromArguments(
                                             "--watch-face",
                                             watchFacePath,
-                                            "--schema-version",
-                                            "1",
                                             "--estimate-optimization")
                                     .get());
 
@@ -1166,8 +1164,7 @@ public class ResourceMemoryEvaluatorTest {
 
                 // act
                 MemoryFootprint memoryFootprint =
-                        evaluateWatchFaceForLayout(
-                                fonts, document, new EvaluationSettings("", "", 0));
+                        evaluateWatchFaceForLayout(fonts, document, new EvaluationSettings("", 0));
 
                 // assert
                 assertEquals(
@@ -1210,7 +1207,7 @@ public class ResourceMemoryEvaluatorTest {
                 // act
                 MemoryFootprint memoryFootprint =
                         evaluateWatchFaceForLayout(
-                                testDrawableMap, document, new EvaluationSettings("", "", 99));
+                                testDrawableMap, document, new EvaluationSettings("", 99));
 
                 // assert
                 assertEquals(
@@ -1224,7 +1221,7 @@ public class ResourceMemoryEvaluatorTest {
 
         @Test
         public void evaluateWatchFaceForLayout_handlesHoneyfaceWatchFaces() throws Exception {
-            EvaluationSettings settings = new EvaluationSettings("", "honeyface");
+            EvaluationSettings settings = new EvaluationSettings("", true);
             try (InputStream is = getClass().getResourceAsStream("/Honeyface.xml")) {
                 Document document =
                         DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(is);
@@ -1279,10 +1276,7 @@ public class ResourceMemoryEvaluatorTest {
                     Paths.get(SAMPLE_WF_BASE_ARTIFACTS_PATH, "bundle/release/sample-wf-release.aab")
                             .toString();
 
-            ResourceMemoryEvaluator.main(
-                    new String[] {
-                        "--watch-face", watchFacePath, "--schema-version", "1", "--report"
-                    });
+            ResourceMemoryEvaluator.main(new String[] {"--watch-face", watchFacePath, "--report"});
             System.out.flush();
             System.setOut(old);
 
@@ -1307,6 +1301,6 @@ public class ResourceMemoryEvaluatorTest {
     }
 
     private static EvaluationSettings getTestEvaluationSettings() {
-        return new EvaluationSettings("", "", false, false);
+        return new EvaluationSettings("", false, false);
     }
 }

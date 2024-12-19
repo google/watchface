@@ -13,12 +13,7 @@ import org.w3c.dom.Document;
 
 public class OptimizationEstimatorTest {
     private static final EvaluationSettings TEST_SETTINGS =
-            parseFromArguments(
-                            "--watch-face",
-                            "path/to/watchface.apk",
-                            "--schema-version",
-                            "1",
-                            "--estimate-optimization")
+            parseFromArguments("--watch-face", "path/to/watchface.apk", "--estimate-optimization")
                     .get();
 
     @Test

@@ -12,7 +12,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
 public class VariantConfigValueTest {
-    private static final EvaluationSettings TEST_SETTINGS = new EvaluationSettings("", "");
+    private static final EvaluationSettings TEST_SETTINGS = new EvaluationSettings("");
     private static final VariantConfigValue AMBIENT = VariantConfigValue.ambient(TEST_SETTINGS);
     private static final VariantConfigValue ACTIVE = VariantConfigValue.active(TEST_SETTINGS);
 
