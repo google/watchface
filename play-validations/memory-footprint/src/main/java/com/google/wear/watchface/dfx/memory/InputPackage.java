@@ -39,7 +39,7 @@ interface InputPackage extends AutoCloseable {
      */
     Stream<AndroidResource> getWatchFaceFiles();
 
-    AndyManifest getManifest();
+    AndroidManifest getManifest();
 
     /** Close the backing watch face package resource. */
     void close();
@@ -81,8 +81,8 @@ interface InputPackage extends AutoCloseable {
             }
 
             @Override
-            public AndyManifest getManifest() {
-                return AndyManifest.loadFromAabDirectory(rootPath);
+            public AndroidManifest getManifest() {
+                return AndroidManifest.loadFromAabDirectory(rootPath);
             }
 
             @Override
@@ -104,8 +104,8 @@ interface InputPackage extends AutoCloseable {
             }
 
             @Override
-            public AndyManifest getManifest() {
-                return AndyManifest.loadFromApk(zipFile);
+            public AndroidManifest getManifest() {
+                return AndroidManifest.loadFromApk(zipFile);
             }
 
             @Override
@@ -132,8 +132,8 @@ interface InputPackage extends AutoCloseable {
             }
 
             @Override
-            public AndyManifest getManifest() {
-                return AndyManifest.loadFromAab(zipFile);
+            public AndroidManifest getManifest() {
+                return AndroidManifest.loadFromAab(zipFile);
             }
 
             @Override
@@ -177,8 +177,8 @@ interface InputPackage extends AutoCloseable {
                 }
 
                 @Override
-                public AndyManifest getManifest() {
-                    return AndyManifest.loadFromMokkaZip(baseSplitApkZip);
+                public AndroidManifest getManifest() {
+                    return AndroidManifest.loadFromMokkaZip(baseSplitApkZip);
                 }
 
                 @Override

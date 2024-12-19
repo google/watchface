@@ -29,14 +29,14 @@ const val ANDROID_MANIFEST_FILE_NAME = "AndroidManifest.xml"
  * Class that represents important properties of the AndroidManifest.xml file, for use in working
  * with watch face packages.
  */
-class AndyManifest private constructor(
+class AndroidManifest private constructor(
     val wffVersion: Int,
     val minSdkVersion: Int,
     val targetSdkVersion: Int
 ) {
     companion object {
         @JvmStatic
-        fun loadFromAab(zipFile: ZipFile): AndyManifest {
+        fun loadFromAab(zipFile: ZipFile): AndroidManifest {
             val manifestPath =
                 ZipPath.create(BundleModuleName.BASE_MODULE_NAME.name)
                     .resolve(BundleModule.SpecialModuleEntry.ANDROID_MANIFEST.path)
@@ -61,21 +61,21 @@ class AndyManifest private constructor(
                 ).toIntOrNull() ?: minSdk
                 val wffVersion =
                     getAttribute(doc, manifestProto, "//property/@android:value").toInt()
-                return AndyManifest(wffVersion, minSdk, targetSdk)
+                return AndroidManifest(wffVersion, minSdk, targetSdk)
             } catch (e: XPathExpressionException) {
                 throw RuntimeException(e)
             }
         }
 
         @JvmStatic
-        private fun loadFromBinaryXml(inputStream: InputStream): AndyManifest {
+        private fun loadFromBinaryXml(inputStream: InputStream): AndroidManifest {
             val manifestBytes = inputStream.readAllBytes()
             val xmlBytes = BinaryXmlParser.decodeXml(manifestBytes)
             return loadFromPlainXml(xmlBytes)
         }
 
         @JvmStatic
-        private fun loadFromPlainXml(bytes: ByteArray): AndyManifest {
+        private fun loadFromPlainXml(bytes: ByteArray): AndroidManifest {
             val factory = DocumentBuilderFactory.newInstance()
             factory.isValidating = false
             factory.isNamespaceAware = true
@@ -87,11 +87,11 @@ class AndyManifest private constructor(
             val targetSdk =
                 getAttribute(doc, "//uses-sdk/@android:targetSdkVersion").toIntOrNull() ?: minSdk
             val wffVersion = getAttribute(doc, "//property/@android:value").toInt()
-            return AndyManifest(wffVersion, minSdk, targetSdk)
+            return AndroidManifest(wffVersion, minSdk, targetSdk)
         }
 
         @JvmStatic
-        fun loadFromApk(zipFile: ZipFile): AndyManifest {
+        fun loadFromApk(zipFile: ZipFile): AndroidManifest {
             val manifestEntry = zipFile.stream()
                 .filter { f: ZipEntry -> f.name.endsWith(ANDROID_MANIFEST_FILE_NAME) }
                 .findFirst()
@@ -102,7 +102,7 @@ class AndyManifest private constructor(
         }
 
         @JvmStatic
-        fun loadFromAabDirectory(aabPath: Path): AndyManifest {
+        fun loadFromAabDirectory(aabPath: Path): AndroidManifest {
             val childrenFilesStream = Files.walk(aabPath)
             val manifestPath = childrenFilesStream
                 .filter { p: Path -> p.endsWith(ANDROID_MANIFEST_FILE_NAME) }.findFirst().get()
@@ -111,7 +111,7 @@ class AndyManifest private constructor(
         }
 
         @JvmStatic
-        fun loadFromMokkaZip(baseSplitZipStream: ZipInputStream): AndyManifest {
+        fun loadFromMokkaZip(baseSplitZipStream: ZipInputStream): AndroidManifest {
             var entry = baseSplitZipStream.nextEntry
             while (entry != null) {
                 if (entry.name.endsWith(ANDROID_MANIFEST_FILE_NAME)) {

@@ -27,7 +27,7 @@ public class InputPackageTest {
                         .toString();
 
         List<AndroidResource> packageFiles;
-        AndyManifest manifest;
+        AndroidManifest manifest;
         try (InputPackage inputPackage = InputPackage.open(testAabDirectory)) {
             packageFiles =
                     inputPackage

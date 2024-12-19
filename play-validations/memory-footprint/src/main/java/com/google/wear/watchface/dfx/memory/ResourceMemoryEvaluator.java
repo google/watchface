@@ -113,7 +113,7 @@ public class ResourceMemoryEvaluator {
     static List<MemoryFootprint> evaluateMemoryFootprint(EvaluationSettings evaluationSettings) {
         try (InputPackage inputPackage = InputPackage.open(evaluationSettings.getWatchFacePath())) {
 
-            AndyManifest manifest = inputPackage.getManifest();
+            AndroidManifest manifest = inputPackage.getManifest();
 
             WatchFaceData watchFaceData =
                     WatchFaceData.fromResourcesStream(
