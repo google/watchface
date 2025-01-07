@@ -119,7 +119,16 @@ public class ResourceMemoryEvaluator {
                     WatchFaceData.fromResourcesStream(
                             inputPackage.getWatchFaceFiles(), evaluationSettings);
             if (!evaluationSettings.isHoneyfaceMode()) {
-                validateFormat(watchFaceData, String.valueOf(manifest.getWffVersion()));
+                String manifestWffVersion = String.valueOf(manifest.getWffVersion());
+                String cliWffVersion = evaluationSettings.getSchemaVersion();
+                if (cliWffVersion != null && !cliWffVersion.equals(manifestWffVersion)) {
+                    System.out.printf(
+                            "Warning: Specified WFF version (%s) "
+                                    + "does not match version in manifest (%s)%n",
+                            cliWffVersion, manifestWffVersion);
+                }
+                validateFormat(
+                        watchFaceData, cliWffVersion != null ? cliWffVersion : manifestWffVersion);
             }
             return watchFaceData.watchFaceDocuments.stream()
                     .map(

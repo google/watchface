@@ -1221,7 +1221,7 @@ public class ResourceMemoryEvaluatorTest {
 
         @Test
         public void evaluateWatchFaceForLayout_handlesHoneyfaceWatchFaces() throws Exception {
-            EvaluationSettings settings = new EvaluationSettings("", true);
+            EvaluationSettings settings = new EvaluationSettings("", "honeyface");
             try (InputStream is = getClass().getResourceAsStream("/Honeyface.xml")) {
                 Document document =
                         DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(is);

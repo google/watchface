@@ -16,6 +16,7 @@
 
 package com.google.wear.watchface.dfx.memory
 
+import com.google.common.collect.ImmutableList
 import java.util.Optional
 import java.util.jar.Manifest
 import kotlin.system.exitProcess
@@ -23,6 +24,7 @@ import org.apache.commons.cli.DefaultParser
 import org.apache.commons.cli.HelpFormatter
 import org.apache.commons.cli.Option
 import org.apache.commons.cli.Options
+import org.apache.commons.cli.ParseException
 
 /**
  * Contains the CLI arguments that the script was invoked with.
@@ -41,9 +43,9 @@ class EvaluationSettings(
 
     constructor(
         watchFacePath: String,
-        isHoneyFace: Boolean,
+        version: String,
     ) : this(watchFacePath) {
-        this.isHoneyfaceMode = isHoneyFace
+        this.schemaVersion = version
     }
 
     constructor(
@@ -54,6 +56,12 @@ class EvaluationSettings(
         this.applyV1OffloadLimitations = applyV1OffloadLimitations
         this.estimateOptimization = estimateOptimization
     }
+
+    /**
+     * The schema version to validate against. This is only used when manually set via command-line,
+     * which then overrides the value read from the Manifest file.
+     */
+    var schemaVersion: String? = null
 
     /**
      * The maximum number of configurations of a watch face under which the real footprint is
@@ -103,9 +111,8 @@ class EvaluationSettings(
     var estimateOptimization: Boolean = false
         private set
 
-    @get:JvmName("isHoneyfaceMode")
-    var isHoneyfaceMode: Boolean = false
-        private set
+    val isHoneyfaceMode
+        get() = schemaVersion == HONEYFACE_VERSION
 
     private object CliParserOptions {
         val options = Options()
@@ -116,6 +123,15 @@ class EvaluationSettings(
                     .desc("Path to the watch face package to be evaluated. Required.")
                     .hasArg()
                     .required()
+            }
+        val schemaVersionOption =
+            options.createOption {
+                longOpt("schema-version")
+                    .desc(
+                        "Watch Face Format schema version of the watch face. This " +
+                            "overrides the version specified in the manifest file")
+                    .hasArg()
+                    .type(String::class.java)
             }
         val ambientLimitOption =
             options.createOption {
@@ -193,21 +209,15 @@ class EvaluationSettings(
                     .hasArg(false)
             }
 
-        val honeyfaceOption =
-            options.createOption {
-                longOpt("honeyface-package")
-                    .desc(
-                        "The package is in legacy Honeyface format."
-                    )
-                    .hasArg(false)
-            }
-
         private fun Options.createOption(block: Option.Builder.() -> Option.Builder): Option =
             Option.builder().block().build().also { this.addOption(it) }
     }
 
     companion object {
+        private const val HONEYFACE_VERSION = "honeyface"
         private const val GREEDY_DEFAULT_LIMIT = 10_000_000
+
+        private val SUPPORTED_VERSIONS: List<String> = ImmutableList.of(HONEYFACE_VERSION, "1", "2")
 
         @JvmStatic
         fun parseFromArguments(vararg arguments: String): Optional<EvaluationSettings> =
@@ -267,8 +277,9 @@ class EvaluationSettings(
                     if (line.hasOption(reportModeOption)) {
                         evaluationSettings.reportMode = true
                     }
-                    if (line.hasOption(honeyfaceOption)) {
-                        evaluationSettings.isHoneyfaceMode = true
+                    if (line.hasOption(schemaVersionOption)) {
+                        validateSchemaVersion(line.getOptionValue(schemaVersionOption))
+                        evaluationSettings.schemaVersion = line.getOptionValue(schemaVersionOption)
                     }
                     Optional.of(evaluationSettings)
                 } catch (e: Exception) {
@@ -288,6 +299,15 @@ class EvaluationSettings(
                 val hash = manifest.mainAttributes.getValue("Git-Hash")
                 println(
                     "memory-footprint version: " + (version ?: "n/a") + " hash: " + (hash ?: "n/a")
+                )
+            }
+        }
+
+        private fun validateSchemaVersion(schemaVersionOption: String) {
+            if (!SUPPORTED_VERSIONS.contains(schemaVersionOption)) {
+                throw ParseException(
+                    "Argument --schema-version has a wrong value. Supported values are " +
+                            SUPPORTED_VERSIONS.joinToString(", "),
                 )
             }
         }

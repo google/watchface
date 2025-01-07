@@ -64,6 +64,8 @@ configurations {
 jar {
     duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
 
+    exclude("META-INF/*.RSA", "META-INF/*.DSA", "META-INF/*.SF")
+
     manifest {
         attributes "Main-Class": "com.google.wear.watchface.dfx.memory.ResourceMemoryEvaluator"
         // Use `gradle :memory-footprint:jar -Dmemory-footprint.git_hash=$(git rev-parse --short HEAD)` to store
