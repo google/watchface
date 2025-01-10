@@ -49,7 +49,10 @@ jobs:
         run: |
           mv LICENSE.txt memory-footprint_LICENSE.txt
           mv third_party/wff/LICENSE.txt dwf-format-2-validator-1.0_LICENSE.txt
-
+      - name: Create XSD archive
+        run: |
+          cd third_party/wff/specification/documents/
+          zip -r * wff-xsd.zip
       - name: Release all jars
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
@@ -62,3 +65,4 @@ jobs:
             dwf-format-2-validator-1.0_LICENSE.txt
             **/memory-footprint.jar
             **/dwf-format-2-validator-1.0.jar
+            **/wff-xsd.zip
