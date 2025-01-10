@@ -52,7 +52,7 @@ jobs:
       - name: Create XSD archive
         run: |
           cd third_party/wff/specification/documents/
-          zip -r * wff-xsd.zip
+          zip -r wff-xsd.zip *
       - name: Release all jars
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
