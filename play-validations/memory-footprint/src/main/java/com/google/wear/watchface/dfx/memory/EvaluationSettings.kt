@@ -43,9 +43,9 @@ class EvaluationSettings(
 
     constructor(
         watchFacePath: String,
-        version: String,
+        schemaVersion: String,
     ) : this(watchFacePath) {
-        this.schemaVersion = version
+        this.schemaVersion = schemaVersion
     }
 
     constructor(
@@ -62,6 +62,7 @@ class EvaluationSettings(
      * which then overrides the value read from the Manifest file.
      */
     var schemaVersion: String? = null
+        private set
 
     /**
      * The maximum number of configurations of a watch face under which the real footprint is

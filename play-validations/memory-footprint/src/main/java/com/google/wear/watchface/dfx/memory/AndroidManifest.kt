@@ -22,8 +22,10 @@ import javax.xml.namespace.NamespaceContext
 import javax.xml.parsers.DocumentBuilderFactory
 import javax.xml.xpath.XPathExpressionException
 import javax.xml.xpath.XPathFactory
+import kotlin.io.path.ExperimentalPathApi
+import kotlin.io.path.walk
 
-const val ANDROID_MANIFEST_FILE_NAME = "AndroidManifest.xml"
+private const val ANDROID_MANIFEST_FILE_NAME = "AndroidManifest.xml"
 
 /**
  * Class that represents important properties of the AndroidManifest.xml file, for use in working
@@ -48,23 +50,20 @@ class AndroidManifest private constructor(
 
             val doc = XmlProtoToXmlConverter.convert(manifestProto)
 
-            try {
-                val minSdk = getAttribute(
-                    doc,
-                    manifestProto,
-                    "//uses-sdk/@android:minSdkVersion"
-                ).toIntOrNull() ?: 1
-                val targetSdk = getAttribute(
-                    doc,
-                    manifestProto,
-                    "//uses-sdk/@android:targetSdkVersion"
-                ).toIntOrNull() ?: minSdk
-                val wffVersion =
-                    getAttribute(doc, manifestProto, "//property/@android:value").toInt()
-                return AndroidManifest(wffVersion, minSdk, targetSdk)
-            } catch (e: XPathExpressionException) {
-                throw RuntimeException(e)
-            }
+            val minSdk = getAttribute(
+                doc,
+                manifestProto,
+                "//uses-sdk/@android:minSdkVersion"
+            ).toIntOrNull() ?: 1
+            val targetSdk = getAttribute(
+                doc,
+                manifestProto,
+                "//uses-sdk/@android:targetSdkVersion"
+            ).toIntOrNull() ?: minSdk
+            val wffVersion =
+                getAttribute(doc, manifestProto, "//property/@android:value").toInt()
+            return AndroidManifest(wffVersion, minSdk, targetSdk)
+
         }
 
         @JvmStatic
@@ -101,11 +100,12 @@ class AndroidManifest private constructor(
             return loadFromBinaryXml(inputStream)
         }
 
+        @OptIn(ExperimentalPathApi::class)
         @JvmStatic
         fun loadFromAabDirectory(aabPath: Path): AndroidManifest {
-            val childrenFilesStream = Files.walk(aabPath)
-            val manifestPath = childrenFilesStream
-                .filter { p: Path -> p.endsWith(ANDROID_MANIFEST_FILE_NAME) }.findFirst().get()
+            val childrenFiles = aabPath.walk()
+            val manifestPath = childrenFiles
+                .filter { p: Path -> p.endsWith(ANDROID_MANIFEST_FILE_NAME) }.first()
             val inputStream = Files.newInputStream(manifestPath)
             return loadFromPlainXml(inputStream.readAllBytes())
         }
@@ -147,7 +147,7 @@ class AndroidManifest private constructor(
 /**
  * Android namespace used for XPath querying.
  */
-val androidNamespace = object : NamespaceContext {
+private val androidNamespace = object : NamespaceContext {
     val namespaces = mapOf("android" to "http://schemas.android.com/apk/res/android")
 
     override fun getNamespaceURI(prefix: String?) = namespaces[prefix]

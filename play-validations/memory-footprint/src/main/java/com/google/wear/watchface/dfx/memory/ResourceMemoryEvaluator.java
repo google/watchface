@@ -121,7 +121,9 @@ public class ResourceMemoryEvaluator {
             if (!evaluationSettings.isHoneyfaceMode()) {
                 String manifestWffVersion = String.valueOf(manifest.getWffVersion());
                 String cliWffVersion = evaluationSettings.getSchemaVersion();
-                if (cliWffVersion != null && !cliWffVersion.equals(manifestWffVersion)) {
+                if (cliWffVersion != null
+                        && !cliWffVersion.equals(manifestWffVersion)
+                        && !evaluationSettings.isReportMode()) {
                     System.out.printf(
                             "Warning: Specified WFF version (%s) "
                                     + "does not match version in manifest (%s)%n",
