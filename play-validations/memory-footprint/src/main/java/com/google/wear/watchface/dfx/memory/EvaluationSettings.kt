@@ -171,7 +171,10 @@ class EvaluationSettings(
             options.createOption {
                 longOpt("version").desc("Show the script's version and quit.").hasArg(false)
             }
-
+        val helpOption =
+            options.createOption {
+                longOpt("help").desc("Display this help message.").hasArg(false)
+            }
         val estimateOptimizationOption =
             options.createOption {
                 longOpt("estimate-optimization").desc("Assume DWF optimizations.").hasArg(false)
@@ -226,12 +229,21 @@ class EvaluationSettings(
 
                 val parser = DefaultParser()
                 try {
-                    val line = parser.parse(options, arguments)
-                    line.hasOption(versionOption)
-                    if (line.hasOption(versionOption)) {
-                        printVersion()
-                        exitProcess(0)
+                    arguments.forEach { arg ->
+                        when (arg) {
+                            "--version" -> {
+                                printVersion()
+                                exitProcess(0)
+                            }
+                            "--help" -> {
+                                HelpFormatter().printHelp(cliInvokeCommand, options, true)
+                                exitProcess(0)
+                            }
+                            else -> {}
+                        }
                     }
+
+                    val line = parser.parse(options, arguments)
 
                     val evaluationSettings =
                         EvaluationSettings(
@@ -307,7 +319,7 @@ class EvaluationSettings(
             if (!SUPPORTED_VERSIONS.contains(schemaVersionOption)) {
                 throw ParseException(
                     "Argument --schema-version has a wrong value. Supported values are " +
-                            SUPPORTED_VERSIONS.joinToString(", "),
+                        SUPPORTED_VERSIONS.joinToString(", "),
                 )
             }
         }
