@@ -113,12 +113,11 @@ public class ResourceMemoryEvaluator {
     static List<MemoryFootprint> evaluateMemoryFootprint(EvaluationSettings evaluationSettings) {
         try (InputPackage inputPackage = InputPackage.open(evaluationSettings.getWatchFacePath())) {
 
-            AndroidManifest manifest = inputPackage.getManifest();
-
             WatchFaceData watchFaceData =
                     WatchFaceData.fromResourcesStream(
                             inputPackage.getWatchFaceFiles(), evaluationSettings);
             if (!evaluationSettings.isHoneyfaceMode()) {
+                AndroidManifest manifest = inputPackage.getManifest();
                 String manifestWffVersion = String.valueOf(manifest.getWffVersion());
                 String cliWffVersion = evaluationSettings.getSchemaVersion();
                 if (cliWffVersion != null

@@ -20,7 +20,6 @@ import java.util.zip.ZipFile
 import java.util.zip.ZipInputStream
 import javax.xml.namespace.NamespaceContext
 import javax.xml.parsers.DocumentBuilderFactory
-import javax.xml.xpath.XPathExpressionException
 import javax.xml.xpath.XPathFactory
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.walk
@@ -61,9 +60,11 @@ class AndroidManifest private constructor(
                 "//uses-sdk/@android:targetSdkVersion"
             ).toIntOrNull() ?: minSdk
             val wffVersion =
-                getAttribute(doc, manifestProto, "//property/@android:value").toInt()
+                getAttribute(doc, manifestProto, "//property[@android:name=\"com.google.wear.watchface.format.version\"]/@android:value").toIntOrNull()
+                requireNotNull(wffVersion) {
+                    "Watch Face Manifest must have a property with name \"com.google.wear.watchface.format.version\" that specifies the version of the Watch Face Format to be used."
+                }
             return AndroidManifest(wffVersion, minSdk, targetSdk)
-
         }
 
         @JvmStatic

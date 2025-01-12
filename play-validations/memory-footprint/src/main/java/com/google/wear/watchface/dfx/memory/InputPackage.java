@@ -163,12 +163,16 @@ interface InputPackage extends AutoCloseable {
             if (!baseSplitApk.isPresent()) {
                 throw new InvalidTestRunException("Zip file does not contain a base split apk");
             }
-            ZipInputStream baseSplitApkZip =
-                    new ZipInputStream(mokkaZip.getInputStream(baseSplitApk.get()));
 
             return new InputPackage() {
                 @Override
                 public Stream<AndroidResource> getWatchFaceFiles() {
+                    ZipInputStream baseSplitApkZip = null;
+                    try {
+                        baseSplitApkZip = new ZipInputStream(mokkaZip.getInputStream(baseSplitApk.get()));
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
                     try {
                         return AndroidResourceLoader.streamFromMokkaZip(baseSplitApkZip);
                     } catch (IOException e) {
@@ -178,6 +182,12 @@ interface InputPackage extends AutoCloseable {
 
                 @Override
                 public AndroidManifest getManifest() {
+                    ZipInputStream baseSplitApkZip = null;
+                    try {
+                        baseSplitApkZip = new ZipInputStream(mokkaZip.getInputStream(baseSplitApk.get()));
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
                     return AndroidManifest.loadFromMokkaZip(baseSplitApkZip);
                 }
 
