@@ -25,6 +25,7 @@ import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.walk
 
 private const val ANDROID_MANIFEST_FILE_NAME = "AndroidManifest.xml"
+private const val WFF_VERSION_PROP_NAME = "//property[@android:name=\"com.google.wear.watchface.format.version\"]/@android:value"
 
 /**
  * Class that represents important properties of the AndroidManifest.xml file, for use in working
@@ -60,7 +61,7 @@ class AndroidManifest private constructor(
                 "//uses-sdk/@android:targetSdkVersion"
             ).toIntOrNull() ?: minSdk
             val wffVersion =
-                getAttribute(doc, manifestProto, "//property[@android:name=\"com.google.wear.watchface.format.version\"]/@android:value").toIntOrNull()
+                getAttribute(doc, manifestProto, WFF_VERSION_PROP_NAME).toIntOrNull()
                 requireNotNull(wffVersion) {
                     "Watch Face Manifest must have a property with name \"com.google.wear.watchface.format.version\" that specifies the version of the Watch Face Format to be used."
                 }
@@ -86,7 +87,7 @@ class AndroidManifest private constructor(
             val minSdk = getAttribute(doc, "//uses-sdk/@android:minSdkVersion").toIntOrNull() ?: 1
             val targetSdk =
                 getAttribute(doc, "//uses-sdk/@android:targetSdkVersion").toIntOrNull() ?: minSdk
-            val wffVersion = getAttribute(doc, "//property/@android:value").toInt()
+            val wffVersion = getAttribute(doc, WFF_VERSION_PROP_NAME).toInt()
             return AndroidManifest(wffVersion, minSdk, targetSdk)
         }
 
