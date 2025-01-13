@@ -169,7 +169,8 @@ interface InputPackage extends AutoCloseable {
                 public Stream<AndroidResource> getWatchFaceFiles() {
                     ZipInputStream baseSplitApkZip = null;
                     try {
-                        baseSplitApkZip = new ZipInputStream(mokkaZip.getInputStream(baseSplitApk.get()));
+                        baseSplitApkZip =
+                                new ZipInputStream(mokkaZip.getInputStream(baseSplitApk.get()));
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
@@ -184,7 +185,8 @@ interface InputPackage extends AutoCloseable {
                 public AndroidManifest getManifest() {
                     ZipInputStream baseSplitApkZip = null;
                     try {
-                        baseSplitApkZip = new ZipInputStream(mokkaZip.getInputStream(baseSplitApk.get()));
+                        baseSplitApkZip =
+                                new ZipInputStream(mokkaZip.getInputStream(baseSplitApk.get()));
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
