@@ -30,29 +30,39 @@ import org.apache.commons.cli.ParseException
  * Contains the CLI arguments that the script was invoked with.
  *
  * @property watchFacePath Path to the watch face package to be evaluated.
- * @property schemaVersion Watch Face Format schema version that the evaluation should use.
  */
 class EvaluationSettings(
-    val watchFacePath: String,
-    val schemaVersion: String,
+    val watchFacePath: String
 ) {
     constructor(
         watchFacePath: String,
-        schemaVersion: String,
         greedyEvaluationSwitch: Int,
-    ) : this(watchFacePath, schemaVersion) {
+    ) : this(watchFacePath) {
         this.greedyEvaluationSwitch = greedyEvaluationSwitch
     }
 
     constructor(
         watchFacePath: String,
         schemaVersion: String,
+    ) : this(watchFacePath) {
+        this.schemaVersion = schemaVersion
+    }
+
+    constructor(
+        watchFacePath: String,
         applyV1OffloadLimitations: Boolean,
         estimateOptimization: Boolean,
-    ) : this(watchFacePath, schemaVersion) {
+    ) : this(watchFacePath) {
         this.applyV1OffloadLimitations = applyV1OffloadLimitations
         this.estimateOptimization = estimateOptimization
     }
+
+    /**
+     * The schema version to validate against. This is only used when manually set via command-line,
+     * which then overrides the value read from the Manifest file.
+     */
+    var schemaVersion: String? = null
+        private set
 
     /**
      * The maximum number of configurations of a watch face under which the real footprint is
@@ -118,9 +128,11 @@ class EvaluationSettings(
         val schemaVersionOption =
             options.createOption {
                 longOpt("schema-version")
-                    .desc("Watch Face Format schema version of the watch face. Required.")
+                    .desc(
+                        "Watch Face Format schema version of the watch face. This " +
+                            "overrides the version specified in the manifest file")
                     .hasArg()
-                    .required()
+                    .type(String::class.java)
             }
         val ambientLimitOption =
             options.createOption {
@@ -234,11 +246,9 @@ class EvaluationSettings(
 
                     val line = parser.parse(options, arguments)
 
-                    validateSchemaVersion(line.getOptionValue(schemaVersionOption))
                     val evaluationSettings =
                         EvaluationSettings(
-                            line.getOptionValue(watchFacePathOption),
-                            line.getOptionValue(schemaVersionOption)
+                            line.getOptionValue(watchFacePathOption)
                         )
 
                     if (line.hasOption(activeLimitOption)) {
@@ -279,6 +289,10 @@ class EvaluationSettings(
                     }
                     if (line.hasOption(reportModeOption)) {
                         evaluationSettings.reportMode = true
+                    }
+                    if (line.hasOption(schemaVersionOption)) {
+                        validateSchemaVersion(line.getOptionValue(schemaVersionOption))
+                        evaluationSettings.schemaVersion = line.getOptionValue(schemaVersionOption)
                     }
                     Optional.of(evaluationSettings)
                 } catch (e: Exception) {
