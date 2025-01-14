@@ -24,7 +24,7 @@ import org.w3c.dom.Node;
 
 public class DrawableNodeConfigTableTest {
 
-    private static final EvaluationSettings TEST_SETTINGS = new EvaluationSettings("", "");
+    private static final EvaluationSettings TEST_SETTINGS = new EvaluationSettings("");
     private static final VariantConfigValue TEST_VARIANT = VariantConfigValue.active(TEST_SETTINGS);
 
     @Test

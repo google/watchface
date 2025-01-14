@@ -20,16 +20,12 @@ public class AmbientMemoryFootprintCalculatorTest {
             parseFromArguments(
                             "--watch-face",
                             "path/to/watchface.apk",
-                            "--schema-version",
-                            "1",
                             "--disable-ambient-deduplication")
                     .get();
     private static final EvaluationSettings TEST_SETTINGS_VERBOSE =
             parseFromArguments(
                             "--watch-face",
                             "path/to/watchface.apk",
-                            "--schema-version",
-                            "1",
                             "--disable-ambient-deduplication",
                             "--verbose")
                     .get();
@@ -37,20 +33,15 @@ public class AmbientMemoryFootprintCalculatorTest {
             parseFromArguments(
                             "--watch-face",
                             "path/to/watchface.apk",
-                            "--schema-version",
-                            "1",
                             "--disable-ambient-deduplication",
                             "--disable-old-style-clocks")
                     .get();
     private static final EvaluationSettings TEST_SETTINGS_DEDUPLICATE =
-            parseFromArguments("--watch-face", "path/to/watchface.apk", "--schema-version", "1")
-                    .get();
+            parseFromArguments("--watch-face", "path/to/watchface.apk").get();
     private static final EvaluationSettings TEST_SETTINGS_V1_LIMITATIONS =
             parseFromArguments(
                             "--watch-face",
                             "path/to/watchface.apk",
-                            "--schema-version",
-                            "1",
                             "--disable-ambient-deduplication",
                             "--apply-v1-offload-limitations")
                     .get();

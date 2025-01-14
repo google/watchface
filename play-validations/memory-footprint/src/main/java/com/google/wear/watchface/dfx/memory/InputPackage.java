@@ -39,6 +39,8 @@ interface InputPackage extends AutoCloseable {
      */
     Stream<AndroidResource> getWatchFaceFiles();
 
+    AndroidManifest getManifest();
+
     /** Close the backing watch face package resource. */
     void close();
 
@@ -79,6 +81,11 @@ interface InputPackage extends AutoCloseable {
             }
 
             @Override
+            public AndroidManifest getManifest() {
+                return AndroidManifest.loadFromAabDirectory(rootPath);
+            }
+
+            @Override
             public void close() {}
         };
     }
@@ -94,6 +101,11 @@ interface InputPackage extends AutoCloseable {
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
+            }
+
+            @Override
+            public AndroidManifest getManifest() {
+                return AndroidManifest.loadFromApk(zipFile);
             }
 
             @Override
@@ -117,6 +129,11 @@ interface InputPackage extends AutoCloseable {
             @Override
             public Stream<AndroidResource> getWatchFaceFiles() {
                 return AndroidResourceLoader.streamFromAabFile(zipFile);
+            }
+
+            @Override
+            public AndroidManifest getManifest() {
+                return AndroidManifest.loadFromAab(zipFile);
             }
 
             @Override
@@ -146,17 +163,34 @@ interface InputPackage extends AutoCloseable {
             if (!baseSplitApk.isPresent()) {
                 throw new InvalidTestRunException("Zip file does not contain a base split apk");
             }
-            ZipInputStream baseSplitApkZip =
-                    new ZipInputStream(mokkaZip.getInputStream(baseSplitApk.get()));
 
             return new InputPackage() {
                 @Override
                 public Stream<AndroidResource> getWatchFaceFiles() {
+                    ZipInputStream baseSplitApkZip = null;
+                    try {
+                        baseSplitApkZip =
+                                new ZipInputStream(mokkaZip.getInputStream(baseSplitApk.get()));
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
                     try {
                         return AndroidResourceLoader.streamFromMokkaZip(baseSplitApkZip);
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
+                }
+
+                @Override
+                public AndroidManifest getManifest() {
+                    ZipInputStream baseSplitApkZip = null;
+                    try {
+                        baseSplitApkZip =
+                                new ZipInputStream(mokkaZip.getInputStream(baseSplitApk.get()));
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                    return AndroidManifest.loadFromMokkaZip(baseSplitApkZip);
                 }
 
                 @Override

@@ -21,12 +21,10 @@ public class EvaluationSettingsTest {
     @Test
     public void parseFromArguments_parsesRequiredArgs() {
         Optional<EvaluationSettings> evaluationSettings =
-                parseFromArguments(
-                        "--watch-face", "path/to/watchface.apk", "--schema-version", "1");
+                parseFromArguments("--watch-face", "path/to/watchface.apk");
 
         assertTrue(evaluationSettings.isPresent());
         assertEquals("path/to/watchface.apk", evaluationSettings.get().getWatchFacePath());
-        assertEquals("1", evaluationSettings.get().getSchemaVersion());
         // assert default values
         assertFalse(evaluationSettings.get().isVerbose());
         assertEquals(
@@ -68,12 +66,7 @@ public class EvaluationSettingsTest {
     public void parseFromArguments_returnsNoneWhenLimitIsNotNumber() {
         Optional<EvaluationSettings> evaluationSettings =
                 parseFromArguments(
-                        "--watch-face",
-                        "path/to/watchface.apk",
-                        "--schema-version",
-                        "1",
-                        "--ambient-limit-mb",
-                        "lorem");
+                        "--watch-face", "path/to/watchface.apk", "--ambient-limit-mb", "lorem");
 
         assertFalse(evaluationSettings.isPresent());
     }

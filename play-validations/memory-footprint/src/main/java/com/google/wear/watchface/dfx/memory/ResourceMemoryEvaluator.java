@@ -112,11 +112,24 @@ public class ResourceMemoryEvaluator {
      */
     static List<MemoryFootprint> evaluateMemoryFootprint(EvaluationSettings evaluationSettings) {
         try (InputPackage inputPackage = InputPackage.open(evaluationSettings.getWatchFacePath())) {
+
             WatchFaceData watchFaceData =
                     WatchFaceData.fromResourcesStream(
                             inputPackage.getWatchFaceFiles(), evaluationSettings);
             if (!evaluationSettings.isHoneyfaceMode()) {
-                validateFormat(watchFaceData, evaluationSettings.getSchemaVersion());
+                AndroidManifest manifest = inputPackage.getManifest();
+                String manifestWffVersion = String.valueOf(manifest.getWffVersion());
+                String cliWffVersion = evaluationSettings.getSchemaVersion();
+                if (cliWffVersion != null
+                        && !cliWffVersion.equals(manifestWffVersion)
+                        && !evaluationSettings.isReportMode()) {
+                    System.out.printf(
+                            "Warning: Specified WFF version (%s) "
+                                    + "does not match version in manifest (%s)%n",
+                            cliWffVersion, manifestWffVersion);
+                }
+                validateFormat(
+                        watchFaceData, cliWffVersion != null ? cliWffVersion : manifestWffVersion);
             }
             return watchFaceData.watchFaceDocuments.stream()
                     .map(
