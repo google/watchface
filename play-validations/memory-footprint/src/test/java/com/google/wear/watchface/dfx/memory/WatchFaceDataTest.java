@@ -63,8 +63,8 @@ public class WatchFaceDataTest {
         WatchFaceData watchFaceData =
                 WatchFaceData.fromResourcesStream(packageFileStream, TEST_EVALUATION_SETTINGS);
 
-        assertThat(watchFaceData.watchFaceDocuments).hasSize(1);
-        assertThat(watchFaceData.resourceDetailsMap).isEqualTo(expectedDetails);
+        assertThat(watchFaceData.getWatchFaceDocuments()).hasSize(1);
+        assertThat(watchFaceData.getResourceDetailsMap()).isEqualTo(expectedDetails);
     }
 
     @Test
@@ -76,8 +76,8 @@ public class WatchFaceDataTest {
             WatchFaceData watchFaceData =
                     WatchFaceData.fromResourcesStream(packageFileStream, TEST_EVALUATION_SETTINGS);
 
-            assertThat(watchFaceData.watchFaceDocuments).hasSize(1);
-            assertThat(watchFaceData.resourceDetailsMap).isEqualTo(expectedDetails);
+            assertThat(watchFaceData.getWatchFaceDocuments()).hasSize(1);
+            assertThat(watchFaceData.getResourceDetailsMap()).isEqualTo(expectedDetails);
         }
     }
 

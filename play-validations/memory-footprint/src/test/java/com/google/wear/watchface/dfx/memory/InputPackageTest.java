@@ -2,16 +2,37 @@ package com.google.wear.watchface.dfx.memory;
 
 import static com.google.common.truth.Truth.assertThat;
 
+import com.google.common.collect.Streams;
 import com.google.common.truth.Correspondence;
 import java.io.File;
+import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
+import org.junit.runners.Parameterized;
 
-@RunWith(JUnit4.class)
+@RunWith(Parameterized.class)
 public class InputPackageTest {
+
+    @Parameterized.Parameters(name = "{0}")
+    public static Iterable<?> parameters() {
+        Path folderPath =
+                new File("test-samples/sample-wf/build/outputs/unpackedBundle/release").toPath();
+        Object[][] p =
+                new Object[][] {
+                    {"absolute", folderPath.toAbsolutePath().toString()},
+                    {"relative", folderPath.toString()}
+                };
+        return Arrays.asList(p);
+    }
+
+    @Parameterized.Parameter(0)
+    public String label;
+
+    @Parameterized.Parameter(1)
+    public String testAabDirectory;
 
     private static final Correspondence<AndroidResource, String> VERIFY_PACKAGE_NAME_ONLY =
             Correspondence.transforming(
@@ -19,19 +40,12 @@ public class InputPackageTest {
                     "has the same file path as");
 
     @Test
-    public void open_handlesFolder() throws Exception {
-        String testAabDirectory =
-                new File("test-samples/sample-wf/build/outputs/unpackedBundle/release")
-                        .toPath()
-                        .toAbsolutePath()
-                        .toString();
-
+    public void open_handlesFolder() {
         List<AndroidResource> packageFiles;
         AndroidManifest manifest;
         try (InputPackage inputPackage = InputPackage.open(testAabDirectory)) {
             packageFiles =
-                    inputPackage
-                            .getWatchFaceFiles()
+                    Streams.stream(inputPackage.getWatchFaceFiles().iterator())
                             // remove this file, which is automatically created on MacOS
                             .filter(
                                     x ->
