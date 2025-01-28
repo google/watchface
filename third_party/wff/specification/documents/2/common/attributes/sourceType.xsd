@@ -185,19 +185,65 @@
     </xs:restriction>
   </xs:simpleType>
 
-  <xs:simpleType name="miscSourceType">
+  <xs:simpleType name="_weatherSourceEnums">
     <xs:annotation>
       <xs:documentation>
-        Miscellaneous sources
+        Weather source enumeration values
       </xs:documentation>
     </xs:annotation>
     <xs:restriction base="xs:string">
-      <xs:enumeration value="SUPPORTED_FORMAT_VERSION"/>
+      <xs:enumeration value="WEATHER.IS_AVAILABLE"/>
+      <xs:enumeration value="WEATHER.IS_ERROR"/>
+      <xs:enumeration value="WEATHER.CONDITION"/>
+      <xs:enumeration value="WEATHER.CONDITION_NAME"/>
+      <xs:enumeration value="WEATHER.IS_DAY"/>
+      <xs:enumeration value="WEATHER.TEMPERATURE"/>
+      <xs:enumeration value="WEATHER.TEMPERATURE_UNIT"/>
+      <xs:enumeration value="WEATHER.TEMPERATURE_LOW"/>
+      <xs:enumeration value="WEATHER.TEMPERATURE_HIGH"/>
+      <xs:enumeration value="WEATHER.CHANCE_OF_PRECIPITATION"/>
+      <xs:enumeration value="WEATHER.WEATHER.UV_INDEX"/>
+      <xs:enumeration value="WEATHER.WEATHER.LAST_UPDATED"/>
     </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="_weatherSourcePatterns">
+    <xs:annotation>
+      <xs:documentation>
+        Weather source patterns
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:pattern value="WEATHER.HOURS\.\d+\.IS_AVAILABLE"/>
+      <xs:pattern value="WEATHER.HOURS\.\d+\.CONDITION"/>
+      <xs:pattern value="WEATHER.HOURS\.\d+\.CONDITION_NAME"/>
+      <xs:pattern value="WEATHER.HOURS\.\d+\.IS_DAY"/>
+      <xs:pattern value="WEATHER.HOURS\.\d+\.TEMPERATURE"/>
+      <xs:pattern value="WEATHER.HOURS\.\d+\.UV_INDEX"/>
+      <xs:pattern value="WEATHER.DAYS\.\d+\.IS_AVAILABLE"/>
+      <xs:pattern value="WEATHER.DAYS\.\d+\.CONDITION_DAY"/>
+      <xs:pattern value="WEATHER.DAYS\.\d+\.CONDITION_DAY_NAME"/>
+      <xs:pattern value="WEATHER.DAYS\.\d+\.CONDITION_NIGHT"/>
+      <xs:pattern value="WEATHER.DAYS\.\d+\.CONDITION_NIGHT_NAME"/>
+      <xs:pattern value="WEATHER.DAYS\.\d+\.TEMPERATURE_LOW"/>
+      <xs:pattern value="WEATHER.DAYS\.\d+\.TEMPERATURE_HIGH"/>
+      <xs:pattern value="WEATHER.DAYS\.\d+\.CHANCE_OF_PRECIPITATION"/>
+      <xs:pattern value="WEATHER.DAYS\.\d+\.CHANCE_OF_PRECIPITATION_NIGHT"/>
+      <xs:pattern value="WEATHER.DAYS\.\d+\.UV_INDEX"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="weatherSourceType">
+    <xs:annotation>
+      <xs:documentation>
+        Sources related to weather
+      </xs:documentation>
+    </xs:annotation>
+    <xs:union memberTypes="_weatherSourceEnums _weatherSourcePatterns"/>
   </xs:simpleType>
   <xs:simpleType name="sourceType">
     <xs:union
         memberTypes="timeSourceType languageSourceType batterySourceType moonPhaseSourceType
-        sensorSourceType healthSourceType notificationSourceType miscSourceType"/>
+        sensorSourceType healthSourceType notificationSourceType weatherSourceType"/>
   </xs:simpleType>
 </xs:schema>
