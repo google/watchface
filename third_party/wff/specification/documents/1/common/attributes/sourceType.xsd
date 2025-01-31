@@ -184,19 +184,9 @@
     </xs:restriction>
   </xs:simpleType>
 
-  <xs:simpleType name="miscSourceType">
-    <xs:annotation>
-      <xs:documentation>
-        Miscellaneous sources
-      </xs:documentation>
-    </xs:annotation>
-    <xs:restriction base="xs:string">
-      <xs:enumeration value="SUPPORTED_FORMAT_VERSION"/>
-    </xs:restriction>
-  </xs:simpleType>
   <xs:simpleType name="sourceType">
     <xs:union
         memberTypes="timeSourceType languageSourceType batterySourceType moonPhaseSourceType
-        sensorSourceType healthSourceType notificationSourceType miscSourceType"/>
+        sensorSourceType healthSourceType notificationSourceType"/>
   </xs:simpleType>
 </xs:schema>
