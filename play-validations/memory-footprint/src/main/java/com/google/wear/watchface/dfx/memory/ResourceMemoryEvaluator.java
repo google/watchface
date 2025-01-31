@@ -22,7 +22,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.samsung.watchface.WatchFaceXmlValidator;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.List;
@@ -131,16 +130,14 @@ public class ResourceMemoryEvaluator {
                 validateFormat(
                         watchFaceData, cliWffVersion != null ? cliWffVersion : manifestWffVersion);
             }
-            return watchFaceData.watchFaceDocuments.stream()
+            return watchFaceData.getWatchFaceDocuments().stream()
                     .map(
                             watchFaceDocument ->
                                     evaluateWatchFaceForLayout(
-                                            watchFaceData.resourceDetailsMap,
+                                            watchFaceData.getResourceDetailsMap(),
                                             watchFaceDocument,
                                             evaluationSettings))
                     .collect(Collectors.toList());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
     }
 
@@ -160,7 +157,7 @@ public class ResourceMemoryEvaluator {
      */
     private static void validateFormat(WatchFaceData watchFaceData, String watchFaceFormatVersion) {
         WatchFaceXmlValidator xmlValidator = new WatchFaceXmlValidator();
-        for (Document watchFaceDocument : watchFaceData.watchFaceDocuments) {
+        for (Document watchFaceDocument : watchFaceData.getWatchFaceDocuments()) {
             boolean documentHasValidSchema =
                     xmlValidator.validate(watchFaceDocument, watchFaceFormatVersion);
             if (!documentHasValidSchema) {
