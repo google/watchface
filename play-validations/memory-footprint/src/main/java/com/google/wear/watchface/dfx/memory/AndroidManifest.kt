@@ -1,15 +1,8 @@
 package com.google.wear.watchface.dfx.memory
 
+import com.android.aapt.Resources
 import com.android.aapt.Resources.XmlNode
-import com.android.tools.apk.analyzer.BinaryXmlParser
-import com.android.tools.build.bundletool.commands.DumpManagerUtils
-import com.android.tools.build.bundletool.model.BundleModule
-import com.android.tools.build.bundletool.model.BundleModuleName
-import com.android.tools.build.bundletool.model.ZipPath
-import com.android.tools.build.bundletool.model.utils.xmlproto.XmlProtoNode
-import com.android.tools.build.bundletool.xml.XPathResolver
-import com.android.tools.build.bundletool.xml.XmlNamespaceContext
-import com.android.tools.build.bundletool.xml.XmlProtoToXmlConverter
+import fr.xgouchet.axml.CompressedXmlParser
 import org.w3c.dom.Document
 import java.io.ByteArrayInputStream
 import java.io.InputStream
@@ -20,12 +13,15 @@ import java.util.zip.ZipFile
 import java.util.zip.ZipInputStream
 import javax.xml.namespace.NamespaceContext
 import javax.xml.parsers.DocumentBuilderFactory
+import javax.xml.xpath.XPathConstants
 import javax.xml.xpath.XPathFactory
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.walk
 
 private const val ANDROID_MANIFEST_FILE_NAME = "AndroidManifest.xml"
-private const val WFF_VERSION_PROP_NAME = "//property[@android:name=\"com.google.wear.watchface.format.version\"]/@android:value"
+private const val DWF_PROPERTY_NAME = "com.google.wear.watchface.format.version"
+private const val WFF_VERSION_PROP_NAME =
+    "//property[@android:name=\"$DWF_PROPERTY_NAME\"]/@android:value"
 
 /**
  * Class that represents important properties of the AndroidManifest.xml file, for use in working
@@ -34,45 +30,56 @@ private const val WFF_VERSION_PROP_NAME = "//property[@android:name=\"com.google
 class AndroidManifest private constructor(
     val wffVersion: Int,
     val minSdkVersion: Int,
-    val targetSdkVersion: Int
+    val targetSdkVersion: Int,
 ) {
     companion object {
+        private fun Resources.XmlElement.getAndroidAttribute(attrName: String) =
+            attributeList.firstOrNull { it.name == attrName && it.namespaceUri == "http://schemas.android.com/apk/res/android" }?.value
+
         @JvmStatic
         fun loadFromAab(zipFile: ZipFile): AndroidManifest {
-            val manifestPath =
-                ZipPath.create(BundleModuleName.BASE_MODULE_NAME.name)
-                    .resolve(BundleModule.SpecialModuleEntry.ANDROID_MANIFEST.path)
-            val manifestProto =
-                XmlProtoNode(
-                    DumpManagerUtils.extractAndParse(
-                        zipFile, manifestPath
-                    ) { input: InputStream? -> XmlNode.parseFrom(input) })
+            val baseManifestEntry = zipFile.entries().asSequence()
+                .first { it.name.startsWith("base") && it.name.endsWith("AndroidManifest.xml") }
+            val manifestXmlNode = zipFile.getInputStream(baseManifestEntry).use {
+                XmlNode.parseFrom(it)
+            }
 
-            val doc = XmlProtoToXmlConverter.convert(manifestProto)
+            val usesSdkNode =
+                manifestXmlNode.element.childList.firstOrNull { it.element.name == "uses-sdk" }?.element
+            val minSdk = usesSdkNode?.getAndroidAttribute("minSdkVersion")?.toIntOrNull() ?: 1
+            val targetSdkVersion =
+                usesSdkNode?.getAndroidAttribute("targetSdkVersion")?.toIntOrNull() ?: minSdk
 
-            val minSdk = getAttribute(
-                doc,
-                manifestProto,
-                "//uses-sdk/@android:minSdkVersion"
-            ).toIntOrNull() ?: 1
-            val targetSdk = getAttribute(
-                doc,
-                manifestProto,
-                "//uses-sdk/@android:targetSdkVersion"
-            ).toIntOrNull() ?: minSdk
             val wffVersion =
-                getAttribute(doc, manifestProto, WFF_VERSION_PROP_NAME).toIntOrNull()
-                requireNotNull(wffVersion) {
-                    "Watch Face Manifest must have a property with name \"com.google.wear.watchface.format.version\" that specifies the version of the Watch Face Format to be used."
-                }
-            return AndroidManifest(wffVersion, minSdk, targetSdk)
+                manifestXmlNode
+                    .element
+                    .childList
+                    .firstOrNull { it.element.name == "application" }
+                    ?.element
+                    ?.childList
+                    ?.firstOrNull {
+                        it.element.name == "property" && it.element.getAndroidAttribute("name") == DWF_PROPERTY_NAME
+                    }?.element
+                    ?.getAndroidAttribute("value")
+                    ?.toIntOrNull()
+
+            requireNotNull(wffVersion) {
+                "Watch Face Manifest must have a property with name \"$DWF_PROPERTY_NAME\" that specifies the version of the Watch Face Format to be used."
+            }
+            return AndroidManifest(
+                wffVersion = wffVersion,
+                minSdkVersion = minSdk,
+                targetSdkVersion = targetSdkVersion
+            )
         }
 
         @JvmStatic
         private fun loadFromBinaryXml(inputStream: InputStream): AndroidManifest {
-            val manifestBytes = inputStream.readAllBytes()
-            val xmlBytes = BinaryXmlParser.decodeXml(manifestBytes)
-            return loadFromPlainXml(xmlBytes)
+            // the axml loads into memory only the inputStream.available() bytes, so the manifest bytes must be fully
+            // loaded into memory for parsing to work
+            val buffer = inputStream.readAllBytes()
+            val doc = CompressedXmlParser().parseDOM(ByteArrayInputStream(buffer))
+            return loadFromDocument(doc)
         }
 
         @JvmStatic
@@ -84,6 +91,11 @@ class AndroidManifest private constructor(
             val docBuilder = factory.newDocumentBuilder()
 
             val doc = docBuilder.parse(ByteArrayInputStream(bytes))
+            return loadFromDocument(doc)
+        }
+
+        @JvmStatic
+        private fun loadFromDocument(doc: Document): AndroidManifest {
             val minSdk = getAttribute(doc, "//uses-sdk/@android:minSdkVersion").toIntOrNull() ?: 1
             val targetSdk =
                 getAttribute(doc, "//uses-sdk/@android:targetSdkVersion").toIntOrNull() ?: minSdk
@@ -128,20 +140,7 @@ class AndroidManifest private constructor(
             val xPath = XPathFactory.newInstance().newXPath()
             xPath.namespaceContext = androidNamespace
             val expression = xPath.compile(pathSpec)
-            val xPathResult = XPathResolver.resolve(doc, expression)
-            return xPathResult.toString()
-        }
-
-        private fun getAttribute(
-            doc: Document,
-            manifestProto: XmlProtoNode,
-            pathSpec: String
-        ): String {
-            val xPath = XPathFactory.newInstance().newXPath()
-            xPath.namespaceContext = XmlNamespaceContext(manifestProto)
-            val compiledXPathExpression = xPath.compile(pathSpec)
-            val xPathResult = XPathResolver.resolve(doc, compiledXPathExpression)
-            return xPathResult.toString()
+            return expression.evaluate(doc, XPathConstants.STRING) as String
         }
     }
 }
