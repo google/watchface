@@ -25,12 +25,10 @@ dependencies {
     implementation 'com.google.guava:guava:33.3.1-jre'
     implementation 'commons-cli:commons-cli:1.5.0'
     implementation 'com.android.tools.apkparser:binary-resources:31.7.3'
-    implementation 'com.android.tools.apkparser:apkanalyzer:31.7.3'
-    implementation("com.android.tools.build:bundletool:1.17.2")
+    implementation 'com.github.xgouchet:AXML:v1.0.1'
     implementation("com.android.tools.build:aapt2-proto:8.7.3-12006047")
-    implementation("com.google.protobuf:protobuf-java:3.25.5")
+    implementation("com.google.protobuf:protobuf-java:4.29.3")
     implementation project(':validator')
-
 
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'com.google.truth:truth:1.4.4'
