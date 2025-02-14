@@ -100,7 +100,7 @@ public class ResourceMemoryEvaluatorTest {
                                             /* expectedActiveFootprintBytes= */ 4712628
                                                     + SYSTEM_DEFAULT_FONT_SIZE,
                                             /* expectedAmbientFootprintBytes= */ 2687628,
-                                            /* expectedLayouts= */ 1))
+                                            /* expectedLayouts= */ 2))
                     .collect(Collectors.toList());
         }
 

@@ -27,13 +27,13 @@ import kotlin.streams.asSequence
 internal class WatchFaceData private constructor() {
 
     /** Mutable backing field for [watchFaceDocuments]. */
-    private val _watchFaceDocuments = mutableListOf<Document>()
+    private val _watchFaceDocuments = mutableListOf<WatchFaceDocument>()
 
     /**
      * The parsed watchface xml documents. A watch face can have multiple layout files for different
      * screen shapes and resolutions.
      */
-    val watchFaceDocuments: List<Document> = _watchFaceDocuments
+    val watchFaceDocuments: List<WatchFaceDocument> = _watchFaceDocuments
 
     /** Mutable backing field for [resourceDetailsMap]. */
     private val _resourceDetailsMap = mutableMapOf<String, DrawableResourceDetails>()
@@ -100,7 +100,8 @@ internal class WatchFaceData private constructor() {
                 if (resource.isWatchFaceXml()) {
                     val document = parseXmlResource(resource.data)
                     if (isWatchFaceDocument(document, evaluationSettings)) {
-                        watchFaceData._watchFaceDocuments.add(document)
+                        watchFaceData._watchFaceDocuments
+                            .add(WatchFaceDocument(document, resource.versionQualifier))
                         continue
                     }
                 }
