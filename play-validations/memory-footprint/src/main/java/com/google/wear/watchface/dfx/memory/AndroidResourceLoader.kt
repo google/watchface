@@ -20,6 +20,8 @@ import com.google.common.io.Files
 import com.google.devrel.gmscore.tools.apk.arsc.BinaryResourceFile
 import com.google.devrel.gmscore.tools.apk.arsc.BinaryResourceValue
 import com.google.devrel.gmscore.tools.apk.arsc.ResourceTableChunk
+import com.google.devrel.gmscore.tools.apk.arsc.TypeChunk
+import com.google.wear.watchface.dfx.memory.AndroidResourceLoader.versionQualifier
 import java.io.IOException
 import java.io.InputStream
 import java.nio.file.Path
@@ -127,16 +129,27 @@ object AndroidResourceLoader {
             .map { entry ->
                 val path = stringPool.getString(entry.value().data())
                 val data = apkFile.getInputStream(ZipEntry(path)).readBytes()
+
                 AndroidResource(
                     entry.parent().typeName,
                     entry.key(),
                     Files.getFileExtension(path),
                     Paths.get(path),
-                    data
+                    data,
+                    entry.versionQualifier
                 )
             }
     }
 
     @JvmStatic
     fun readAllBytes(steam: InputStream) = steam.readBytes()
+
+    // If the entry in the table has a version qualifier, use that, otherwise use the special value
+    // to indicate that no version qualifier is present.
+    private val TypeChunk.Entry.versionQualifier: Int
+        get() = if (parent().configuration.sdkVersion() > 0) {
+            parent().configuration.sdkVersion()
+        } else {
+            AndroidResource.NO_VERSION_QUALIFIER
+        }
 }

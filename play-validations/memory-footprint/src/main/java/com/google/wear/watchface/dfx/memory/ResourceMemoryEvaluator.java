@@ -127,15 +127,19 @@ public class ResourceMemoryEvaluator {
                                     + "does not match version in manifest (%s)%n",
                             cliWffVersion, manifestWffVersion);
                 }
-                validateFormat(
-                        watchFaceData, cliWffVersion != null ? cliWffVersion : manifestWffVersion);
+                // If the CLI was used to set the version number then this version should be used
+                // for all WFF XML files, irrespective of the resource qualifier.
+                boolean useFixedVersionNumber = cliWffVersion != null;
+                String validationVersion =
+                        cliWffVersion != null ? cliWffVersion : manifestWffVersion;
+                validateFormat(watchFaceData, validationVersion, useFixedVersionNumber);
             }
             return watchFaceData.getWatchFaceDocuments().stream()
                     .map(
                             watchFaceDocument ->
                                     evaluateWatchFaceForLayout(
                                             watchFaceData.getResourceDetailsMap(),
-                                            watchFaceDocument,
+                                            watchFaceDocument.getDocument(),
                                             evaluationSettings))
                     .collect(Collectors.toList());
         }
@@ -153,13 +157,29 @@ public class ResourceMemoryEvaluator {
      *
      * @param watchFaceData the watch face data containing the watchface xml documents.
      * @param watchFaceFormatVersion the watch face format version.
+     * @param useFixedVersionNumber whether to use only the specified version number or to override
+     *     with the version number from any resource qualifier. This is useful when the version is
+     *     specified on the command-line, and should therefore be fixed to that value irrespective.
      * @throws TestFailedException if the watch face does not comply to the format version.
      */
-    private static void validateFormat(WatchFaceData watchFaceData, String watchFaceFormatVersion) {
+    private static void validateFormat(
+            WatchFaceData watchFaceData,
+            String watchFaceFormatVersion,
+            boolean useFixedVersionNumber) {
         WatchFaceXmlValidator xmlValidator = new WatchFaceXmlValidator();
-        for (Document watchFaceDocument : watchFaceData.getWatchFaceDocuments()) {
+        for (WatchFaceDocument watchFaceDocument : watchFaceData.getWatchFaceDocuments()) {
+            String version;
+            // If the version of the watch face document was derived from a resource qualifier, e.g.
+            // being in a directory such as res/raw-v34/ indicating WFF v2, override the manifest
+            // specified version, unless useFixedVersionNumber is true.
+            if (watchFaceDocument.getWffVersion() == AndroidResource.NO_VERSION_QUALIFIER
+                    || useFixedVersionNumber) {
+                version = watchFaceFormatVersion;
+            } else {
+                version = String.valueOf(watchFaceDocument.getWffVersion());
+            }
             boolean documentHasValidSchema =
-                    xmlValidator.validate(watchFaceDocument, watchFaceFormatVersion);
+                    xmlValidator.validate(watchFaceDocument.getDocument(), version);
             if (!documentHasValidSchema) {
                 throw new TestFailedException(
                         "Watch Face has syntactic errors and cannot be parsed.");
