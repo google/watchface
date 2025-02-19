@@ -40,6 +40,7 @@ import org.w3c.dom.Node;
  * watch face interactivity is restricted, only a sub-set of the dynamic nodes are calculated (the
  * clocks and complication slots).
  */
+@SuppressWarnings("KotlinInternal")
 class DynamicNodePerConfigurationFootprintCalculator {
     private final Document document;
     private final EvaluationSettings evaluationSettings;

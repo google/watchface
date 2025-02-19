@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
 import org.w3c.dom.Document;
 
 /** Computes the asset memory footprint for a given watch face. */
+@SuppressWarnings("KotlinInternal")
 public class ResourceMemoryEvaluator {
 
     private static final int EXIT_STATUS_BAD_ARGUMENTS = 2;

@@ -38,6 +38,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+@SuppressWarnings("KotlinInternal")
 class WatchFaceResourceCollector {
     private final Map<String, Node> bitmapFontDefinitions;
     private final Map<String, DrawableResourceDetails> resourceMemoryMap;

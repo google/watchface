@@ -6,7 +6,6 @@ import fr.xgouchet.axml.CompressedXmlParser
 import org.w3c.dom.Document
 import java.io.ByteArrayInputStream
 import java.io.InputStream
-import java.nio.file.Files
 import java.nio.file.Path
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
@@ -15,8 +14,6 @@ import javax.xml.namespace.NamespaceContext
 import javax.xml.parsers.DocumentBuilderFactory
 import javax.xml.xpath.XPathConstants
 import javax.xml.xpath.XPathFactory
-import kotlin.io.path.ExperimentalPathApi
-import kotlin.io.path.walk
 
 private const val ANDROID_MANIFEST_FILE_NAME = "AndroidManifest.xml"
 private const val DWF_PROPERTY_NAME = "com.google.wear.watchface.format.version"
@@ -114,14 +111,12 @@ class AndroidManifest private constructor(
             return loadFromBinaryXml(inputStream)
         }
 
-        @OptIn(ExperimentalPathApi::class)
         @JvmStatic
         fun loadFromAabDirectory(aabPath: Path): AndroidManifest {
-            val childrenFiles = aabPath.walk()
-            val manifestPath = childrenFiles
-                .filter { p: Path -> p.endsWith(ANDROID_MANIFEST_FILE_NAME) }.first()
-            val inputStream = Files.newInputStream(manifestPath)
-            return loadFromPlainXml(inputStream.readAllBytes())
+            val childrenFiles = aabPath.toFile().walk()
+            val manifestFile = childrenFiles
+                .filter { p -> p.toPath().endsWith(ANDROID_MANIFEST_FILE_NAME) }.first()
+            return loadFromPlainXml(manifestFile.readBytes())
         }
 
         @JvmStatic
