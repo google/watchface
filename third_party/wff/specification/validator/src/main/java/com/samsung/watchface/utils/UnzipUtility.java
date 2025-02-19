@@ -50,13 +50,19 @@ public class UnzipUtility {
     private static void tryCreateDirectory(String directory) {
         File destDir = new File(directory);
         if (!destDir.exists()) {
-            if (!destDir.mkdir()) {
+            if (!destDir.mkdirs()) {
                 throw new RuntimeException("Couldn't create directory : " + directory);
             }
         }
     }
 
     private static void tryExtractFile(ZipInputStream zipIn, String filePath) {
+        File file = new File(filePath);
+        File parent = file.getParentFile();
+        if (parent != null && !parent.exists()) {
+            tryCreateDirectory(parent.getAbsolutePath());
+        }
+
         try (FileOutputStream fileOutputStream = new FileOutputStream(filePath);
              BufferedOutputStream outStream = new BufferedOutputStream(fileOutputStream)) {
             byte[] bytesIn = new byte[BUFFER_SIZE];
