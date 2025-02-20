@@ -34,7 +34,7 @@ interface InputPackage : AutoCloseable {
      */
     fun getWatchFaceFiles(): Sequence<AndroidResource>
 
-    fun getManifest(): AndroidManifest
+    fun getManifest(): AndroidManifest?
 
     /** Close the backing watch face package resource. */
     override fun close()

@@ -110,6 +110,7 @@ test {
             "test-samples:sample-wf:bundleRelease",
             "test-samples:sample-wf:assembleRelease",
             "test-samples:sample-wf:unpackBundle",
+            "test-samples:sample-wf:resDirectory",
             "test-samples:sample-wf:zipApk"
     )
 }

@@ -118,18 +118,30 @@ public class ResourceMemoryEvaluator {
                             inputPackage.getWatchFaceFiles(), evaluationSettings);
             if (!evaluationSettings.isHoneyfaceMode()) {
                 AndroidManifest manifest = inputPackage.getManifest();
-                String manifestWffVersion = String.valueOf(manifest.getWffVersion());
+                String manifestWffVersion =
+                        manifest == null ? null : String.valueOf(manifest.getWffVersion());
                 String cliWffVersion = evaluationSettings.getSchemaVersion();
-                if (cliWffVersion != null
-                        && !cliWffVersion.equals(manifestWffVersion)
-                        && !evaluationSettings.isReportMode()) {
-                    System.out.printf(
-                            "Warning: Specified WFF version (%s) "
-                                    + "does not match version in manifest (%s)%n",
-                            cliWffVersion, manifestWffVersion);
+
+                String wffVersion;
+                if (cliWffVersion == null && manifestWffVersion == null) {
+                    throw new TestFailedException(
+                            "No WFF version could be inferred. When running the memory footprint"
+                                    + " tool with a directory and without the --schema-version"
+                                    + " argument, the directory must contain an AndroidManifest.xml"
+                                    + " file");
+                } else {
+                    if (cliWffVersion != null
+                            && manifestWffVersion != null
+                            && !cliWffVersion.equals(manifestWffVersion)
+                            && !evaluationSettings.isReportMode()) {
+                        System.out.printf(
+                                "Warning: Specified WFF version (%s) "
+                                        + "does not match version in manifest (%s)%n",
+                                cliWffVersion, manifestWffVersion);
+                    }
+                    wffVersion = cliWffVersion != null ? cliWffVersion : manifestWffVersion;
                 }
-                validateFormat(
-                        watchFaceData, cliWffVersion != null ? cliWffVersion : manifestWffVersion);
+                validateFormat(watchFaceData, wffVersion);
             }
             return watchFaceData.getWatchFaceDocuments().stream()
                     .map(
