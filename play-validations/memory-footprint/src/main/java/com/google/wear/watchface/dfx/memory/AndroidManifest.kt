@@ -112,11 +112,11 @@ class AndroidManifest private constructor(
         }
 
         @JvmStatic
-        fun loadFromAabDirectory(aabPath: Path): AndroidManifest {
+        fun loadFromAabDirectory(aabPath: Path): AndroidManifest? {
             val childrenFiles = aabPath.toFile().walk()
             val manifestFile = childrenFiles
-                .filter { p -> p.toPath().endsWith(ANDROID_MANIFEST_FILE_NAME) }.first()
-            return loadFromPlainXml(manifestFile.readBytes())
+                .filter { p -> p.toPath().endsWith(ANDROID_MANIFEST_FILE_NAME) }.firstOrNull()
+            return manifestFile?.let { loadFromPlainXml(it.readBytes()) }
         }
 
         @JvmStatic

@@ -52,6 +52,15 @@ afterEvaluate {
         }
     }
 
+    // create a directory containing only a res sub-directory, used for tests
+    tasks.register("resDirectory", Copy) {
+        into layout.buildDirectory.dir("outputs/resDirectory/release")
+
+        from(layout.projectDirectory.dir("src/main/res")) {
+            into("res")
+        }
+    }
+
     // create a zip that follows the structure used internally, for tests
     tasks.register('zipApk', Zip) {
         duplicatesStrategy DuplicatesStrategy.INCLUDE

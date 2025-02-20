@@ -53,11 +53,11 @@ class AndroidManifestTest {
 
         val manifest = AndroidManifest.loadFromAabDirectory(wffDirectory)
 
-        assertThat(manifest.wffVersion).isEqualTo(1)
+        assertThat(manifest?.wffVersion).isEqualTo(1)
         // The unbundled manifest does not specify min and target SDKs, which according to specs
         // should then default to: minSdk -> 1, targetSdk -> minSdk.
-        assertThat(manifest.minSdkVersion).isEqualTo(1)
-        assertThat(manifest.targetSdkVersion).isEqualTo(1)
+        assertThat(manifest?.minSdkVersion).isEqualTo(1)
+        assertThat(manifest?.targetSdkVersion).isEqualTo(1)
     }
 
     @Test

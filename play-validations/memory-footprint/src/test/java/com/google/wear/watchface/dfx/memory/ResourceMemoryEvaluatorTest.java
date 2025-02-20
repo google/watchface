@@ -60,15 +60,19 @@ public class ResourceMemoryEvaluatorTest {
 
             final int expectedLayouts;
 
+            final String cliSchemaVersion;
+
             private TestParams(
                     String watchFace,
                     long expectedActiveFootprintBytes,
                     long expectedAmbientFootprintBytes,
-                    int expectedLayouts) {
+                    int expectedLayouts,
+                    String cliSchemaVersion) {
                 this.watchFace = watchFace;
                 this.expectedActiveFootprintBytes = expectedActiveFootprintBytes;
                 this.expectedAmbientFootprintBytes = expectedAmbientFootprintBytes;
                 this.expectedLayouts = expectedLayouts;
+                this.cliSchemaVersion = cliSchemaVersion;
             }
 
             @Override
@@ -86,6 +90,7 @@ public class ResourceMemoryEvaluatorTest {
 
             return Stream.of(
                             "unpackedBundle/release",
+                            "resDirectory",
                             "apk/release/sample-wf-release.apk",
                             "apk/debug/sample-wf-debug.apk",
                             "bundle/release/sample-wf-release.aab",
@@ -100,14 +105,22 @@ public class ResourceMemoryEvaluatorTest {
                                             /* expectedActiveFootprintBytes= */ 4712628
                                                     + SYSTEM_DEFAULT_FONT_SIZE,
                                             /* expectedAmbientFootprintBytes= */ 2687628,
-                                            /* expectedLayouts= */ 1))
+                                            /* expectedLayouts= */ 1,
+                                            /* cliSchemaVersion= */ artifactRelativePath.equals(
+                                                            "resDirectory")
+                                                    ? "1"
+                                                    : null))
                     .collect(Collectors.toList());
         }
 
         @Test
         public void validate_hasExpectedFootprint() {
             List<MemoryFootprint> multiShapesFootprint =
-                    evaluateMemoryFootprint(new EvaluationSettings(testParams.watchFace));
+                    evaluateMemoryFootprint(
+                            testParams.cliSchemaVersion == null
+                                    ? new EvaluationSettings(testParams.watchFace)
+                                    : new EvaluationSettings(
+                                            testParams.watchFace, testParams.cliSchemaVersion));
 
             assertEquals(testParams.expectedLayouts, multiShapesFootprint.size());
             assertEquals(
