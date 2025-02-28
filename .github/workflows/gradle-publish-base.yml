@@ -16,6 +16,10 @@ on:
         type: string
         required: true
 
+permissions:
+  contents: write
+  packages: write
+
 jobs:
   build_memory_footprint:
     runs-on: ubuntu-latest
