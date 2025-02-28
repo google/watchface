@@ -120,7 +120,7 @@ jobs:
           VERSION="${{ steps.final_version.outputs.final_version }}"
           ARTEFACT_ID=${{ steps.artefact_id.outputs.artefact_id }}
 
-          METADATA_URL="https://maven.pkg.github.com/google/watchface/com.google.watchface//./}/${ARTIFACT_ID}/${VERSION}/maven-metadata.xml"
+          METADATA_URL="https://maven.pkg.github.com/google/watchface/com.google.watchface/${ARTIFACT_ID}/${VERSION}/maven-metadata.xml"
 
           TOKEN="${{ secrets.GITHUB_TOKEN }}"
 
