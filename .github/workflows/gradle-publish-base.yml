@@ -62,7 +62,7 @@ jobs:
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           automatic_release_tag: "${{ inputs.release_name }}"
-          prerelease: true
+          prerelease: false
           title: "Memory Footprint Build"
           files: |
             memory-footprint_LICENSE.txt
