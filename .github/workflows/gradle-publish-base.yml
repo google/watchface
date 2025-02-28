@@ -118,7 +118,6 @@ jobs:
         shell: bash
         env:
           GITHUB_PATH: ~/.m2/
-          
       - name: Publish to GitHub Packages
         run: |
           mvn deploy:deploy-file \
