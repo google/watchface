@@ -102,7 +102,7 @@ jobs:
           VERSION="${{ steps.get_version.outputs.version }}"
           if ${{ inputs.release_name == 'latest' }}; then
             COMMIT_SHA=$(curl -s "https://api.github.com/repos/google/watchface/git/ref/tags/${{ inputs.release_name }}" | jq -r '.object.sha')
-            SHORT_COMMIT_SHA=$(git rev-parse --short "$COMMIT_SHA")
+            SHORT_COMMIT_SHA=$(echo "$COMMIT_SHA" | cut -c -7)
             VERSION="$VERSION-$SHORT_COMMIT_SHA-SNAPSHOT"
           fi
           echo "Final version: $VERSION"
