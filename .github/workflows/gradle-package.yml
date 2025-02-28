@@ -1,85 +1,35 @@
 name: Publish JAR to GitHub Packages
 
 on:
-  workflow_dispatch:
-    inputs:
-      jar_path:
-        description: "Path to the JAR file"
-        required: true
-        type: string
-      group_id:
-        description: "Group ID for the Maven artifact"
-        required: true
-        type: string
-      artifact_id:
-        description: "Artifact ID for the Maven artifact"
-        required: true
-        type: string
-      is_snapshot:
-        description: "Whether to append '-SNAPSHOT' to the version"
-        required: false
-        type: boolean
-        default: false
-      repo_token:
-        description: "GitHub repo token"
-        required: true
-        type: string
+  release:
+    types: [published]
 
 permissions:
   contents: write
   packages: write
 
 jobs:
-  publish:
+  download-assets:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set up JDK
-        uses: actions/setup-java@v3
-        with:
-          java-version: "17" # Or your desired Java version
-          distribution: "temurin"
-
-      - name: Get JAR version
-        id: get_version
+      - uses: actions/checkout@v4
+      - name: Get latest release info
+        id: get_release_info
         run: |
-          VERSION=$(unzip -p ${{ github.event.inputs.jar_path }} META-INF/MANIFEST.MF | grep "^Version: " | cut -d' ' -f2)
-          if [[ -z "$VERSION" ]]; then
-            echo "::error file=${{ github.event.inputs.jar_path }}::Could not determine version from JAR's Manifest file"
-            exit 1
-          fi
-          echo "::set-output name=version::$VERSION"
-
-      - name: Determine final version
-        id: final_version
+          response=$(curl \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/${{ github.repository }}/releases/latest"
+          )
+          echo "::set-output name=response::$response"
+      - name: Download assets
         run: |
-          VERSION="${{ steps.get_version.outputs.version }}"
-          if ${{ github.event.inputs.is_snapshot }}; then
-            VERSION="$VERSION-SNAPSHOT"
-          fi
-          echo "Final version: $VERSION"
-          echo "::set-output name=final_version::$VERSION"
+          release_info=$(echo "${{ steps.get_release_info.outputs.response }}" | jq -r .)
+          assets=$(echo "$release_info" | jq -r '.assets| [.name, .browser_download_url] | @tsv')
 
-      - name: Publish to GitHub Packages
-        run: |
-          mvn deploy:deploy-file \
-            -DgroupId=${{ github.event.inputs.group_id }} \
-            -DartifactId=${{ github.event.inputs.artifact_id }} \
-            -Dversion=${{ steps.final_version.outputs.final_version }} \
-            -Dpackaging=jar \
-            -Dfile=${{ github.event.inputs.jar_path }} \
-            -Durl=https://maven.pkg.github.com/google/watchface \
-            -DrepositoryId=github -s ~/.m2/settings.xml
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: create settings.xml
-        run: |
-           mkdir -p ~/.m2
-           echo "<settings><servers><server><id>github</id><username>${{ github.actor }}</username><password>${{ github.event.inputs.repo_token }}</password></server></servers></settings>" > ~/.m2/settings.xml
-        shell: bash
-        env:
-          GITHUB_PATH: ~/.m2/
+          echo "$assets" | while IFS=$'\t' read -r name url; do
+            echo "Downloading $name from $url"
+            curl -Lo "$name" "$url"
+          done
+      - name: List downloaded files
+        run: ls -l
