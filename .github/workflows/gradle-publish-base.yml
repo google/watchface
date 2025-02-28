@@ -83,7 +83,7 @@ jobs:
           sudo apt-get install gh
       - name: Download all assets
         run: |
-          gh release download --repo "$GITHUB_REPOSITORY"
+          gh release download --repo "$GITHUB_REPOSITORY" --pattern "*.jar" 
       - name: Verify download
         run: |
           ls -l
