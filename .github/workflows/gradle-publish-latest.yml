@@ -9,7 +9,11 @@ name: Release latest artifacts
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "package-test" ]
+
+permissions:
+  contents: write
+  packages: write
 
 jobs:
   call-publish-base:
