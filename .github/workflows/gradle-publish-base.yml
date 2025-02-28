@@ -103,8 +103,7 @@ jobs:
           if ${{ inputs.release_name == 'latest' }}; then
             COMMIT_SHA=$(curl -s "https://api.github.com/repos/google/watchface/git/ref/tags/${{ inputs.release_name }}" | jq -r '.object.sha')
             SHORT_COMMIT_SHA=$(echo "$COMMIT_SHA" | cut -c -7)
-            #VERSION="$VERSION-$SHORT_COMMIT_SHA-SNAPSHOT"
-            VERSION="$VERSION-SNAPSHOT"
+            VERSION="$VERSION-$SHORT_COMMIT_SHA-SNAPSHOT"
           fi
           echo "::set-output name=final_version::$VERSION"
       - name: Determine artefact ID
@@ -113,7 +112,6 @@ jobs:
           FILE_NAME="${{ matrix.jar_file }}"
           FILE_NAME_WITHOUT_EXTENSION="${FILE_NAME%.*}"
           echo "::set-output name=artefact_id::$FILE_NAME_WITHOUT_EXTENSION"
-
       - name: Check if Maven package already exists
         id: check_exists
         run: |
@@ -122,9 +120,7 @@ jobs:
 
           METADATA_URL="https://maven.pkg.github.com/google/watchface/com.google.watchface/${ARTIFACT_ID}/${VERSION}/maven-metadata.xml"
 
-          TOKEN="${{ secrets.GITHUB_TOKEN }}"
-
-          if curl -s -f -o /dev/null -H "Authorization: Bearer $TOKEN" "$METADATA_URL"; then
+          if curl -s -f -o /dev/null -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" "$METADATA_URL"; then
             echo "Maven package with version $VERSION already exists."
           else
             echo "Maven package with version $VERSION does not exist."
