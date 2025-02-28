@@ -18,6 +18,9 @@ on:
         description: The git sha of the commit from where the current release will be built from.
         required: true
 
+permissions:
+  contents: write
+
 jobs:
   call-publish-base:
     uses: ./.github/workflows/gradle-publish-base.yml
