@@ -115,7 +115,7 @@ jobs:
       - name: create settings.xml
         run: |
             mkdir -p ~/.m2
-            echo "<settings><servers><server><id>github</id><username>${{ github.actor }}</username><password>${{ github.event.inputs.repo_token }}</password></server></servers></settings>" > ~/.m2/settings.xml
+            echo "<settings><servers><server><id>github</id><configuration><httpHeaders><property><name>Authorization</name><value>Bearer ${{ github.event.inputs.repo_token }}</value></property></httpHeaders></configuration></server></servers></settings>"
         shell: bash
         env:
           GITHUB_PATH: ~/.m2/
