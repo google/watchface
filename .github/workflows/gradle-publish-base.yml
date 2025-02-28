@@ -39,8 +39,8 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
         with:
           build-root-directory: play-validations
-          arguments: memory-footprint:jar -Dmemory-footprint.git_hash=${{ env.git_hash }} -Dmemory-footprint.version=latest
-      - name: Build dwf-format-1-validator-1.0.jar
+          arguments: memory-footprint:jar -Dmemory-footprint.git_hash=${{ env.git_hash }} 
+      - name: Build wff-validator
         uses: gradle/actions/setup-gradle@v3
         with:
           build-root-directory: third_party/wff
@@ -48,7 +48,7 @@ jobs:
       - name: Copy LICENSE files
         run: |
           mv LICENSE.txt memory-footprint_LICENSE.txt
-          mv third_party/wff/LICENSE.txt dwf-format-2-validator-1.0_LICENSE.txt
+          mv third_party/wff/LICENSE.txt wff-validator_LICENSE.txt
       - name: Create XSD archive
         run: |
           cd third_party/wff/specification/documents/
@@ -62,7 +62,7 @@ jobs:
           title: "Memory Footprint Build"
           files: |
             memory-footprint_LICENSE.txt
-            dwf-format-2-validator-1.0_LICENSE.txt
+            wff-validator_LICENSE.txt
             **/memory-footprint.jar
-            **/dwf-format-2-validator-1.0.jar
+            **/wff-validator.jar
             **/wff-xsd.zip

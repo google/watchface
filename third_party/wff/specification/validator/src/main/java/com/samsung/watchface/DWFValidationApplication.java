@@ -19,12 +19,18 @@ package com.samsung.watchface;
 import com.samsung.watchface.utils.Log;
 import com.samsung.watchface.utils.OptionParser;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.List;
+import java.util.jar.Attributes;
+import java.util.jar.Manifest;
 
 public class DWFValidationApplication {
-    private final static String APPLICATION_VERSION = "1.0";
+    private final static String APPLICATION_NAME = "wff-validator";
     private final static String MAX_SUPPORTED_FORMAT_VERSION = "2";
     private WatchFaceXmlValidator validator;
 
@@ -64,7 +70,7 @@ public class DWFValidationApplication {
     }
 
     public DWFValidationApplication() {
-        Log.i("DWF Validation Application Version "+ APPLICATION_VERSION +
+        Log.i("WFF Validation Application Version "+ getVersion() +
                 ". Maximum Supported Format Version #" + MAX_SUPPORTED_FORMAT_VERSION);
     }
 
@@ -77,8 +83,7 @@ public class DWFValidationApplication {
 
     private static void printUsage() {
         System.out.println("Usage : " +
-                "java -jar dwf-format-" + MAX_SUPPORTED_FORMAT_VERSION +
-                "-validator-" + APPLICATION_VERSION + ".jar" +
+                "java -jar " + APPLICATION_NAME + ".jar " +
                 " <format-version> <any options> <your-watchface.xml> <more-watchface.xml> ...");
     }
 
@@ -108,5 +113,24 @@ public class DWFValidationApplication {
             Log.i("Not supported version : " + targetFormatVersion);
             return false;
         }
+    }
+
+    /**
+     * Get the version of the application from the MANIFEST.MF file.
+     *
+     * @return The version of the application
+     */
+    private static String getVersion() {
+        Enumeration<URL> resources = null;
+        try {
+            resources = DWFValidationApplication.class.getClassLoader().getResources("META-INF/MANIFEST.MF");
+            while (resources.hasMoreElements()) {
+                Manifest manifest = new Manifest(resources.nextElement().openStream());
+                return manifest.getMainAttributes().getValue("Version");
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        throw new RuntimeException("Version not found in MANIFEST.MF");
     }
 }

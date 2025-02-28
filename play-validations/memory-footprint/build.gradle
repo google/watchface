@@ -18,6 +18,8 @@ plugins {
     id 'org.jetbrains.kotlin.jvm' version "2.0.21"
 }
 
+def baseVersion = "1.0.0"
+
 dependencies {
     implementation 'com.twelvemonkeys.imageio:imageio-webp:3.9.4'
     implementation 'com.twelvemonkeys.imageio:imageio-core:3.9.4'
@@ -70,9 +72,7 @@ jar {
         if (System.getProperty("memory-footprint.git_hash")) {
             attributes "Git-Hash": System.getProperty("memory-footprint.git_hash")
         }
-        if (System.getProperty("memory-footprint.version")) {
-            attributes "Version": System.getProperty("memory-footprint.version")
-        }
+        attributes "Version": baseVersion
     }
 
     from {
