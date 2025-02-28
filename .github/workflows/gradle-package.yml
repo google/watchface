@@ -20,6 +20,10 @@ on:
         required: false
         type: boolean
         default: false
+      repo_token:
+        description: "GitHub repo token"
+        required: true
+        type: string
 
 permissions:
   contents: write
@@ -75,7 +79,7 @@ jobs:
       - name: create settings.xml
         run: |
            mkdir -p ~/.m2
-           echo "<settings><servers><server><id>github</id><username>${{ github.actor }}</username><password>${{ secrets.GITHUB_TOKEN }}</password></server></servers></settings>" > ~/.m2/settings.xml
+           echo "<settings><servers><server><id>github</id><username>${{ github.actor }}</username><password>${{ github.event.inputs.repo_token }}</password></server></servers></settings>" > ~/.m2/settings.xml
         shell: bash
         env:
           GITHUB_PATH: ~/.m2/

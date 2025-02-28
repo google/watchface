@@ -77,5 +77,4 @@ jobs:
           group_id: com.google.watchface
           artifact_id: wff-validator
           is_snapshot: ${{ inputs.release_name == 'latest' }}
-        secrets:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
