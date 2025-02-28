@@ -70,3 +70,12 @@ jobs:
             **/memory-footprint.jar
             **/wff-validator.jar
             **/wff-xsd.zip
+      - name: Publish WFF validator package
+        uses: ./.github/workflows/gradle-package.yml
+        with:
+          jar_path: third_party/wff/specification/validator/build/libs/wff-validator.jar
+          group_id: com.google.watchface
+          artifact_id: wff-validator
+          is_snapshot: ${{ inputs.release_name == 'latest' }}
+        secrets:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
