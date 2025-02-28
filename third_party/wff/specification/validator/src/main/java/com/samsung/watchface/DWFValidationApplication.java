@@ -19,12 +19,17 @@ package com.samsung.watchface;
 import com.samsung.watchface.utils.Log;
 import com.samsung.watchface.utils.OptionParser;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.jar.Attributes;
+import java.util.jar.Manifest;
 
 public class DWFValidationApplication {
-    private final static String APPLICATION_VERSION = "1.0";
+    private final static String APPLICATION_NAME = "wff-validator";
     private final static String MAX_SUPPORTED_FORMAT_VERSION = "2";
     private WatchFaceXmlValidator validator;
 
@@ -64,7 +69,7 @@ public class DWFValidationApplication {
     }
 
     public DWFValidationApplication() {
-        Log.i("DWF Validation Application Version "+ APPLICATION_VERSION +
+        Log.i("WFF Validation Application Version "+ getVersion() +
                 ". Maximum Supported Format Version #" + MAX_SUPPORTED_FORMAT_VERSION);
     }
 
@@ -77,8 +82,7 @@ public class DWFValidationApplication {
 
     private static void printUsage() {
         System.out.println("Usage : " +
-                "java -jar dwf-format-" + MAX_SUPPORTED_FORMAT_VERSION +
-                "-validator-" + APPLICATION_VERSION + ".jar" +
+                "java -jar " + APPLICATION_NAME + ".jar " +
                 " <format-version> <any options> <your-watchface.xml> <more-watchface.xml> ...");
     }
 
@@ -108,5 +112,27 @@ public class DWFValidationApplication {
             Log.i("Not supported version : " + targetFormatVersion);
             return false;
         }
+    }
+
+    /**
+     * Get the version of the application from the MANIFEST.MF file.
+     *
+     * @return The version of the application
+     */
+    private static String getVersion() {
+        String className = DWFValidationApplication.class.getName().replace('.', '/') + ".class";
+        String classJar = DWFValidationApplication.class.getResource("/" + className).toString();
+        if (classJar.startsWith("jar:")) {
+            String manifestPath = classJar.substring(0, classJar.lastIndexOf("!") + 1) + "/META-INF/MANIFEST.MF";
+            Manifest manifest = null;
+            try {
+                manifest = new Manifest(new URL(manifestPath).openStream());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            Attributes attr = manifest.getMainAttributes();
+            return attr.getValue("Version");
+        }
+        throw new RuntimeException("Version not found in manifest");
     }
 }
