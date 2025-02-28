@@ -84,4 +84,4 @@ jobs:
           gh release download --repo "$GITHUB_REPOSITORY"
       - name: Verify download
         run: |
-          ls -l xyz.jar
+          ls -l
