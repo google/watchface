@@ -105,8 +105,7 @@ jobs:
           fi
           echo "Final version: $VERSION"
           echo "::set-output name=final_version::$VERSION"
-
-      - name: Determine artefact name
+      - name: Determine artefact ID
         id: artefact_id
         run: |
           FILE_NAME="${{ matrix.jar_file }}"
@@ -119,6 +118,7 @@ jobs:
         shell: bash
         env:
           GITHUB_PATH: ~/.m2/
+          
       - name: Publish to GitHub Packages
         run: |
           mvn deploy:deploy-file \
