@@ -112,7 +112,13 @@ jobs:
           FILE_NAME="${{ matrix.jar_file }}"
           FILE_NAME_WITHOUT_EXTENSION="${FILE_NAME%.*}"
           echo "::set-output name=artefact_id::$FILE_NAME_WITHOUT_EXTENSION"
-  
+      - name: create settings.xml
+        run: |
+            mkdir -p ~/.m2
+            echo "<settings><servers><server><id>github</id><username>${{ github.actor }}</username><password>${{ github.event.inputs.repo_token }}</password></server></servers></settings>" > ~/.m2/settings.xml
+        shell: bash
+        env:
+          GITHUB_PATH: ~/.m2/
       - name: Publish to GitHub Packages
         run: |
           mvn deploy:deploy-file \
@@ -125,11 +131,3 @@ jobs:
             -DrepositoryId=github -s ~/.m2/settings.xml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: create settings.xml
-        run: |
-            mkdir -p ~/.m2
-            echo "<settings><servers><server><id>github</id><username>${{ github.actor }}</username><password>${{ github.event.inputs.repo_token }}</password></server></servers></settings>" > ~/.m2/settings.xml
-        shell: bash
-        env:
-          GITHUB_PATH: ~/.m2/
