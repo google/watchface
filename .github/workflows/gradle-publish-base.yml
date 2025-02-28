@@ -116,7 +116,8 @@ jobs:
         run: |
             mkdir -p ~/.m2
             echo "<settings><servers><server><id>github</id><configuration><httpHeaders><property><name>Authorization</name><value>Bearer ${{ github.event.inputs.repo_token }}</value></property></httpHeaders></configuration></server></servers></settings>" > ~/.m2/settings.xml
-        shell: bash
+            cat ~/.m2/settings.xml
+            shell: bash
         env:
           GITHUB_PATH: ~/.m2/
       - name: Publish to GitHub Packages
