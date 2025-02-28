@@ -126,11 +126,12 @@ jobs:
 
           if curl -s -f -o /dev/null -H "Authorization: Bearer $TOKEN" "$METADATA_URL"; then
             echo "Maven package with version $VERSION already exists."
-            exit 0
           else
             echo "Maven package with version $VERSION does not exist."
+            echo "::set-output name=should_publish::true"
           fi
       - name: create settings.xml
+        if: steps.check_exists.outputs.should_publish == 'true'
         run: |
           mkdir -p ~/.m2
           echo "<settings><servers><server><id>github</id><configuration><httpHeaders><property><name>Authorization</name><value>Bearer ${{ secrets.GITHUB_TOKEN }}</value></property></httpHeaders></configuration></server></servers></settings>" > ~/.m2/settings.xml
@@ -138,6 +139,7 @@ jobs:
         env:
           GITHUB_PATH: ~/.m2/
       - name: Publish to GitHub Packages
+        if: steps.check_exists.outputs.should_publish == 'true'
         run: |
           mvn deploy:deploy-file \
             -DgroupId=com.google.watchface \
