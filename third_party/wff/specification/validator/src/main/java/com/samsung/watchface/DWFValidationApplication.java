@@ -24,6 +24,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
@@ -120,19 +121,16 @@ public class DWFValidationApplication {
      * @return The version of the application
      */
     private static String getVersion() {
-        String className = DWFValidationApplication.class.getName().replace('.', '/') + ".class";
-        String classJar = DWFValidationApplication.class.getResource("/" + className).toString();
-        if (classJar.startsWith("jar:")) {
-            String manifestPath = classJar.substring(0, classJar.lastIndexOf("!") + 1) + "/META-INF/MANIFEST.MF";
-            Manifest manifest = null;
-            try {
-                manifest = new Manifest(new URL(manifestPath).openStream());
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+        Enumeration<URL> resources = null;
+        try {
+            resources = DWFValidationApplication.class.getClassLoader().getResources("META-INF/MANIFEST.MF");
+            while (resources.hasMoreElements()) {
+                Manifest manifest = new Manifest(resources.nextElement().openStream());
+                return manifest.getMainAttributes().getValue("Version");
             }
-            Attributes attr = manifest.getMainAttributes();
-            return attr.getValue("Version");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-        throw new RuntimeException("Version not found in manifest");
+        throw new RuntimeException("Version not found in MANIFEST.MF");
     }
 }

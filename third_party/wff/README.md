@@ -22,20 +22,20 @@ cd third_party/wff
 ./gradlew :specification:validator:build
 ```
 
-The resulting JAR file can then be found at: `specification/validator/build/libs/dwf-format-2-validator-1.0.jar`
+The resulting JAR file can then be found at: `specification/validator/build/libs/wff-validator.jar`
 
 ### Usage
 
 To check whether a watch face is valid, invoke the validator as follows:
 
 ```shell
-java -jar dwf-format-2-validator-1.0.jar <format-version> <any options> <your-watchface.xml> <more-watchface.xml>
+java -jar wff-validator.jar <format-version> <any options> <your-watchface.xml> <more-watchface.xml>
 ```
 
 For example:
 
 ```shell
-java -jar dwf-format-2-validator-1.0.jar 2 ~/MyWatchface/res/raw/watchface.xml
+java -jar wff-validator.jar 2 ~/MyWatchface/res/raw/watchface.xml
 ```
 
 [xsd-files]: specification/documents/1
