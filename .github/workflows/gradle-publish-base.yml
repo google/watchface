@@ -101,9 +101,7 @@ jobs:
         run: |
           VERSION="${{ steps.get_version.outputs.version }}"
           if ${{ inputs.release_name == 'latest' }}; then
-            COMMIT_SHA=$(curl -s "https://api.github.com/repos/google/watchface/git/ref/tags/${{ inputs.release_name }}" | jq -r '.object.sha')
-            SHORT_COMMIT_SHA=$(echo "$COMMIT_SHA" | cut -c -7)
-            VERSION="$VERSION-$SHORT_COMMIT_SHA-SNAPSHOT"
+            VERSION="$VERSION-SNAPSHOT"
           fi
           echo "::set-output name=final_version::$VERSION"
       - name: Determine artefact ID
@@ -120,7 +118,11 @@ jobs:
 
           METADATA_URL="https://maven.pkg.github.com/google/watchface/com.google.watchface/${ARTIFACT_ID}/${VERSION}/maven-metadata.xml"
 
-          if curl -s -f -o /dev/null -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" "$METADATA_URL"; then
+          if ${{ inputs.release_name == 'latest' }}; then
+            # SNAPSHOT version should always publish
+            echo "::set-output name=should_publish::true"
+          elif curl -s -f -o /dev/null -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" "$METADATA_URL"; then
+            # Don't republish existing non-SNAPSHOT versions
             echo "Maven package with version $VERSION already exists."
           else
             echo "Maven package with version $VERSION does not exist."
