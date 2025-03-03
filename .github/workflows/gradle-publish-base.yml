@@ -121,7 +121,7 @@ jobs:
           if ${{ inputs.release_name == 'latest' }}; then
             # SNAPSHOT version should always publish
             echo "::set-output name=should_publish::true"
-          elif curl -s -f -o /dev/null -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" "$METADATA_URL"; then
+          elif curl -s -f -o /dev/null -w "%{http_code}" -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" "$METADATA_URL" | grep -q "^200$"; then
             # Don't republish existing non-SNAPSHOT versions
             echo "Maven package with version $VERSION already exists."
           else
