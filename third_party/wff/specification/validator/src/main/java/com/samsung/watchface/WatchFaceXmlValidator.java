@@ -43,6 +43,14 @@ public class WatchFaceXmlValidator {
         resourceManager = new ResourceManager();
     }
 
+    /** Exception thrown when the watch face format validation has failed to execute. */
+    public static class WatchFaceFormatValidationException extends Exception {
+        public WatchFaceFormatValidationException(String message, Throwable cause) {
+            super(message, cause);
+        }
+
+    }
+
     /**
      * Check whether the validator support the version or not
      *
@@ -75,11 +83,11 @@ public class WatchFaceXmlValidator {
             return true;
         } catch (SAXParseException e) {
             String errorMessage = String.format(
-                    "[Line %d:Column %d]: %s",
-                    e.getLineNumber(),
-                    e.getColumnNumber(),
-                    e.getMessage()
-                    );
+                "[Line %d:Column %d]: %s",
+                e.getLineNumber(),
+                e.getColumnNumber(),
+                e.getMessage()
+            );
             Log.e(errorMessage);
             return false;
         } catch (Exception e) {
@@ -100,6 +108,7 @@ public class WatchFaceXmlValidator {
             if (!isSupportedVersion(version)) {
                 throw new RuntimeException("Validator not support the version #" + version);
             }
+
             validateXMLSchema(
                 resourceManager.getXsdFile(version).getCanonicalPath(), new DOMSource(xmlDocument));
             return true;
@@ -109,8 +118,37 @@ public class WatchFaceXmlValidator {
         }
     }
 
+    /**
+     * Validate watch face format xml via specified version of the watch face xsd file.
+     *
+     * @param xmlDocument the watchface layout document
+     * @param version version of the watch face format
+     * @return true if valid, else false
+     * @throws WatchFaceFormatValidationException if the schema for the validation was not
+     *    available.
+     */
+    public boolean validateOrThrow(Document xmlDocument, String version)
+        throws WatchFaceFormatValidationException {
+        if (!isSupportedVersion(version)) {
+            Log.e("Validator not support the version #" + version);
+            return false;
+        }
+
+        try {
+            validateXMLSchema(
+                resourceManager.getXsdFile(version).getCanonicalPath(), new DOMSource(xmlDocument));
+            return true;
+        } catch (SAXException | IOException e) {
+            Log.e(e.getMessage());
+            return false;
+        } catch (IllegalArgumentException e) {
+            throw new WatchFaceFormatValidationException("No schema available: " + e.getMessage(), e);
+        }
+    }
+
+
     private static void validateXMLSchema(String xsdPath, Source xmlSource) throws
-            IllegalArgumentException, SAXException, IOException, NullPointerException {
+        IllegalArgumentException, SAXException, IOException, NullPointerException {
         // https://stackoverflow.com/questions/20807066/how-to-validate-xml-against-xsd-1-1-in-java
         SchemaFactory factory = SchemaFactory.newInstance("http://www.w3.org/XML/XMLSchema/v1.1");
         Schema schema = factory.newSchema(new File(xsdPath));
