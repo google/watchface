@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright 2023 Samsung Electronics Co., Ltd All Rights Reserved
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:include schemaLocation="textComponentGroup.xsd"/>
+
+  <xs:element name="Font">
+    <xs:complexType mixed="true">
+      <xs:annotation>
+        <xs:documentation>
+          Specifies Font for text.
+        </xs:documentation>
+      </xs:annotation>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:group ref="TextComponentGroup"/>
+      </xs:choice>
+      <xs:attribute name="family" type="xs:string" use="required"/>
+      <xs:attribute name="size" type="xs:float" use="required"/>
+      <xs:attribute name="color" type="colorAttributeType" default="#FFFFFF"/>
+      <xs:attribute name="letterSpacing" type="xs:float">
+        <xs:annotation>
+          <xs:documentation>
+            Letter-Spacing is space between letters. The default value is 0.
+            The value is in 'EM' units. Typical values for slight expansion will be around 0.05.
+            Negative values tighten text.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="slant" default="NORMAL">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="NORMAL"/>
+            <xs:enumeration value="ITALIC"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="width" default="NORMAL">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="ULTRA_CONDENSED"/>
+            <xs:enumeration value="EXTRA_CONDENSED"/>
+            <xs:enumeration value="CONDENSED"/>
+            <xs:enumeration value="SEMI_CONDENSED"/>
+            <xs:enumeration value="NORMAL"/>
+            <xs:enumeration value="SEMI_EXPANDED"/>
+            <xs:enumeration value="EXPANDED"/>
+            <xs:enumeration value="EXTRA_EXPANDED"/>
+            <xs:enumeration value="ULTRA_EXPANDED"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="weight" default="NORMAL">
+        <xs:simpleType>
+          <!--https://developer.android.com/reference/android/graphics/Typeface#create(android.graphics.Typeface,%20int,%20boolean)-->
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="THIN"/>
+            <xs:enumeration value="ULTRA_LIGHT"/>
+            <xs:enumeration value="EXTRA_LIGHT"/>
+            <xs:enumeration value="LIGHT"/>
+            <xs:enumeration value="NORMAL"/>
+            <xs:enumeration value="MEDIUM"/>
+            <xs:enumeration value="SEMI_BOLD"/>
+            <xs:enumeration value="BOLD"/>
+            <xs:enumeration value="ULTRA_BOLD"/>
+            <xs:enumeration value="EXTRA_BOLD"/>
+            <xs:enumeration value="BLACK"/>
+            <xs:enumeration value="EXTRA_BLACK"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

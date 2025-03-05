@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright 2023 Samsung Electronics Co., Ltd All Rights Reserved
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:include schemaLocation="defaultProviderPolicyElement.xsd"/>
+  <xs:include schemaLocation="boundingElement.xsd"/>
+  <xs:include schemaLocation="complicationElement.xsd"/>
+  <xs:include schemaLocation="../common/variant/variantElements.xsd"/>
+  <xs:include schemaLocation="../common/attributes/geometricAttributes.xsd"/>
+  <xs:include schemaLocation="../common/transform/pivotType.xsd"/>
+  <xs:include schemaLocation="../common/attributes/angleType.xsd"/>
+  <xs:include schemaLocation="../common/attributes/colorAttributes.xsd"/>
+  <xs:include schemaLocation="../common/booleanType.xsd"/>
+
+  <xs:simpleType name="complicationListType">
+    <xs:list itemType="complicationType"/>
+  </xs:simpleType>
+
+  <xs:element name="ComplicationSlot">
+    <xs:complexType>
+      <xs:all>
+        <xs:element ref="DefaultProviderPolicy" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="BoundingShape" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="Complication" minOccurs="1" maxOccurs="unbounded"/>
+        <xs:element ref="Variant" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element ref="ScreenReader" minOccurs="0" maxOccurs="1"/>
+      </xs:all>
+
+      <xs:attribute name="name" type="xs:string"/>
+      <xs:attributeGroup ref="geometricAttributesRequired"/>
+      <xs:attributeGroup ref="pivot2D"/>
+      <xs:attribute name="angle" type="angleType"/>
+      <xs:attribute ref="alpha"/>
+      <xs:attribute name="scaleX" type="xs:float"/>
+      <xs:attribute name="scaleY" type="xs:float"/>
+      <xs:attribute name="tintColor" type='colorAttributeType'/>
+
+      <xs:attribute name="slotId" type="xs:string" use="required"/>
+      <xs:attribute name="supportedTypes" type="complicationListType" use="required"/>
+      <xs:attribute name="displayName" type="xs:string"/>
+      <xs:attribute name="isCustomizable" type="booleanType"/>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

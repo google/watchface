@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright 2023 Samsung Electronics Co., Ltd All Rights Reserved
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:include schemaLocation="../partDrawElement.xsd"/>
+  <xs:include schemaLocation="../../../../common/attributes/dimensionType.xsd"/>
+  <xs:include schemaLocation="../../../../common/transform/transformElements.xsd"/>
+  <xs:include schemaLocation="../style/strokeElement.xsd"/>
+  <xs:include schemaLocation="../style/weightedStrokeElement.xsd"/>
+
+  <xs:element name="Line" substitutionGroup="DrawElement">
+    <xs:annotation>
+      <xs:documentation>
+        Draw line from start point to end point
+      </xs:documentation>
+    </xs:annotation>
+
+    <xs:complexType>
+      <xs:all>
+        <xs:element ref="Stroke" minOccurs="0" maxOccurs="1" />
+        <xs:element ref="WeightedStroke" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Transform" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:all>
+
+      <xs:attribute name="startX" type="floatDimensionType" use="required"/>
+      <xs:attribute name="startY" type="floatDimensionType" use="required"/>
+      <xs:attribute name="endX" type="floatDimensionType" use="required"/>
+      <xs:attribute name="endY" type="floatDimensionType" use="required"/>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
