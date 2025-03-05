@@ -31,7 +31,7 @@ import java.util.jar.Manifest;
 
 public class DWFValidationApplication {
     private final static String APPLICATION_NAME = "wff-validator";
-    private final static String MAX_SUPPORTED_FORMAT_VERSION = "2";
+    private final static String MAX_SUPPORTED_FORMAT_VERSION = "3";
     private WatchFaceXmlValidator validator;
 
     public static void main(String[] args) {

@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright 2023 Samsung Electronics Co., Ltd All Rights Reserved
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<xs:include schemaLocation="colorAttributes.xsd"/>
+
+	<xs:simpleType name="vector4fType">
+		<xs:annotation>
+			<xs:documentation>
+				Vector type for 4 floats
+				e.g., "0.1 0.2 0.3 0.4"
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="floatListType">
+			<xs:minLength value="4"/>
+			<xs:maxLength value="4"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="vector3fType">
+		<xs:annotation>
+			<xs:documentation>
+				Vector type for 3 floats
+				e.g., "0.1 0.2 0.3"
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="floatListType">
+			<xs:minLength value="3"/>
+			<xs:maxLength value="3"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="floatListType">
+		<xs:annotation>
+			<xs:documentation>
+				List type for floats
+				e.g., "0.1 0.2 0.3 0.4 0.5 0.6 0.7 ..."
+			</xs:documentation>
+		</xs:annotation>
+		<xs:list itemType="xs:float"/>
+	</xs:simpleType>
+
+	<xs:simpleType name="vector4iType">
+		<xs:annotation>
+			<xs:documentation>
+				Vector type for 4 integers
+				e.g., "1 2 3 4"
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="intListType">
+			<xs:minLength value="4"/>
+			<xs:maxLength value="4"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="vector3iType">
+		<xs:annotation>
+			<xs:documentation>
+				Vector type for 3 integers
+				e.g., "1 2 3"
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="intListType">
+			<xs:minLength value="3"/>
+			<xs:maxLength value="3"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="intListType">
+		<xs:annotation>
+			<xs:documentation>
+				List type for integers
+				e.g., "1 2 3 4 5 6 7 ..."
+			</xs:documentation>
+		</xs:annotation>
+		<xs:list itemType="xs:int"/>
+	</xs:simpleType>
+
+	<xs:simpleType name="vector4sType">
+		<xs:annotation>
+			<xs:documentation>
+				Vector type for 4 strings
+				e.g., "abc def ghi jkl"
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="stringListType">
+			<xs:minLength value="4"/>
+			<xs:maxLength value="4"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="vector3sType">
+		<xs:annotation>
+			<xs:documentation>
+				Vector type for 3 strings
+				e.g., "abc def ghi"
+			</xs:documentation>
+		</xs:annotation>
+
+		<xs:restriction base="stringListType">
+			<xs:minLength value="3"/>
+			<xs:maxLength value="3"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="stringListType">
+		<xs:annotation>
+			<xs:documentation>
+				List type for strings
+				e.g., "abc def ghi jkl mno pqr student ..."
+			</xs:documentation>
+		</xs:annotation>
+		<xs:list itemType="xs:string"/>
+	</xs:simpleType>
+
+	<xs:simpleType name="userStyleColorOptionType">
+		<xs:annotation>
+			<xs:documentation>
+				List type for hexadecimal colors
+				e.g., "#FF00FF #FFFFFF #80FF1234"
+			</xs:documentation>
+		</xs:annotation>
+
+		<xs:restriction base="colorListType">
+			<xs:minLength value="1"/>
+			<xs:maxLength value="5"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="colorListType">
+		<xs:annotation>
+			<xs:documentation>
+				List type for hexadecimal colors
+				e.g., "#FF00FF #FFFFFF #80FF1234 #12345678 #123456 ..."
+			</xs:documentation>
+		</xs:annotation>
+		<xs:list itemType="colorAttributeType"/>
+	</xs:simpleType>
+
+	<xs:simpleType name="colorWeightListType">
+		<xs:annotation>
+			<xs:documentation>
+				List type for floats or integers
+				e.g., "0.1 0.2 0.3 0.4 0.5 0.6 0.7 ...", "1 2 3",
+				or
+				Data source representing a weight: COMPLICATION.RANGED_VALUE_COLOR_INTERPOLATE
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:pattern value="\[[A-Z0-9]+([._]\w+)*\]|([0-9 fF]+(.[0-9fF]+)?)+"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+</xs:schema>
