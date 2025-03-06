@@ -106,7 +106,7 @@ public class WatchFaceXmlValidator {
     public boolean validate(Document xmlDocument, String version) {
         try {
             if (!isSupportedVersion(version)) {
-                throw new RuntimeException("Validator not support the version #" + version);
+                throw new RuntimeException("Validator does not support the version #" + version);
             }
 
             validateXMLSchema(
@@ -130,7 +130,7 @@ public class WatchFaceXmlValidator {
     public boolean validateOrThrow(Document xmlDocument, String version)
         throws WatchFaceFormatValidationException {
         if (!isSupportedVersion(version)) {
-            Log.e("Validator not support the version #" + version);
+            Log.e("Validator does not support the version #" + version);
             return false;
         }
 
@@ -138,11 +138,11 @@ public class WatchFaceXmlValidator {
             validateXMLSchema(
                 resourceManager.getXsdFile(version).getCanonicalPath(), new DOMSource(xmlDocument));
             return true;
-        } catch (SAXException | IOException e) {
-            Log.e(e.getMessage());
+        } catch (SAXException | IOException | NullPointerException e) {
+            Log.e("Could not validate xml: " + e.getMessage());
             return false;
         } catch (IllegalArgumentException e) {
-            throw new WatchFaceFormatValidationException("No schema available: " + e.getMessage(), e);
+            throw new WatchFaceFormatValidationException("No schema available", e);
         }
     }
 
