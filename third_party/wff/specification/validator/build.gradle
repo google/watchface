@@ -15,7 +15,7 @@
  */
 apply plugin: 'java-library'
 
-def baseVersion="1.0.1"
+def baseVersion="1.4.0"
 def baseArchivesName="wff-validator"
 
 dependencies {

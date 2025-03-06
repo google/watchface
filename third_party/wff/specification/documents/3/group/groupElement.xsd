@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright 2023 Samsung Electronics Co., Ltd All Rights Reserved
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:include schemaLocation="renderModeType.xsd"/>
+  <xs:include schemaLocation="part/partElementGroup.xsd"/>
+  <xs:include schemaLocation="../common/attributes/geometricAttributes.xsd"/>
+  <xs:include schemaLocation="../common/launchElement.xsd"/>
+  <xs:include schemaLocation="../common/transform/pivotType.xsd"/>
+  <xs:include schemaLocation="../common/conditionElement.xsd"/>
+  <xs:include schemaLocation="../common/transform/transformElements.xsd"/>
+  <xs:include schemaLocation="../common/transform/gyroElements.xsd"/>
+  <xs:include schemaLocation="../userConfiguration/listConfigurationElement.xsd"/>
+  <xs:include schemaLocation="../userConfiguration/booleanConfigurationElement.xsd"/>
+  <xs:include schemaLocation="../common/variant/variantElements.xsd" />
+  <xs:include schemaLocation="../common/localizationElement.xsd"/>
+  <xs:include schemaLocation="../common/screenReaderElement.xsd"/>
+  <xs:include schemaLocation="../clock/analogClock.xsd"/>
+  <xs:include schemaLocation="../clock/digitalClock.xsd"/>
+
+  <xs:element name="Group">
+    <xs:annotation>
+      <xs:documentation>
+        The Group element contains other groups or parts as children.
+        This is an important node in the scene graph that lays out the components on the scene.
+        The group does not have the ability to draw on its own, but it affects the position, size,
+        angle or color of the child hierarchies.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:all>
+        <xs:element ref="Localization" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Gyro" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Launch" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Transform" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element ref="Variant" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element ref="Group" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element ref="PartText" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element ref="PartImage" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element ref="PartAnimatedImage" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element ref="PartDraw" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element ref="ScreenReader" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Condition" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element ref="ListConfiguration" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element ref="BooleanConfiguration" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element ref="AnalogClock" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element ref="DigitalClock" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:all>
+
+      <xs:attribute name="id">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:minLength value="1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="name" use="required">
+        <xs:annotation>
+          <xs:documentation>
+            Name of this group.
+          </xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:minLength value="1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attributeGroup ref="geometricAttributesRequired"/>
+      <xs:attributeGroup ref="pivot2D"/>
+      <xs:attribute name="angle" type="angleType"/>
+      <xs:attribute ref="alpha"/>
+      <xs:attribute name="scaleX" type='xs:float'/>
+      <xs:attribute name="scaleY" type='xs:float'/>
+      <xs:attribute name="renderMode" type="renderModeType" default="SOURCE"/>
+      <xs:attribute name="tintColor" type='colorAttributeType'/>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
