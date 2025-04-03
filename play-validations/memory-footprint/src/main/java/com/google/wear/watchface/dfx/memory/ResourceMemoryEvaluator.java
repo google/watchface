@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.samsung.watchface.WatchFaceXmlValidator;
+import com.samsung.watchface.WatchFaceXmlValidator.WatchFaceFormatValidationException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.List;
@@ -112,37 +113,48 @@ public class ResourceMemoryEvaluator {
      */
     static List<MemoryFootprint> evaluateMemoryFootprint(EvaluationSettings evaluationSettings) {
         try (InputPackage inputPackage = InputPackage.open(evaluationSettings.getWatchFacePath())) {
-
             WatchFaceData watchFaceData =
                     WatchFaceData.fromResourcesStream(
                             inputPackage.getWatchFaceFiles(), evaluationSettings);
             if (!evaluationSettings.isHoneyfaceMode()) {
-                AndroidManifest manifest = inputPackage.getManifest();
-                String manifestWffVersion =
-                        manifest == null ? null : String.valueOf(manifest.getWffVersion());
-                String cliWffVersion = evaluationSettings.getSchemaVersion();
-
-                String wffVersion;
-                if (cliWffVersion == null && manifestWffVersion == null) {
-                    throw new TestFailedException(
-                            "No WFF version could be inferred. When running the memory footprint"
-                                    + " tool with a directory and without the --schema-version"
-                                    + " argument, the directory must contain an AndroidManifest.xml"
-                                    + " file");
-                } else {
-                    if (cliWffVersion != null
-                            && manifestWffVersion != null
-                            && !cliWffVersion.equals(manifestWffVersion)
-                            && !evaluationSettings.isReportMode()) {
-                        System.out.printf(
-                                "Warning: Specified WFF version (%s) "
-                                        + "does not match version in manifest (%s)%n",
-                                cliWffVersion, manifestWffVersion);
-                    }
-                    wffVersion = cliWffVersion != null ? cliWffVersion : manifestWffVersion;
-                }
+                String wffVersion =
+                        getWatchFaceFormatVersion(inputPackage.getManifest(), evaluationSettings);
                 validateFormat(watchFaceData, wffVersion);
             }
+
+            return watchFaceData.getWatchFaceDocuments().stream()
+                    .map(
+                            watchFaceDocument ->
+                                    evaluateWatchFaceForLayout(
+                                            watchFaceData.getResourceDetailsMap(),
+                                            watchFaceDocument,
+                                            evaluationSettings))
+                    .collect(Collectors.toList());
+        }
+    }
+
+    /**
+     * Parses a watch face package and evaluates the memory footprint for all of its layouts.
+     *
+     * @param evaluationSettings the settings object for running the watch face evaluation.
+     * @return the list of memory footprints, one for each layout supported by the watch face.
+     * @throws WatchFaceFormatValidationException if the schema for the validation was not
+     *     available.
+     * @throws TestFailedException if the watch face memory footprint validation has failed.
+     */
+    public static List<MemoryFootprint> evaluateMemoryFootprintOrThrow(
+            EvaluationSettings evaluationSettings)
+            throws TestFailedException, WatchFaceFormatValidationException {
+        try (InputPackage inputPackage = InputPackage.open(evaluationSettings.getWatchFacePath())) {
+            WatchFaceData watchFaceData =
+                    WatchFaceData.fromResourcesStream(
+                            inputPackage.getWatchFaceFiles(), evaluationSettings);
+            if (!evaluationSettings.isHoneyfaceMode()) {
+                String wffVersion =
+                        getWatchFaceFormatVersion(inputPackage.getManifest(), evaluationSettings);
+                validateFormatOrThrow(watchFaceData, wffVersion);
+            }
+
             return watchFaceData.getWatchFaceDocuments().stream()
                     .map(
                             watchFaceDocument ->
@@ -159,6 +171,46 @@ public class ResourceMemoryEvaluator {
             Document currentLayout,
             EvaluationSettings settings) {
         return WatchFaceLayoutEvaluator.evaluate(currentLayout, resourceMemoryMap, settings);
+    }
+
+    /**
+     * Returns format version as specified in the evaluation settings or from Android Manifest file.
+     */
+    private static String getWatchFaceFormatVersion(
+            AndroidManifest manifest, EvaluationSettings evaluationSettings) {
+        String manifestWffVersion =
+                manifest == null ? null : String.valueOf(manifest.getWffVersion());
+        String cliWffVersion = evaluationSettings.getSchemaVersion();
+
+        if (cliWffVersion == null && manifestWffVersion == null) {
+            throw new TestFailedException("No Watch Face Format version could be inferred.");
+        }
+
+        if (cliWffVersion != null
+                && manifestWffVersion != null
+                && !cliWffVersion.equals(manifestWffVersion)
+                && !evaluationSettings.isReportMode()) {
+            System.out.printf(
+                    "Warning: Specified WFF version (%s) "
+                            + "does not match version in manifest (%s)%n",
+                    cliWffVersion, manifestWffVersion);
+        }
+
+        return cliWffVersion != null ? cliWffVersion : manifestWffVersion;
+    }
+
+    private static void validateFormatOrThrow(
+            WatchFaceData watchFaceData, String watchFaceFormatVersion)
+            throws WatchFaceFormatValidationException {
+        WatchFaceXmlValidator xmlValidator = new WatchFaceXmlValidator();
+        for (Document watchFaceDocument : watchFaceData.getWatchFaceDocuments()) {
+            boolean documentHasValidSchema =
+                    xmlValidator.validateOrThrow(watchFaceDocument, watchFaceFormatVersion);
+            if (!documentHasValidSchema) {
+                throw new TestFailedException(
+                        "Watch Face has syntactic errors and cannot be parsed.");
+            }
+        }
     }
 
     /**
