@@ -104,17 +104,17 @@ jobs:
             VERSION="$VERSION-SNAPSHOT"
           fi
           echo "::set-output name=final_version::$VERSION"
-      - name: Determine artefact ID
-        id: artefact_id
+      - name: Determine artifact ID
+        id: artifact_id
         run: |
           FILE_NAME="${{ matrix.jar_file }}"
           FILE_NAME_WITHOUT_EXTENSION="${FILE_NAME%.*}"
-          echo "::set-output name=artefact_id::$FILE_NAME_WITHOUT_EXTENSION"
+          echo "::set-output name=artifact_id::$FILE_NAME_WITHOUT_EXTENSION"
       - name: Check if Maven package already exists
         id: check_exists
         run: |
           VERSION="${{ steps.final_version.outputs.final_version }}"
-          ARTEFACT_ID=${{ steps.artefact_id.outputs.artefact_id }}
+          ARTIFACT_ID=${{ steps.artifact_id.outputs.artifact_id }}
 
           METADATA_URL="https://maven.pkg.github.com/google/watchface/com.google.watchface/${ARTIFACT_ID}/${VERSION}/maven-metadata.xml"
 
@@ -141,7 +141,7 @@ jobs:
         run: |
           mvn deploy:deploy-file \
             -DgroupId=com.google.watchface \
-            -DartifactId=${{ steps.artefact_id.outputs.artefact_id }} \
+            -DartifactId=${{ steps.artifact_id.outputs.artifact_id }} \
             -Dversion=${{ steps.final_version.outputs.final_version }} \
             -Dpackaging=jar \
             -Dfile=${{ matrix.jar_file }} \
