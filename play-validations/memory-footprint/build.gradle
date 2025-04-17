@@ -63,7 +63,7 @@ configurations {
 jar {
     duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
 
-    exclude("META-INF/*.RSA", "META-INF/*.DSA", "META-INF/*.SF")
+    exclude("META-INF/*.RSA", "META-INF/*.DSA", "META-INF/*.SF", "META-INF/maven/**")
 
     manifest {
         attributes "Main-Class": "com.google.wear.watchface.dfx.memory.ResourceMemoryEvaluator"
