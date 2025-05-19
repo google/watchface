@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright 2023 Samsung Electronics Co., Ltd All Rights Reserved
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:include schemaLocation="sourceType.xsd"/>
+
+  <xs:simpleType name="_anyExpressionType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="["/>
+      <xs:enumeration value="]"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="_functionType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="round()"/>
+      <xs:enumeration value="floor()"/>
+      <xs:enumeration value="ceil()"/>
+      <xs:enumeration value="fract()"/>
+      <xs:enumeration value="sin()"/>
+      <xs:enumeration value="cos()"/>
+      <xs:enumeration value="tan()"/>
+      <xs:enumeration value="asin()"/>
+      <xs:enumeration value="acos()"/>
+      <xs:enumeration value="atan()"/>
+      <xs:enumeration value="abs()"/>
+      <xs:enumeration value="clamp(,,)"/>
+      <xs:enumeration value="rand(,)"/>
+      <xs:enumeration value="log()"/>
+      <xs:enumeration value="log2()"/>
+      <xs:enumeration value="log10()"/>
+      <xs:enumeration value="sqrt()"/>
+      <xs:enumeration value="cbrt()"/>
+      <xs:enumeration value="exp()"/>
+      <xs:enumeration value="expm1()"/>
+      <xs:enumeration value="deg()"/>
+      <xs:enumeration value="rad()"/>
+      <xs:enumeration value="pow(,)"/>
+      <xs:enumeration value="numberFormat(,)"/>
+      <xs:enumeration value="icuText()"/>
+      <xs:enumeration value="icuBestText()"/>
+      <xs:enumeration value="icuText(,)"/>
+      <xs:enumeration value="icuBestText(,)"/>
+      <xs:enumeration value="subText(,,)"/>
+      <xs:enumeration value="textLength()"/>
+      <xs:enumeration value="colorArgb(,,,)"/>
+      <xs:enumeration value="colorRgb(,,)"/>
+      <xs:enumeration value="extractColorFromColors(,,)"/>
+      <xs:enumeration value="extractColorFromWeightedColors(,,,)"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="_operatorType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="+"/>
+      <xs:enumeration value="-"/>
+      <xs:enumeration value="*"/>
+      <xs:enumeration value="/"/>
+      <xs:enumeration value="%"/>
+      <xs:enumeration value="~"/>
+      <xs:enumeration value="!"/>
+      <xs:enumeration value="|"/>
+      <xs:enumeration value="||"/>
+      <xs:enumeration value="&amp;"/>
+      <xs:enumeration value="&amp;&amp;"/>
+
+      <xs:enumeration value="("/>
+      <xs:enumeration value=")"/>
+      <xs:enumeration value=">"/>
+      <xs:enumeration value=">="/>
+      <xs:enumeration value="?"/>
+      <xs:enumeration value=":"/>
+      <xs:enumeration value="=="/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="_arithmeticType">
+    <xs:union memberTypes="sourceType _operatorType _functionType _anyExpressionType xs:string"/>
+  </xs:simpleType>
+
+  <xs:simpleType name="_arithmeticListType">
+    <xs:list itemType="_arithmeticType"/>
+  </xs:simpleType>
+
+  <xs:simpleType name="_gyroArithmeticType">
+    <xs:union memberTypes="sensorSourceType _operatorType _functionType _anyExpressionType xs:string"/>
+  </xs:simpleType>
+
+  <xs:simpleType name="_gyroArithmeticListType">
+    <xs:list itemType="_gyroArithmeticType"/>
+  </xs:simpleType>
+
+  <!-- Arithmetic expression by attribute -->
+  <xs:simpleType name="arithmeticExpressionType">
+    <xs:annotation>
+      <xs:documentation>
+        Arithmetic expression with algebraic source expression.
+        Use CDATA tag if necessary.
+        ex. [SECOND] * 6 + 180
+      </xs:documentation>
+    </xs:annotation>
+    <xs:union memberTypes="_arithmeticType _arithmeticListType"/>
+  </xs:simpleType>
+
+  <!-- Arithmetic expression by attribute -->
+  <xs:simpleType name="gyroArithmeticExpressionType">
+    <xs:annotation>
+      <xs:documentation>
+        Arithmetic expression with algebraic source expression for gyro effect.
+        Use CDATA tag if necessary.
+        ex. (5/90)* clamp([ACCELEROMETER_ANGLE_X], 0, 90) + (-5/-90)* clamp([ACCELEROMETER_ANGLE_X], -90, 0)
+      </xs:documentation>
+    </xs:annotation>
+    <xs:union memberTypes="_gyroArithmeticType _gyroArithmeticListType"/>
+  </xs:simpleType>
+</xs:schema>

@@ -221,7 +221,7 @@ class EvaluationSettings(
         private const val HONEYFACE_VERSION = "honeyface"
         private const val GREEDY_DEFAULT_LIMIT = 10_000_000
 
-        private val SUPPORTED_VERSIONS: List<String> = ImmutableList.of(HONEYFACE_VERSION, "1", "2", "3")
+        private val SUPPORTED_VERSIONS: List<String> = ImmutableList.of(HONEYFACE_VERSION, "1", "2", "3", "4")
 
         @JvmStatic
         fun parseFromArguments(vararg arguments: String): Optional<EvaluationSettings> =

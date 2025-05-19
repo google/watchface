@@ -35,7 +35,7 @@ java -jar wff-validator.jar <format-version> <any options> <your-watchface.xml> 
 For example:
 
 ```shell
-java -jar wff-validator.jar 2 ~/MyWatchface/res/raw/watchface.xml
+java -jar wff-validator.jar 4 ~/MyWatchface/res/raw/watchface.xml
 ```
 
 [xsd-files]: specification/documents/1
