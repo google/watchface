@@ -19,7 +19,10 @@ def baseVersion="1.4.2"
 def baseArchivesName="wff-validator"
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'xml-apis:xml-apis:1.4.01'
+    implementation 'org.exist-db.thirdparty.xerces:xercesImpl:2.12.0:xml-schema-1.1'
+    implementation 'com.rackspace.eclipse.webtools.sourceediting:org.eclipse.wst.xml.xpath2.processor:2.1.100'
+    implementation 'edu.princeton.cup:java-cup:10k'
 }
 
 // bundle documents into a zip file
