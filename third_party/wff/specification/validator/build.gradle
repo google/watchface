@@ -51,6 +51,20 @@ jar {
     }
 }
 
+tasks.register('library-jar', Jar) {
+    from sourceSets.main.output
+
+    archiveBaseName.set("${baseArchivesName}-library")
+    archiveVersion.set(baseVersion)
+    from ('build/libs') {
+        include 'docs.zip'
+    }
+
+    manifest {
+        attributes 'Version': baseVersion
+    }
+}
+
 java {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
