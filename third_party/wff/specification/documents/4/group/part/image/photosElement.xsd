@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xs:include schemaLocation="partImageElement.xsd"/>
+
+    <xs:simpleType name="photoEventTriggerType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="TAP"/>
+            <xs:enumeration value="ON_VISIBLE"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="photoEventTriggerListType">
+        <xs:list itemType="photoEventTriggerType"/>
+    </xs:simpleType>
+
+    <xs:element name="Photos" substitutionGroup="ImageElement">
+        <xs:annotation>
+            <xs:documentation>
+                An element for photos.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:attribute name="source" type="xs:string" use="required">
+                <xs:annotation>
+                    <xs:documentation>
+                        Source of image. This can only be pointed to a PhotosConfiguration.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="defaultImageResource" type="xs:string" use="required">
+                <xs:annotation>
+                    <xs:documentation>
+                        Resource for default image.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="change" type="photoEventTriggerListType" default="TAP">
+                <xs:annotation>
+                    <xs:documentation>
+                        Event trigger for changing photos.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="changeAfterEvery">
+                <xs:annotation>
+                    <xs:documentation>
+                        Number of times of the change event before the actual change takes place.
+                        Only works with ON_VISIBLE.
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:positiveInteger">
+                        <xs:minInclusive value="3"/>
+                        <xs:maxInclusive value="10"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:attribute>
+            <xs:attribute name="width" type="xs:positiveInteger">
+                <xs:annotation>
+                    <xs:documentation>
+                        Size of the crop in pixels (width, height), if any of these are zero,
+                        the original crop (device width, device height) is retained.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+
+            <xs:attribute name="height" type="xs:positiveInteger">
+                <xs:annotation>
+                    <xs:documentation>
+                        Size of the crop in pixels (width, height), if any of these are zero,
+                        the original crop (device width, device height) is retained.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

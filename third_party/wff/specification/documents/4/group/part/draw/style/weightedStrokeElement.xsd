@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright 2023 Samsung Electronics Co., Ltd All Rights Reserved
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:include schemaLocation="../../../../common/transform/transformElements.xsd" />
+    <xs:include schemaLocation="../../../../common/reference/referenceElements.xsd" />
+    <xs:include schemaLocation="../../../../common/attributes/colorAttribute.xsd"/>
+    <xs:include schemaLocation="../../../../common/simpleTypes/interpolateType.xsd" />
+
+    <xs:element name="WeightedStroke">
+        <xs:annotation>
+            <xs:documentation>
+                Stroke style with weight, each element can have different colors.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:element ref="Transform" />
+                <xs:element ref="Reference" />
+            </xs:choice>
+            <xs:attribute name="colors" type="colorListType" use="required" >
+                <xs:annotation>
+                    <xs:documentation>
+                        Series of color in hexadecimal like "#FF0000 #00FF00 #0000FF".
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="weights" type="colorWeightListType" default="0.0" >
+                <xs:annotation>
+                    <xs:documentation>
+                        Series of weight in float like "3.0 4.0 5.0". Each value represents a
+                        portion of the stroke range.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="discreteGap" type="nonNegativeFloatType" default="0.0" >
+                <xs:annotation>
+                    <xs:documentation>
+                        This indicates the gap between elements. It is useful when the strokes
+                        split by weight are clearly divided, especially when there is a round cap.
+                        This is because each cap of the divided stroke overlaps each other as they
+                        are placed outside the stroke. To prevent overlapping caps, this value can
+                        be set to the value greater than or equal to the thickness of the stroke.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="interpolate" type="interpolateBooleanType" default="false" >
+                <xs:annotation>
+                    <xs:documentation>
+                        If it is true, the stroke is drawn as a gradient color. Each segment takes
+                        two colors for gradation: from and to. It means that the number of colors should
+                        be one more than the number of weights. For example, two weights requires
+                        three colors to show a color gradient across all segments of the stroke.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="thickness" type="nonNegativeFloatType" use="required" >
+                <xs:annotation>
+                    <xs:documentation>
+                        Width of stroke. Center of thickness is given arc geometry.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+
+            <xs:attribute name="cap" default="BUTT">
+                <xs:annotation>
+                    <xs:documentation>
+                        The Cap specifies the treatment for the beginning and ending of stroked lines and paths.
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value="BUTT" />
+                        <xs:enumeration value="ROUND" />
+                        <xs:enumeration value="SQUARE" />
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:attribute>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>
