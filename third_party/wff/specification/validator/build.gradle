@@ -15,7 +15,7 @@
  */
 apply plugin: 'java-library'
 
-def baseVersion="1.5.0"
+def baseVersion="1.5.1"
 def baseArchivesName="wff-validator"
 
 dependencies {
@@ -36,6 +36,8 @@ tasks.register("bundleDocs", Zip) {
 compileJava.dependsOn(bundleDocs)
 
 jar {
+    exclude("META-INF/maven/**")
+
     from {
         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
     }
