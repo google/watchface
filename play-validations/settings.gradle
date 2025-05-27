@@ -1,4 +1,6 @@
-/*
+plugins {
+    id 'org.gradle.toolchains.foojay-resolver-convention' version '0.8.0'
+}/*
  * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,3 +20,6 @@ include ':memory-footprint'
 include ':memory-footprint:test-samples:sample-wf'
 include ':validator'
 project(':validator').projectDir = new File('../third_party/wff/specification/validator')
+include 'memory-footprint:memory-footprint-lib'
+findProject(':memory-footprint:memory-footprint-lib')?.name = 'memory-footprint-lib'
+

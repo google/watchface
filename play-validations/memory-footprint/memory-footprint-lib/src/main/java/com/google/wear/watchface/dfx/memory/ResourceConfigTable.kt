@@ -166,7 +166,7 @@ internal class ResourceConfigTable(
         fun fromDrawableNodeConfigTable(
             drawableNodeConfigTable: DrawableNodeConfigTable,
             resourceCollector: WatchFaceResourceCollector,
-            variant: VariantConfigValue,
+            variant: com.google.wear.watchface.dfx.memory.VariantConfigValue,
         ): ResourceConfigTable {
             val keysForResourcesBuilder = ImmutableSetMultimap.Builder<String, UserConfigKey>()
 

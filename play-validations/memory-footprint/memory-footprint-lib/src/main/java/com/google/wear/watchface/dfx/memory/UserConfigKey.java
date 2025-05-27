@@ -105,12 +105,12 @@ class UserConfigKey {
         }
         SupportedConfigs nodeType = SupportedConfigs.valueOf(originNode.getNodeName());
         switch (nodeType) {
-            case ListConfiguration:
+            case SupportedConfigs.ListConfiguration:
                 return childrenStream(originNode)
                         .filter(listOption -> listOption.getNodeName().equals("ListOption"))
                         .map(listOption -> new UserConfigValue(getNodeId(listOption)))
                         .collect(Collectors.toList());
-            case BooleanConfiguration:
+            case SupportedConfigs.BooleanConfiguration:
                 return Arrays.asList(new UserConfigValue("TRUE"), new UserConfigValue("FALSE"));
             default:
                 throw new IllegalStateException(

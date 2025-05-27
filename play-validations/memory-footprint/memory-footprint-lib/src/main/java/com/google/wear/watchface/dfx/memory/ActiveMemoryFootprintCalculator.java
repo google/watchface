@@ -28,7 +28,7 @@ public class ActiveMemoryFootprintCalculator {
             System.out.println(">> Starting active evaluation");
         }
         DrawableNodeConfigTable drawableNodeConfigTable =
-                DrawableNodeConfigTable.create(findSceneNode(document), activeConfigValue);
+                DrawableNodeConfigTable.create(WatchFaceDocuments.findSceneNode(document), activeConfigValue);
         WatchFaceResourceCollector resourceCollector =
                 new WatchFaceResourceCollector(document, resourceMemoryMap, evaluationSettings);
         return new DynamicNodePerConfigurationFootprintCalculator(
@@ -42,7 +42,7 @@ public class ActiveMemoryFootprintCalculator {
     }
 
     private long evaluateResource(String resource) {
-        DrawableResourceDetails details = findInMap(resourceMemoryMap, resource);
+        DrawableResourceDetails details = DrawableResourceDetails.findInMap(resourceMemoryMap, resource);
         long imageBytes = details.getTotalFootprintBytes();
         if (evaluationSettings.isVerbose()) {
             System.out.printf(

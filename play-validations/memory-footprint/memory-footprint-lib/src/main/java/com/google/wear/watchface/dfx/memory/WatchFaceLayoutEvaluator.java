@@ -25,12 +25,16 @@ import org.w3c.dom.Document;
 
 class WatchFaceLayoutEvaluator {
 
+    private WatchFaceLayoutEvaluator() {
+        // No-op constructor
+    }
+
     static MemoryFootprint evaluate(
             Document currentLayout,
-            Map<String, DrawableResourceDetails> resourceMemoryMap,
+            WatchFaceData watchFaceData,
             EvaluationSettings settings) {
         long startTime = System.currentTimeMillis();
-        MemoryFootprint footprint = getMemoryFootprint(currentLayout, resourceMemoryMap, settings);
+        MemoryFootprint footprint = getMemoryFootprint(currentLayout, watchFaceData.getResourceDetailsMap(), settings);
         long endTime = System.currentTimeMillis();
         long duration = endTime - startTime;
 

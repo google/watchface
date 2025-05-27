@@ -20,7 +20,6 @@ import static com.google.wear.watchface.dfx.memory.UserConfigValue.SupportedConf
 import static com.google.wear.watchface.dfx.memory.WatchFaceDocuments.childrenStream;
 import static com.google.wear.watchface.dfx.memory.WatchFaceDocuments.isDrawableNode;
 import static java.util.Collections.emptyMap;
-import static java.util.stream.Collectors.*;
 import static java.util.stream.Collectors.toList;
 
 import java.util.ArrayList;
@@ -179,7 +178,7 @@ class DrawableNodeConfigTable {
                     new DrawableNodeConfigTable.Entry(currentNode, configSetSoFar));
         }
 
-        if (isValidUserConfigNode(currentNode)) {
+        if (SupportedConfigs.isValidUserConfigNode(currentNode)) {
             UserConfigKey key = UserConfigKey.fromNode(currentNode);
             // In case of nested user configs, the format allows nesting the same user config under
             // itself. We have to filter out incompatible branches, so that we don't get in a state

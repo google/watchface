@@ -10,7 +10,7 @@ import java.util.zip.ZipFile
 import java.util.zip.ZipInputStream
 
 @RunWith(JUnit4::class)
-class AndroidManifestTest {
+class AndroidManifestParserTest {
     private val SAMPLE_WF_BASE_ARTIFACTS_PATH = "test-samples/sample-wf/build/outputs"
 
     @Test
@@ -18,7 +18,7 @@ class AndroidManifestTest {
         val wffPackage =
             Path.of(SAMPLE_WF_BASE_ARTIFACTS_PATH, "bundle/release/sample-wf-release.aab")
 
-        val manifest = AndroidManifest.loadFromAab(ZipFile(wffPackage.toFile()))
+        val manifest = AndroidManifestParser.loadFromAab(ZipFile(wffPackage.toFile()))
 
         assertThat(manifest.wffVersion).isEqualTo(1)
         assertThat(manifest.minSdkVersion).isEqualTo(33)
@@ -29,7 +29,7 @@ class AndroidManifestTest {
     fun loadFromApk_validDebugVersionsTest() {
         val wffPackage = Path.of(SAMPLE_WF_BASE_ARTIFACTS_PATH, "apk/debug/sample-wf-debug.apk")
 
-        val manifest = AndroidManifest.loadFromApk(ZipFile(wffPackage.toFile()))
+        val manifest = AndroidManifestParser.loadFromApk(ZipFile(wffPackage.toFile()))
 
         assertThat(manifest.wffVersion).isEqualTo(1)
         assertThat(manifest.minSdkVersion).isEqualTo(33)
@@ -40,7 +40,7 @@ class AndroidManifestTest {
     fun loadFromApk_validReleaseVersionsTest() {
         val wffPackage = Path.of(SAMPLE_WF_BASE_ARTIFACTS_PATH, "apk/release/sample-wf-release.apk")
 
-        val manifest = AndroidManifest.loadFromApk(ZipFile(wffPackage.toFile()))
+        val manifest = AndroidManifestParser.loadFromApk(ZipFile(wffPackage.toFile()))
 
         assertThat(manifest.wffVersion).isEqualTo(1)
         assertThat(manifest.minSdkVersion).isEqualTo(33)
@@ -51,7 +51,7 @@ class AndroidManifestTest {
     fun loadFromAabDirectory_validVersionsTest() {
         val wffDirectory = Path.of(SAMPLE_WF_BASE_ARTIFACTS_PATH, "unpackedBundle/release")
 
-        val manifest = AndroidManifest.loadFromAabDirectory(wffDirectory)
+        val manifest = AndroidManifestParser.loadFromAabDirectory(wffDirectory)
 
         assertThat(manifest?.wffVersion).isEqualTo(1)
         // The unbundled manifest does not specify min and target SDKs, which according to specs
@@ -77,7 +77,7 @@ class AndroidManifestTest {
         }
         val baseSplitApkZip = ZipInputStream(wffZip.getInputStream(baseSplitApk.get()))
 
-        val manifest = AndroidManifest.loadFromMokkaZip(baseSplitApkZip)
+        val manifest = AndroidManifestParser.loadFromMokkaZip(baseSplitApkZip)
 
         assertThat(manifest.wffVersion).isEqualTo(1)
         assertThat(manifest.minSdkVersion).isEqualTo(33)

@@ -112,7 +112,7 @@ public class ResourceMemoryEvaluator {
      * @return the list of memory footprints, one for each layout supported by the watch face.
      */
     static List<MemoryFootprint> evaluateMemoryFootprint(EvaluationSettings evaluationSettings) {
-        try (InputPackage inputPackage = InputPackage.open(evaluationSettings.getWatchFacePath())) {
+        try (InputPackage inputPackage = InputPackageParser.open(evaluationSettings.getWatchFacePath())) {
             WatchFaceData watchFaceData =
                     WatchFaceData.fromResourcesStream(
                             inputPackage.getWatchFaceFiles(), evaluationSettings);
@@ -125,10 +125,8 @@ public class ResourceMemoryEvaluator {
             return watchFaceData.getWatchFaceDocuments().stream()
                     .map(
                             watchFaceDocument ->
-                                    evaluateWatchFaceForLayout(
-                                            watchFaceData.getResourceDetailsMap(),
-                                            watchFaceDocument,
-                                            evaluationSettings))
+                                    WatchFaceLayoutEvaluator.evaluate(watchFaceDocument, watchFaceData, evaluationSettings)
+                    )
                     .collect(Collectors.toList());
         }
     }
@@ -158,10 +156,8 @@ public class ResourceMemoryEvaluator {
             return watchFaceData.getWatchFaceDocuments().stream()
                     .map(
                             watchFaceDocument ->
-                                    evaluateWatchFaceForLayout(
-                                            watchFaceData.getResourceDetailsMap(),
-                                            watchFaceDocument,
-                                            evaluationSettings))
+                                    WatchFaceLayoutEvaluator.evaluate(watchFaceDocument, watchFaceData, evaluationSettings)
+                    )
                     .collect(Collectors.toList());
         }
     }

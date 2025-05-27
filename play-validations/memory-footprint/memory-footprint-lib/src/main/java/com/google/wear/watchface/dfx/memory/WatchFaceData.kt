@@ -24,7 +24,7 @@ import javax.xml.xpath.XPathConstants
 import javax.xml.xpath.XPathFactory
 import kotlin.streams.asSequence
 
-internal class WatchFaceData private constructor() {
+class WatchFaceData private constructor() {
 
     /** Mutable backing field for [watchFaceDocuments]. */
     private val _watchFaceDocuments = mutableListOf<Document>()
@@ -86,7 +86,7 @@ internal class WatchFaceData private constructor() {
         fun fromResourcesStream(
             resources: Stream<AndroidResource>,
             evaluationSettings: EvaluationSettings
-        ) = fromResourcesStream(resources.asSequence(), evaluationSettings)
+        ) = Companion.fromResourcesStream(resources.asSequence(), evaluationSettings)
 
         /** Creates a WatchFaceData object from a stream of watch face package resources. */
         @JvmStatic

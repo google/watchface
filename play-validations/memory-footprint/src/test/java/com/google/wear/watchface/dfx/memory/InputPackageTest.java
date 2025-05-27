@@ -42,7 +42,7 @@ public class InputPackageTest {
     @Test
     public void open_handlesFolder() {
         List<AndroidResource> packageFiles;
-        AndroidManifest manifest;
+        AndroidManifestParser manifest;
         try (InputPackage inputPackage = InputPackage.open(testAabDirectory)) {
             packageFiles =
                     Streams.stream(inputPackage.getWatchFaceFiles().iterator())

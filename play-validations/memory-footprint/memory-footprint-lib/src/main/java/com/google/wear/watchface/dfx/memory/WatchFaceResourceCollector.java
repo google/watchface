@@ -104,7 +104,7 @@ class WatchFaceResourceCollector {
             if (evaluationSettings.isVerbose()) {
                 System.out.println("Using system default font for unknown font family " + family);
             }
-            family = SYSTEM_DEFAULT_FONT;
+            family = WatchFaceData.SYSTEM_DEFAULT_FONT;
         }
         resourceReferences.add(family);
         return resourceReferences;

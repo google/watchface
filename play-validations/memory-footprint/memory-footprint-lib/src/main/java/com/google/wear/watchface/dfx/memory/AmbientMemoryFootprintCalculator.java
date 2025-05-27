@@ -130,7 +130,7 @@ class AmbientMemoryFootprintCalculator {
             System.out.println(">> Starting ambient evaluation");
         }
         Visitor visitor = new Visitor(/* prevNodeIsDrawnDynamically= */ true, /* numClocks= */ 0);
-        visitor.visitNodes(findSceneNode(document));
+        visitor.visitNodes(WatchFaceDocuments.findSceneNode(document));
 
         long maximumResourceUsage =
                 new DynamicNodePerConfigurationFootprintCalculator(
@@ -354,11 +354,11 @@ class AmbientMemoryFootprintCalculator {
             for (int i = 0; i < childNodes.getLength(); i++) {
                 Node child = childNodes.item(i);
                 if (child.getNodeName().equals("Transform")) {
-                    if (!getNodeAttribute(child, "target").orElse("").equals("angle")) {
+                    if (!WatchFaceDocuments.getNodeAttribute(child, "target").orElse("").equals("angle")) {
                         continue;
                     }
 
-                    String valueString = getNodeAttribute(child, "value").orElse("");
+                    String valueString = WatchFaceDocuments.getNodeAttribute(child, "value").orElse("");
                     for (String property : OFFLOADABLE_TIME_RELATED_DATA_SOURCES) {
                         if (valueString.contains(property)) {
                             return true;
@@ -405,7 +405,7 @@ class AmbientMemoryFootprintCalculator {
     }
 
     private static boolean nodeHasTimeBasedExpression(Node node) {
-        String expression = getNodeAttribute(node, "expression").orElse("");
+        String expression = WatchFaceDocuments.getNodeAttribute(node, "expression").orElse("");
         if (expression.isEmpty()) {
             return false;
         }
@@ -424,12 +424,12 @@ class AmbientMemoryFootprintCalculator {
 
     private static String getNodeName(Node node) {
         String path = node.getNodeName();
-        String id = getNodeAttribute(node, "id").orElse("");
+        String id = WatchFaceDocuments.getNodeAttribute(node, "id").orElse("");
         if (!id.isEmpty()) {
             path = path + " id = \"" + id + "\"";
         }
 
-        String name = getNodeAttribute(node, "name").orElse("");
+        String name = WatchFaceDocuments.getNodeAttribute(node, "name").orElse("");
         if (!name.isEmpty()) {
             path = path + " name = \"" + name + "\"";
         }

@@ -123,7 +123,7 @@ class DynamicNodePerConfigurationFootprintCalculator {
                     .sum();
         }
         LongStream childrenFootprints = childrenStream(currentNode).mapToLong(this::greedyEvaluate);
-        if (isValidUserConfigNode(currentNode)) {
+        if (SupportedConfigs.isValidUserConfigNode(currentNode)) {
             return childrenFootprints.max().orElse(0);
         }
         return childrenFootprints.sum();
