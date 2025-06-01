@@ -16,9 +16,25 @@
 plugins {
     id 'java'
     id 'org.jetbrains.kotlin.jvm' version "2.0.21"
+    id 'java-library'
+    id 'maven-publish'
 }
 
 def baseVersion = "1.5.1"
+
+group = 'com.example'
+version = '1.0.0'
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
+    repositories {
+        mavenLocal()
+    }
+}
 
 dependencies {
     implementation 'com.twelvemonkeys.imageio:imageio-webp:3.9.4'
