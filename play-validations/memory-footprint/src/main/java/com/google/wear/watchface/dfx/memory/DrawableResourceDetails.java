@@ -34,7 +34,7 @@ import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 
 /** Details about a drawable resource that are relevant for the memory footprint calculation. */
-class DrawableResourceDetails {
+public class DrawableResourceDetails {
     private static final int CHANNEL_MASK_A = 0xff000000;
 
     /**

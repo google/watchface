@@ -26,7 +26,6 @@ import com.samsung.watchface.WatchFaceXmlValidator.WatchFaceFormatValidationExce
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.w3c.dom.Document;
@@ -125,9 +124,9 @@ public class ResourceMemoryEvaluator {
             return watchFaceData.getWatchFaceDocuments().stream()
                     .map(
                             watchFaceDocument ->
-                                    evaluateWatchFaceForLayout(
-                                            watchFaceData.getResourceDetailsMap(),
+                                    WatchFaceLayoutEvaluator.evaluate(
                                             watchFaceDocument,
+                                            watchFaceData.getResourceDetailsMap(),
                                             evaluationSettings))
                     .collect(Collectors.toList());
         }
@@ -158,19 +157,12 @@ public class ResourceMemoryEvaluator {
             return watchFaceData.getWatchFaceDocuments().stream()
                     .map(
                             watchFaceDocument ->
-                                    evaluateWatchFaceForLayout(
-                                            watchFaceData.getResourceDetailsMap(),
+                                    WatchFaceLayoutEvaluator.evaluate(
                                             watchFaceDocument,
+                                            watchFaceData.getResourceDetailsMap(),
                                             evaluationSettings))
                     .collect(Collectors.toList());
         }
-    }
-
-    static MemoryFootprint evaluateWatchFaceForLayout(
-            Map<String, DrawableResourceDetails> resourceMemoryMap,
-            Document currentLayout,
-            EvaluationSettings settings) {
-        return WatchFaceLayoutEvaluator.evaluate(currentLayout, resourceMemoryMap, settings);
     }
 
     /**
