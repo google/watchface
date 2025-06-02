@@ -26,7 +26,7 @@ import org.junit.runners.Parameterized.Parameters;
 @RunWith(Enclosed.class)
 public class ResourceMemoryEvaluatorTest {
     private static final String SAMPLE_WF_BASE_ARTIFACTS_PATH =
-            "test-samples/sample-wf/build/outputs";
+            "../test-samples/sample-wf/build/outputs";
 
     /**
      * Applies the resource memory evaluator to the sample DWFs from this project to ensure expected
@@ -153,9 +153,5 @@ public class ResourceMemoryEvaluatorTest {
             JsonElement jsonElement = JsonParser.parseString(outStreamCaptor.toString());
             assertThat(jsonElement.isJsonObject()).isTrue();
         }
-    }
-
-    private static EvaluationSettings getTestEvaluationSettings() {
-        return new EvaluationSettings("", false, false);
     }
 }

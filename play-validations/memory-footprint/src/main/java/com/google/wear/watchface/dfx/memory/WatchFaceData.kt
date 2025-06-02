@@ -24,7 +24,7 @@ import javax.xml.xpath.XPathConstants
 import javax.xml.xpath.XPathFactory
 import kotlin.streams.asSequence
 
-internal class WatchFaceData private constructor() {
+class WatchFaceData private constructor() {
 
     /** Mutable backing field for [watchFaceDocuments]. */
     private val _watchFaceDocuments = mutableListOf<Document>()
