@@ -1,0 +1,38 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+# This workflow will build a Java project with Gradle and cache/restore any dependencies to improve the workflow execution time
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-gradle
+
+on:
+  pull_request:
+    branches: ["main"]
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  publish_libraries:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_PACKAGES_URL: "https://maven.pkg.github.com/google/watchface"
+      GITHUB_PACKAGES_USER: "x-oauth-basic"
+      GITHUB_PACKAGES_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Checkout project
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ inputs.release_git_sha }}
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: "17"
+          distribution: "corretto"
+          architecture: "x64"
+      - name: Publish Memory Footprint
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          build-root-directory: play-validations
+          arguments: memory-footprint:publishAllPublicationsToGithubPackagesRepository
