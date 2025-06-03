@@ -16,6 +16,7 @@
 plugins {
     id 'java'
     id 'org.jetbrains.kotlin.jvm' version "2.0.21"
+    id 'maven-publish'
 }
 
 def baseVersion = "1.5.1"
@@ -50,16 +51,6 @@ compileTestKotlin {
     kotlinOptions.jvmTarget = "17"
 }
 
-configurations {
-    executableJar {
-        canBeConsumed = true
-        canBeResolved = false
-        attributes {
-            attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, objects.named(LibraryElements, 'executableJar'))
-        }
-    }
-}
-
 jar {
     duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
 
@@ -80,10 +71,6 @@ jar {
             it.isDirectory() ? it : zipTree(it)
         }
     }
-}
-
-artifacts {
-    executableJar(jar)
 }
 
 afterEvaluate {
