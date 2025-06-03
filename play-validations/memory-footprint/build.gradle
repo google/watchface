@@ -51,9 +51,9 @@ compileTestKotlin {
     kotlinOptions.jvmTarget = "17"
 }
 
-jar {
+tasks.register('executable-jar', Jar) {
+    dependsOn("jar")
     duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
-
     exclude("META-INF/*.RSA", "META-INF/*.DSA", "META-INF/*.SF", "META-INF/maven/**")
 
     manifest {
@@ -65,12 +65,19 @@ jar {
         }
         attributes "Version": baseVersion
     }
-
     from {
         configurations.runtimeClasspath.collect {
             it.isDirectory() ? it : zipTree(it)
         }
     }
+    from sourceSets.main.output
+    archiveVersion = ""
+    archiveBaseName = "memory-footprint"
+}
+
+jar {
+    // exclude the runner class, which is not needed in the library
+    exclude 'com/google/wear/watchface/dfx/memory/ResourceMemoryEvaluator.class'
 }
 
 afterEvaluate {
@@ -100,4 +107,27 @@ test {
             "test-samples:sample-wf:resDirectory",
             "test-samples:sample-wf:zipApk"
     )
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+
+            // customize pom, removing the dependency to the validator library
+            // which is not needed when publishing the library
+            pom {
+                withXml {
+                    def dependenciesNode = asNode().dependencies[0]
+                    if (dependenciesNode) {
+                        dependenciesNode.dependency.each { dependency ->
+                            if (dependency.artifactId.text() == 'validator') {
+                                dependency.parent().remove(dependency)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
