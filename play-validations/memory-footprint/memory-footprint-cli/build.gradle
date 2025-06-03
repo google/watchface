@@ -55,6 +55,9 @@ configurations {
 }
 
 jar {
+    // Keep the resulting jar name the same as before the module structure changes,
+    // so that the release permalink is consistent
+    archiveBaseName = 'memory-footprint'
     duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
 
     exclude("META-INF/*.RSA", "META-INF/*.DSA", "META-INF/*.SF", "META-INF/maven/**")
@@ -82,7 +85,7 @@ artifacts {
 
 afterEvaluate {
     tasks.named("jar") {
-        dependsOn(":validator:jar")
+        dependsOn(":validator:jar", ":memory-footprint:jar")
     }
 }
 

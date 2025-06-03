@@ -46,7 +46,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
         with:
           build-root-directory: play-validations
-          arguments: memory-footprint:jar -Dmemory-footprint.git_hash=${{ env.git_hash }}
+          arguments: memory-footprint:memory-footprint-cli:jar -Dmemory-footprint.git_hash=${{ env.git_hash }}
       - name: Test memory-footprint
         uses: gradle/actions/setup-gradle@v3
         with:
