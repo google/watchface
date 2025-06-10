@@ -51,3 +51,28 @@ allprojects { project ->
         }
     }
 }
+
+def libModules = List.of("validator", "memory-footprint")
+subprojects { project ->
+    if (project.name in libModules) {
+        afterEvaluate {
+            version = "1.6.0-SNAPSHOT"
+            group = "com.google.watchface"
+            publishing {
+                repositories {
+                    mavenLocal()
+                    if (System.getenv("GITHUB_PACKAGES_URL") != null) {
+                        maven {
+                            name = "GithubPackages"
+                            url = System.getenv("GITHUB_PACKAGES_URL")
+                            credentials {
+                                username = System.getenv("GITHUB_PACKAGES_USER")
+                                password = System.getenv("GITHUB_PACKAGES_TOKEN")
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
