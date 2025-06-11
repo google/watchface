@@ -25,6 +25,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.w3c.dom.Document;
 
+@SuppressWarnings("KotlinInternal")
 public class WatchFaceLayoutEvaluator {
     public static List<MemoryFootprint> evaluate(EvaluationSettings evaluationSettings) {
         try (InputPackage inputPackage = InputPackage.open(evaluationSettings.getWatchFacePath())) {
