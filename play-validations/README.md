@@ -28,7 +28,7 @@ and variants.
 ## Building the tool
 
 ```bash
-./gradlew :memory-footprint:jar
+./gradlew :memory-footprint:executable-jar
 java -jar ./memory-footprint/build/libs/memory-footprint.jar --help
 ```
 

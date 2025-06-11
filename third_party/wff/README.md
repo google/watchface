@@ -19,7 +19,7 @@ specific watch face XML files.
 
 ```shell
 cd third_party/wff
-./gradlew :specification:validator:build
+./gradlew :specification:validator:executable-jar
 ```
 
 The resulting JAR file can then be found at: `specification/validator/build/libs/wff-validator.jar`
