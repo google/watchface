@@ -22,7 +22,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.samsung.watchface.WatchFaceXmlValidator;
-import com.samsung.watchface.WatchFaceXmlValidator.WatchFaceFormatValidationException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.List;
@@ -116,6 +115,7 @@ public class ResourceMemoryEvaluator {
             WatchFaceData watchFaceData =
                     WatchFaceData.fromResourcesStream(
                             inputPackage.getWatchFaceFiles(), evaluationSettings);
+
             if (!evaluationSettings.isHoneyfaceMode()) {
                 String wffVersion =
                         getWatchFaceFormatVersion(inputPackage.getManifest(), evaluationSettings);
@@ -125,42 +125,9 @@ public class ResourceMemoryEvaluator {
             return watchFaceData.getWatchFaceDocuments().stream()
                     .map(
                             watchFaceDocument ->
-                                    evaluateWatchFaceForLayout(
-                                            watchFaceData.getResourceDetailsMap(),
+                                    WatchFaceLayoutEvaluator.evaluate(
                                             watchFaceDocument,
-                                            evaluationSettings))
-                    .collect(Collectors.toList());
-        }
-    }
-
-    /**
-     * Parses a watch face package and evaluates the memory footprint for all of its layouts.
-     *
-     * @param evaluationSettings the settings object for running the watch face evaluation.
-     * @return the list of memory footprints, one for each layout supported by the watch face.
-     * @throws WatchFaceFormatValidationException if the schema for the validation was not
-     *     available.
-     * @throws TestFailedException if the watch face memory footprint validation has failed.
-     */
-    public static List<MemoryFootprint> evaluateMemoryFootprintOrThrow(
-            EvaluationSettings evaluationSettings)
-            throws TestFailedException, WatchFaceFormatValidationException {
-        try (InputPackage inputPackage = InputPackage.open(evaluationSettings.getWatchFacePath())) {
-            WatchFaceData watchFaceData =
-                    WatchFaceData.fromResourcesStream(
-                            inputPackage.getWatchFaceFiles(), evaluationSettings);
-            if (!evaluationSettings.isHoneyfaceMode()) {
-                String wffVersion =
-                        getWatchFaceFormatVersion(inputPackage.getManifest(), evaluationSettings);
-                validateFormatOrThrow(watchFaceData, wffVersion);
-            }
-
-            return watchFaceData.getWatchFaceDocuments().stream()
-                    .map(
-                            watchFaceDocument ->
-                                    evaluateWatchFaceForLayout(
                                             watchFaceData.getResourceDetailsMap(),
-                                            watchFaceDocument,
                                             evaluationSettings))
                     .collect(Collectors.toList());
         }
@@ -197,20 +164,6 @@ public class ResourceMemoryEvaluator {
         }
 
         return cliWffVersion != null ? cliWffVersion : manifestWffVersion;
-    }
-
-    private static void validateFormatOrThrow(
-            WatchFaceData watchFaceData, String watchFaceFormatVersion)
-            throws WatchFaceFormatValidationException {
-        WatchFaceXmlValidator xmlValidator = new WatchFaceXmlValidator();
-        for (Document watchFaceDocument : watchFaceData.getWatchFaceDocuments()) {
-            boolean documentHasValidSchema =
-                    xmlValidator.validateOrThrow(watchFaceDocument, watchFaceFormatVersion);
-            if (!documentHasValidSchema) {
-                throw new TestFailedException(
-                        "Watch Face has syntactic errors and cannot be parsed.");
-            }
-        }
     }
 
     /**

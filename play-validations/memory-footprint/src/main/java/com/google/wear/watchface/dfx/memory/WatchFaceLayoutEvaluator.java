@@ -19,11 +19,30 @@ package com.google.wear.watchface.dfx.memory;
 import static com.google.wear.watchface.dfx.memory.DrawableResourceDetails.findInMap;
 import static com.google.wear.watchface.dfx.memory.WatchFaceDocuments.findSceneNode;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.w3c.dom.Document;
 
-class WatchFaceLayoutEvaluator {
+public class WatchFaceLayoutEvaluator {
+    public static List<MemoryFootprint> evaluate(EvaluationSettings evaluationSettings) {
+        try (InputPackage inputPackage = InputPackage.open(evaluationSettings.getWatchFacePath())) {
+            WatchFaceData watchFaceData =
+                    WatchFaceData.fromResourcesStream(
+                            inputPackage.getWatchFaceFiles(), evaluationSettings);
+            AndroidManifest manifest = inputPackage.getManifest();
+            String wffVersion = manifest == null ? null : String.valueOf(manifest.getWffVersion());
+            return watchFaceData.getWatchFaceDocuments().stream()
+                    .map(
+                            watchFaceDocument ->
+                                    getMemoryFootprint(
+                                            watchFaceDocument,
+                                            watchFaceData.getResourceDetailsMap(),
+                                            evaluationSettings))
+                    .collect(Collectors.toList());
+        }
+    }
 
     static MemoryFootprint evaluate(
             Document currentLayout,
