@@ -56,12 +56,15 @@ public class WatchFaceDataTest {
                             .setNumberOfImages(1)
                             .build());
 
+    private static final ImageProcessor imageProcessor = new JvmImageProcessor();
+
     @Test
     public void fromResourcesStream_createsPackageFromLinuxPaths() {
         Stream<AndroidResource> packageFileStream = TEST_FILES.stream().map(this::readPackageFile);
 
         WatchFaceData watchFaceData =
-                WatchFaceData.fromResourcesStream(packageFileStream, TEST_EVALUATION_SETTINGS);
+                WatchFaceData.fromResourcesStream(
+                        packageFileStream, TEST_EVALUATION_SETTINGS, imageProcessor);
 
         assertThat(watchFaceData.getWatchFaceDocuments()).hasSize(1);
         assertThat(watchFaceData.getResourceDetailsMap()).isEqualTo(expectedDetails);
@@ -74,7 +77,8 @@ public class WatchFaceDataTest {
                     TEST_FILES.stream().map(x -> readWindowsPackageFile(x, windowsFs));
 
             WatchFaceData watchFaceData =
-                    WatchFaceData.fromResourcesStream(packageFileStream, TEST_EVALUATION_SETTINGS);
+                    WatchFaceData.fromResourcesStream(
+                            packageFileStream, TEST_EVALUATION_SETTINGS, imageProcessor);
 
             assertThat(watchFaceData.getWatchFaceDocuments()).hasSize(1);
             assertThat(watchFaceData.getResourceDetailsMap()).isEqualTo(expectedDetails);

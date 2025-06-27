@@ -27,11 +27,12 @@ import org.w3c.dom.Document;
 
 @SuppressWarnings("KotlinInternal")
 public class WatchFaceLayoutEvaluator {
-    public static List<MemoryFootprint> evaluate(EvaluationSettings evaluationSettings) {
+    public static List<MemoryFootprint> evaluate(
+            EvaluationSettings evaluationSettings, ImageProcessor imageProcessor) {
         try (InputPackage inputPackage = InputPackage.open(evaluationSettings.getWatchFacePath())) {
             WatchFaceData watchFaceData =
                     WatchFaceData.fromResourcesStream(
-                            inputPackage.getWatchFaceFiles(), evaluationSettings);
+                            inputPackage.getWatchFaceFiles(), evaluationSettings, imageProcessor);
             AndroidManifest manifest = inputPackage.getManifest();
             String wffVersion = manifest == null ? null : String.valueOf(manifest.getWffVersion());
             return watchFaceData.getWatchFaceDocuments().stream()

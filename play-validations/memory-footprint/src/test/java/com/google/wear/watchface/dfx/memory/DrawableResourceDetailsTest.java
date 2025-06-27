@@ -37,13 +37,15 @@ public class DrawableResourceDetailsTest {
                     .setCanUseRGB565(true)
                     .build();
 
+    private static final ImageProcessor imageProcessor = new JvmImageProcessor();
+
     @Test
     public void fromPackageFile_parsesTtfWithExtension() throws Exception {
 
         AndroidResource ttfFile = readPackageFile("base/res/font/roboto_regular.ttf");
 
         Optional<DrawableResourceDetails> fontDetails =
-                DrawableResourceDetails.fromPackageResource(ttfFile);
+                DrawableResourceDetails.fromPackageResource(ttfFile, imageProcessor);
 
         assertThat(fontDetails.isPresent()).isTrue();
         assertThat(fontDetails.get()).isEqualTo(expectedRobotoRegular);
@@ -58,7 +60,7 @@ public class DrawableResourceDetailsTest {
                         Paths.get("base/res/font/roboto_regular"));
 
         Optional<DrawableResourceDetails> fontDetails =
-                DrawableResourceDetails.fromPackageResource(ttfFile);
+                DrawableResourceDetails.fromPackageResource(ttfFile, imageProcessor);
 
         assertThat(fontDetails.isPresent()).isTrue();
         assertThat(fontDetails.get()).isEqualTo(expectedRobotoRegular);
@@ -69,7 +71,7 @@ public class DrawableResourceDetailsTest {
         AndroidResource pngFile = readPackageFile("base/res/drawable-nodpi/dial.png");
 
         Optional<DrawableResourceDetails> pngDetails =
-                DrawableResourceDetails.fromPackageResource(pngFile);
+                DrawableResourceDetails.fromPackageResource(pngFile, imageProcessor);
 
         assertThat(pngDetails.isPresent()).isTrue();
         assertThat(pngDetails.get()).isEqualTo(expectedPng);
@@ -83,7 +85,7 @@ public class DrawableResourceDetailsTest {
                         Paths.get("base/res/drawable-nodpi/dial"));
 
         Optional<DrawableResourceDetails> pngDetails =
-                DrawableResourceDetails.fromPackageResource(pngFile);
+                DrawableResourceDetails.fromPackageResource(pngFile, imageProcessor);
 
         assertThat(pngDetails.isPresent()).isTrue();
         assertThat(pngDetails.get()).isEqualTo(expectedPng);
@@ -99,7 +101,7 @@ public class DrawableResourceDetailsTest {
                     changePath(originalPackageFile, Paths.get(testFilePath));
 
             Optional<DrawableResourceDetails> testDrawableDetails =
-                    DrawableResourceDetails.fromPackageResource(testPackageFile);
+                    DrawableResourceDetails.fromPackageResource(testPackageFile, imageProcessor);
 
             assertThat(testDrawableDetails.isPresent()).isTrue();
         }
@@ -120,7 +122,7 @@ public class DrawableResourceDetailsTest {
                             dropSections(Paths.get(testFilePath), 1));
 
             Optional<DrawableResourceDetails> testDrawableDetails =
-                    DrawableResourceDetails.fromPackageResource(testPackageFile);
+                    DrawableResourceDetails.fromPackageResource(testPackageFile, imageProcessor);
 
             assertThat(testDrawableDetails.isPresent()).isTrue();
         }
@@ -141,7 +143,8 @@ public class DrawableResourceDetailsTest {
                                 makeWindowsPath(testFilePath, windowsFileSystem));
 
                 Optional<DrawableResourceDetails> testDrawableDetails =
-                        DrawableResourceDetails.fromPackageResource(testPackageFile);
+                        DrawableResourceDetails.fromPackageResource(
+                                testPackageFile, imageProcessor);
 
                 assertThat(testDrawableDetails.isPresent()).isTrue();
             }
@@ -157,7 +160,7 @@ public class DrawableResourceDetailsTest {
             AndroidResource testPackageFile = changePath(originalFile, Paths.get(testFilePath));
 
             Optional<DrawableResourceDetails> testDrawableDetails =
-                    DrawableResourceDetails.fromPackageResource(testPackageFile);
+                    DrawableResourceDetails.fromPackageResource(testPackageFile, imageProcessor);
 
             assertThat(testDrawableDetails.isPresent()).isTrue();
             assertThat(testDrawableDetails.get()).isEqualTo(expectedPng);
@@ -173,7 +176,7 @@ public class DrawableResourceDetailsTest {
                         Paths.get("base/res/drawable/non-image"));
 
         Optional<DrawableResourceDetails> resourceDetailsOptional =
-                DrawableResourceDetails.fromPackageResource(unexpectedFile);
+                DrawableResourceDetails.fromPackageResource(unexpectedFile, imageProcessor);
 
         assertThat(resourceDetailsOptional.isPresent()).isFalse();
     }
@@ -183,7 +186,7 @@ public class DrawableResourceDetailsTest {
         AndroidResource unexpectedFile = readPackageFile("base/res/xml/watch_face_info.xml");
 
         Optional<DrawableResourceDetails> resourceDetailsOptional =
-                DrawableResourceDetails.fromPackageResource(unexpectedFile);
+                DrawableResourceDetails.fromPackageResource(unexpectedFile, imageProcessor);
 
         assertThat(resourceDetailsOptional.isPresent()).isFalse();
     }
@@ -234,7 +237,8 @@ public class DrawableResourceDetailsTest {
         String path = String.format("/res/drawable/%s", name);
         try (InputStream is = getClass().getResourceAsStream(path)) {
             return DrawableResourceDetails.fromPackageResource(
-                    AndroidResource.fromPath(path, AndroidResourceLoader.readAllBytes(is)));
+                    AndroidResource.fromPath(path, AndroidResourceLoader.readAllBytes(is)),
+                    imageProcessor);
         }
     }
 }
