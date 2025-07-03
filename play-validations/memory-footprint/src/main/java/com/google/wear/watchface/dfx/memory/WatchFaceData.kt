@@ -85,14 +85,16 @@ internal class WatchFaceData private constructor() {
         @JvmStatic
         fun fromResourcesStream(
             resources: Stream<AndroidResource>,
-            evaluationSettings: EvaluationSettings
-        ) = fromResourcesStream(resources.asSequence(), evaluationSettings)
+            evaluationSettings: EvaluationSettings,
+            imageProcessor: ImageProcessor
+        ) = fromResourcesStream(resources.asSequence(), evaluationSettings, imageProcessor)
 
         /** Creates a WatchFaceData object from a stream of watch face package resources. */
         @JvmStatic
         fun fromResourcesStream(
             resources: Sequence<AndroidResource>,
             evaluationSettings: EvaluationSettings,
+            imageProcessor: ImageProcessor
         ): WatchFaceData {
             val watchFaceData = WatchFaceData()
 
@@ -104,7 +106,7 @@ internal class WatchFaceData private constructor() {
                         continue
                     }
                 }
-                DrawableResourceDetails.fromPackageResource(resource).ifPresent {
+                DrawableResourceDetails.fromPackageResource(resource, imageProcessor).ifPresent {
                     watchFaceData.recordResourceDetails(it)
                 }
             }

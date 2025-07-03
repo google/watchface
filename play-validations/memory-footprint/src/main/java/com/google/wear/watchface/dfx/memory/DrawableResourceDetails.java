@@ -20,39 +20,33 @@ import static java.lang.Math.abs;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 
-import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.security.MessageDigest;
 import java.util.Formatter;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import javax.imageio.ImageIO;
-import javax.imageio.ImageReader;
-import javax.imageio.stream.ImageInputStream;
 
 /** Details about a drawable resource that are relevant for the memory footprint calculation. */
 class DrawableResourceDetails {
     private static final int CHANNEL_MASK_A = 0xff000000;
 
     /**
-     * A lookup table used for computing the loss of precision whern an 8bit value is qualtized to a
+     * A lookup table used for computing the loss of precision where an 8bit value is quantized to a
      * 5bit value.
      */
-    private static final int QUANTZATION_ERROR_LUT5[] =
-            create8bppToNbppQualtizationErrorLookUpTable(5);
+    private static final int QUANTIZATION_ERROR_LUT5[] =
+            create8bppToNbppQuantizationErrorLookUpTable(5);
 
     /**
-     * A lookup table used for computing the loss of precision whern an 8bit value is qualtized to a
+     * A lookup table used for computing the loss of precision where an 8bit value is quantized to a
      * 6bit value.
      */
-    private static final int QUANTZATION_ERROR_LUT6[] =
-            create8bppToNbppQualtizationErrorLookUpTable(6);
+    private static final int QUANTIZATION_ERROR_LUT6[] =
+            create8bppToNbppQuantizationErrorLookUpTable(6);
 
     /** This corresponds to an average difference in luminosity of 5/10th of an 8bit value. */
-    private static final double MAX_ACCEPTIABLE_QUANTIZATION_ERROR = 0.5f;
+    private static final double MAX_ACCEPTABLE_QUANTIZATION_ERROR = 0.5f;
 
     public static class Bounds {
         int left;
@@ -123,11 +117,13 @@ class DrawableResourceDetails {
      * take in its uncompressed format.
      *
      * @param resource the resource from a watch face package.
+     * @param imageProcessor the image processing implementation.
      * @return the memory footprint of that asset file or {@code Optional.empty()} if the file is
      *     not a drawable asset.
      * @throws java.lang.IllegalArgumentException when the image cannot be processed.
      */
-    static Optional<DrawableResourceDetails> fromPackageResource(AndroidResource resource) {
+    static Optional<DrawableResourceDetails> fromPackageResource(
+            AndroidResource resource, ImageProcessor imageProcessor) {
         // For fonts we assume the raw size of the resource is the MCU footprint.
         if (resource.isFont()) {
             return Optional.of(
@@ -153,58 +149,54 @@ class DrawableResourceDetails {
                     String.format("Error while processing image %s", resource.getFilePath()), e);
         }
 
-        try (ImageInputStream imageInputStream =
-                ImageIO.createImageInputStream(new ByteArrayInputStream(resource.getData()))) {
-            Iterator<ImageReader> imageReaders = ImageIO.getImageReaders(imageInputStream);
-            if (!imageReaders.hasNext()) {
-                return Optional.empty();
-            }
-            ImageReader reader = imageReaders.next();
-            reader.setInput(imageInputStream);
-            // allowSearch forces the reader to return the true number of images even if the file
-            // format does not specify it, requiring an exhaustive search.
-            int numberOfImages = reader.getNumImages(/* allowSearch= */ true);
-            int maxWidth = 0;
-            int maxHeight = 0;
-            double maxQuantizationError = 0.0;
-            DrawableResourceDetails.Bounds accumulatedBounds = null;
-            for (int i = 0; i < numberOfImages; i++) {
-                // If an asset such as a GIF or a WEBP has more than 1 frame, then find the
-                // maximum size for any frame and multiply that by the number of frames.
-                maxWidth = max(maxWidth, reader.getWidth(i));
-                maxHeight = max(maxHeight, reader.getHeight(i));
+        ImageProcessor.ImageReader reader =
+                imageProcessor.createImageReader(new ByteArrayInputStream(resource.getData()));
 
-                BufferedImage image = reader.read(i);
-                Bounds bounds = computeBounds(image);
-
-                if (bounds != null) {
-                    if (accumulatedBounds == null) {
-                        accumulatedBounds = bounds;
-                    } else {
-                        accumulatedBounds = accumulatedBounds.computeUnion(bounds);
-                    }
-                }
-
-                QualtizationStats stats = computeQualtizationStats(image);
-                maxQuantizationError = max(maxQuantizationError, stats.getVisibleError());
-            }
-            long biggestFrameMemoryFootprint = ((long) maxWidth) * maxHeight * 4;
-            boolean canBeQuantized = (maxQuantizationError < MAX_ACCEPTIABLE_QUANTIZATION_ERROR);
-            return Optional.of(
-                    new Builder()
-                            .setName(resource.getResourceName())
-                            .setNumberOfImages(numberOfImages)
-                            .setBiggestFrameFootprintBytes(biggestFrameMemoryFootprint)
-                            .setBounds(accumulatedBounds)
-                            .setWidth(maxWidth)
-                            .setHeight(maxHeight)
-                            .setSha1(sha1)
-                            .setCanUseRGB565(canBeQuantized)
-                            .build());
-        } catch (IOException e) {
-            throw new IllegalArgumentException(
-                    String.format("Error while processing image %s", resource.getFilePath()), e);
+        if (reader == null) {
+            return Optional.empty();
         }
+
+        int numberOfImages = reader.getNumImages();
+        int maxWidth = 0;
+        int maxHeight = 0;
+        double maxQuantizationError = 0.0;
+        DrawableResourceDetails.Bounds accumulatedBounds = null;
+
+        for (int i = 0; i < numberOfImages; i++) {
+            // If an asset such as a GIF or a WEBP has more than 1 frame, then find the
+            // maximum size for any frame and multiply that by the number of frames.
+            maxWidth = max(maxWidth, reader.getWidth(i));
+            maxHeight = max(maxHeight, reader.getHeight(i));
+
+            ImageProcessor.ImageData image = reader.read(i);
+            Bounds bounds = computeBounds(image);
+
+            if (bounds != null) {
+                if (accumulatedBounds == null) {
+                    accumulatedBounds = bounds;
+                } else {
+                    accumulatedBounds = accumulatedBounds.computeUnion(bounds);
+                }
+            }
+
+            QuantizationStats stats = computeQualtizationStats(image);
+            maxQuantizationError = max(maxQuantizationError, stats.getVisibleError());
+        }
+
+        long biggestFrameMemoryFootprint = ((long) maxWidth) * maxHeight * 4;
+        boolean canBeQuantized = (maxQuantizationError < MAX_ACCEPTABLE_QUANTIZATION_ERROR);
+
+        return Optional.of(
+                new Builder()
+                        .setName(resource.getResourceName())
+                        .setNumberOfImages(numberOfImages)
+                        .setBiggestFrameFootprintBytes(biggestFrameMemoryFootprint)
+                        .setBounds(accumulatedBounds)
+                        .setWidth(maxWidth)
+                        .setHeight(maxHeight)
+                        .setSha1(sha1)
+                        .setCanUseRGB565(canBeQuantized)
+                        .build());
     }
 
     private final String name;
@@ -437,10 +429,10 @@ class DrawableResourceDetails {
      * Reads the image with the specified index and then computes the {@link Bounds} of the visible
      * pixels.
      *
-     * @param image the {@link BufferedImage}
+     * @param image the {@link ImageProcessor.ImageData}
      * @return The {@link Bounds} of the visible pixels.
      */
-    private static Bounds computeBounds(BufferedImage image) {
+    private static Bounds computeBounds(ImageProcessor.ImageData image) {
         Bounds bounds = new Bounds();
 
         // Scan from the top down to find the first non-transparent row.
@@ -454,11 +446,11 @@ class DrawableResourceDetails {
         }
 
         if (y == height) {
-            // The image is fully transparent!
+            // The image is fully transparent.
             return null;
         }
 
-        // Scan from the bottum up to find the first non-transparent row.
+        // Scan from the bottom up to find the first non-transparent row.
         for (y = height; y > 0; ) {
             y--;
             if (!isRowFullyTransparent(image, y)) {
@@ -488,10 +480,10 @@ class DrawableResourceDetails {
         return bounds;
     }
 
-    private static boolean isRowFullyTransparent(BufferedImage image, int y) {
+    private static boolean isRowFullyTransparent(ImageProcessor.ImageData image, int y) {
         int width = image.getWidth();
         for (int x = 0; x < width; x++) {
-            if (!isFullyTransparent(image.getRGB(x, y))) {
+            if (!isFullyTransparent(image.getRgb(x, y))) {
                 return false;
             }
         }
@@ -499,9 +491,9 @@ class DrawableResourceDetails {
     }
 
     private static boolean isColumnFullyTransparent(
-            BufferedImage image, int x, int top, int bottom) {
+            ImageProcessor.ImageData image, int x, int top, int bottom) {
         for (int y = top; y < bottom; y++) {
-            if (!isFullyTransparent(image.getRGB(x, y))) {
+            if (!isFullyTransparent(image.getRgb(x, y))) {
                 return false;
             }
         }
@@ -512,7 +504,7 @@ class DrawableResourceDetails {
         return (argb & CHANNEL_MASK_A) == 0;
     }
 
-    private static class QualtizationStats {
+    private static class QuantizationStats {
         long visiblePixels = 0;
         long visiblePixelQuantizationErrorSum = 0;
 
@@ -521,34 +513,34 @@ class DrawableResourceDetails {
         }
     }
 
-    private static QualtizationStats computeQualtizationStats(BufferedImage image) {
+    private static QuantizationStats computeQualtizationStats(ImageProcessor.ImageData image) {
         int width = image.getWidth();
         int height = image.getHeight();
-        QualtizationStats qualtizationStats = new QualtizationStats();
+        QuantizationStats quantizationStats = new QuantizationStats();
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                int argb = image.getRGB(x, y);
+                int argb = image.getRgb(x, y);
                 int a = (argb >> 24) & 0xff;
                 if (a < 255) {
                     continue;
                 }
 
-                qualtizationStats.visiblePixels++;
+                quantizationStats.visiblePixels++;
 
                 int r = (argb >> 16) & 0xff;
                 int g = (argb >> 8) & 0xff;
                 int b = argb & 0xff;
 
-                qualtizationStats.visiblePixelQuantizationErrorSum += QUANTZATION_ERROR_LUT5[r];
-                qualtizationStats.visiblePixelQuantizationErrorSum += QUANTZATION_ERROR_LUT6[g];
-                qualtizationStats.visiblePixelQuantizationErrorSum += QUANTZATION_ERROR_LUT5[b];
+                quantizationStats.visiblePixelQuantizationErrorSum += QUANTIZATION_ERROR_LUT5[r];
+                quantizationStats.visiblePixelQuantizationErrorSum += QUANTIZATION_ERROR_LUT6[g];
+                quantizationStats.visiblePixelQuantizationErrorSum += QUANTIZATION_ERROR_LUT5[b];
             }
         }
-        return qualtizationStats;
+        return quantizationStats;
     }
 
     /** Constructs a table of the error introduced by quantizing an 8 bit value to a N bit value. */
-    private static int[] create8bppToNbppQualtizationErrorLookUpTable(int n) {
+    private static int[] create8bppToNbppQuantizationErrorLookUpTable(int n) {
         int[] table = new int[256];
         int bitsLost = 8 - n;
         int twoPowN = 1 << bitsLost;
@@ -557,7 +549,7 @@ class DrawableResourceDetails {
             // This rounds i to the nearest n-bit value before converting back to an 8 bit value.
             int quantizedValue = min(((i + halfTwoPowN) / twoPowN) * twoPowN, 255);
 
-            // Record the error due to qualtization in the table. This has a saw-tooth pattern where
+            // Record the error due to quantization in the table. This has a saw-tooth pattern where
             // n-bit values that correspond directly to 8 bit ones have an error of 0, rising to a
             // maximum error of halfPlusOne in between.
             table[i] = abs(i - quantizedValue);
