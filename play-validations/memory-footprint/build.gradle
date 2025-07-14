@@ -80,6 +80,7 @@ tasks.assemble.dependsOn 'executable-jar'
 jar {
     // exclude the runner class, which is not needed in the library
     exclude 'com/google/wear/watchface/dfx/memory/ResourceMemoryEvaluator.class'
+    exclude 'com/google/wear/watchface/dfx/memory/JvmImageProcessor.class'
 }
 
 afterEvaluate {
