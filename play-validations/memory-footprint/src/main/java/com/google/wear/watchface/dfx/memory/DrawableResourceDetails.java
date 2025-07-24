@@ -163,15 +163,20 @@ class DrawableResourceDetails {
         DrawableResourceDetails.Bounds accumulatedBounds = null;
 
         for (int i = 0; i < numberOfImages; i++) {
-            // If an asset such as a GIF or a WEBP has more than 1 frame, then find the
-            // maximum size for any frame and multiply that by the number of frames.
-            maxWidth = max(maxWidth, reader.getWidth(i));
-            maxHeight = max(maxHeight, reader.getHeight(i));
-
             ImageProcessor.ImageData image = reader.read(i);
+
             Bounds bounds = computeBounds(image);
+            if (numberOfImages == 1) {
+                maxWidth = image.getWidth();
+                maxHeight = image.getHeight();
+            }
 
             if (bounds != null) {
+                // In case of multiple frames, largest one is taken.
+                // Note: Only visible pixels are taken to compute the width and height.
+                maxWidth = max(bounds.getWidth(), maxWidth);
+                maxHeight = max(bounds.getHeight(), maxHeight);
+
                 if (accumulatedBounds == null) {
                     accumulatedBounds = bounds;
                 } else {
