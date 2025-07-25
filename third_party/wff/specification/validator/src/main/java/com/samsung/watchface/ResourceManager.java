@@ -24,19 +24,22 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Comparator;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 class ResourceManager {
     private static final String RESOURCE_ZIP_XSD_DOCS = "/docs.zip";
-    private static final int BUFFER_SIZE = 4096;
 
     private final File xsdTempDirectory;
 
     ResourceManager() {
-        // load resources
-        String zipFilePath = getResourceAsFile(RESOURCE_ZIP_XSD_DOCS).toString();
         xsdTempDirectory = createTempDirectory();
-        UnzipUtility.unzip(zipFilePath, xsdTempDirectory.toString());
+        UnzipUtility.unzip(
+            this.getClass().getResourceAsStream(RESOURCE_ZIP_XSD_DOCS),
+            xsdTempDirectory.toString()
+        );
     }
 
     File getXsdFile(String version) {
@@ -44,48 +47,32 @@ class ResourceManager {
                 version + File.separator + "watchface.xsd");
     }
 
-    private File getResourceAsFile(String resource) {
-        File file;
-        URL res = getClass().getResource(resource);
-        if (res == null) {
-            throw new RuntimeException("No resource File : " + resource);
-        }
-        if (res.getProtocol().equals("jar")) {
-            try {
-                file = File.createTempFile("dwf_temp", "tmp");
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            file.deleteOnExit();
-
-            try (InputStream input = getClass().getResourceAsStream(resource);
-                 OutputStream output = Files.newOutputStream(file.toPath())) {
-                byte[] bytes = new byte[BUFFER_SIZE];
-                int read;
-                while ((read = Objects.requireNonNull(input).read(bytes)) != -1) {
-                    output.write(bytes, 0, read);
-                }
-            } catch (Exception e) {
-                throw new RuntimeException(e.getMessage());
-            }
-        } else { // for IDE
-            file = new File(res.getFile());
-        }
-
-        if (!file.exists()) {
-            throw new RuntimeException(
-                    "Error: Cannot read Resource File " + file + "(" + resource + ")!");
-        }
-        return file;
-    }
-
     private File createTempDirectory() {
         try {
-            File file = new File(Files.createTempDirectory("validator").toString());
-            file.deleteOnExit();
-            return file;
+            Path dirPath = Files.createTempDirectory("validator");
+            deleteFileAndContentOnExit(dirPath);
+            return dirPath.toFile();
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage());
         }
+    }
+
+    private static void deleteFileAndContentOnExit(Path dirPath) {
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            if (Files.exists(dirPath)) {
+                try (Stream<Path> walk = Files.walk(dirPath)) {
+                    walk.sorted(Comparator.reverseOrder()) // Reverse order to delete contents first
+                        .forEach(path -> {
+                            try {
+                                Files.delete(path);
+                            } catch (IOException e) {
+                                // Do nothing
+                            }
+                        });
+                } catch (IOException e) {
+                    System.err.println("Failed to delete temp dir " + dirPath);
+                }
+            }
+        }));
     }
 }
