@@ -18,6 +18,15 @@ package com.samsung.watchface;
 
 import com.samsung.watchface.utils.Log;
 
+import com.samsung.watchface.utils.UnzipUtility;
+import java.io.InputStream;
+import java.nio.file.FileVisitOption;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Stream;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
 import org.w3c.dom.Document;
@@ -36,11 +45,10 @@ import javax.xml.validation.Validator;
  * Validator of the watchface.xml
  */
 public class WatchFaceXmlValidator {
-    private final ResourceManager resourceManager;
+    private final Map<String, Validator> validatorPerVersion;
 
     public WatchFaceXmlValidator() {
-        // load resources for validation via xsd documents
-        resourceManager = new ResourceManager();
+        validatorPerVersion = parseSchemas();
     }
 
     /** Exception thrown when the watch face format validation has failed to execute. */
@@ -58,8 +66,7 @@ public class WatchFaceXmlValidator {
      * @return true if supported, else false
      */
     public boolean isSupportedVersion(String version) {
-        File xsdFile = resourceManager.getXsdFile(version);
-        return xsdFile != null && xsdFile.exists();
+        return validatorPerVersion.containsKey(version);
     }
 
     /**
@@ -78,8 +85,7 @@ public class WatchFaceXmlValidator {
             if (!xmlFile.exists()) {
                 throw new RuntimeException("xml path is invalid : " + xmlPath);
             }
-            validateXMLSchema(
-                resourceManager.getXsdFile(version).getCanonicalPath(), new StreamSource(xmlFile));
+            validatorPerVersion.get(version).validate(new StreamSource(xmlFile));
             return true;
         } catch (SAXParseException e) {
             String errorMessage = String.format(
@@ -109,8 +115,7 @@ public class WatchFaceXmlValidator {
                 throw new RuntimeException("Validator does not support the version #" + version);
             }
 
-            validateXMLSchema(
-                resourceManager.getXsdFile(version).getCanonicalPath(), new DOMSource(xmlDocument));
+            validatorPerVersion.get(version).validate(new DOMSource(xmlDocument));
             return true;
         } catch (Exception e) {
             Log.e(e.getMessage());
@@ -135,8 +140,7 @@ public class WatchFaceXmlValidator {
         }
 
         try {
-            validateXMLSchema(
-                resourceManager.getXsdFile(version).getCanonicalPath(), new DOMSource(xmlDocument));
+            validatorPerVersion.get(version).validate(new DOMSource(xmlDocument));
             return true;
         } catch (SAXException | IOException | NullPointerException e) {
             Log.e("Could not validate xml: " + e.getMessage());
@@ -146,13 +150,54 @@ public class WatchFaceXmlValidator {
         }
     }
 
-
-    private static void validateXMLSchema(String xsdPath, Source xmlSource) throws
-        IllegalArgumentException, SAXException, IOException, NullPointerException {
-        // https://stackoverflow.com/questions/20807066/how-to-validate-xml-against-xsd-1-1-in-java
+    private static Validator createXmlSchema(File xsdFile) {
         SchemaFactory factory = SchemaFactory.newInstance("http://www.w3.org/XML/XMLSchema/v1.1");
-        Schema schema = factory.newSchema(new File(xsdPath));
-        Validator validator = schema.newValidator();
-        validator.validate(xmlSource);
+        try {
+            return factory.newSchema(xsdFile).newValidator();
+        } catch (SAXException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static Map<String, Validator> parseSchemas() {
+        Map<String, Validator> validators = new HashMap<>();
+
+        try (InputStream docsStream = WatchFaceXmlValidator.class.getResourceAsStream("/docs.zip")) {
+            Path unzipDocsPath = Files.createTempDirectory("watch_face_validator");
+            try {
+                UnzipUtility.unzip(docsStream, unzipDocsPath);
+
+                Files.list(unzipDocsPath).forEach(docChild -> {
+                    File docChildFile = docChild.toFile();
+                    File watchFaceXsdFile = docChild.resolve("watchface.xsd").toFile();
+                    if (docChildFile.isDirectory() && watchFaceXsdFile.exists()) {
+                        validators.put(
+                            docChild.getName(docChild.getNameCount() - 1).toString(),
+                            createXmlSchema(watchFaceXsdFile)
+                        );
+                    }
+                });
+            } finally {
+                deleteDirectory(unzipDocsPath);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to parse XSD schemas", e);
+        }
+        return validators;
+    }
+
+    private static void deleteDirectory(Path dirPath) throws IOException {
+        if (Files.exists(dirPath)) {
+            try (Stream<Path> walk = Files.walk(dirPath)) {
+                walk.sorted(Comparator.reverseOrder()) // Reverse order to delete contents first
+                    .forEach(path -> {
+                        try {
+                            Files.delete(path);
+                        } catch (IOException e) {
+                            // Do nothing
+                        }
+                    });
+            }
+        }
     }
 }

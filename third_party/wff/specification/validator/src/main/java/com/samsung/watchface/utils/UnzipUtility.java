@@ -16,62 +16,68 @@
 
 package com.samsung.watchface.utils;
 
+import static java.nio.file.Files.*;
+
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Path;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 public class UnzipUtility {
     private static final int BUFFER_SIZE = 4096;
 
-    public static void unzip(String zipFilePath, String destDirectory) {
-        tryCreateDirectory(destDirectory);
+    /**
+     * Unzips a ZIP file from an InputStream to a destination directory.
+     *
+     * @param inputStream     The stream of the ZIP file to unzip.
+     * @param destinationDir  The directory where files will be extracted.
+     * @throws IOException    If an I/O error occurs.
+     */
+    public static void unzip(InputStream inputStream, Path destinationDir) throws IOException {
+        // Create a buffer for reading/writing data
+        byte[] buffer = new byte[BUFFER_SIZE];
 
-        try (FileInputStream fileIn = new FileInputStream(zipFilePath);
-             ZipInputStream zipIn = new ZipInputStream(fileIn)) {
-            ZipEntry entry = zipIn.getNextEntry();
-            while (entry != null) {
-                final String filePath = destDirectory + File.separator + entry.getName();
-                if (entry.isDirectory()) {
-                    tryCreateDirectory(filePath);
-                } else {
-                    tryExtractFile(zipIn, filePath);
+        // Use try-with-resources to ensure the stream is closed automatically
+        try (ZipInputStream zis = new ZipInputStream(inputStream)) {
+            ZipEntry zipEntry = zis.getNextEntry();
+
+            while (zipEntry != null) {
+                Path newFilePath = destinationDir.resolve(zipEntry.getName());
+
+                // SECURITY CHECK: Prevent Zip Slip vulnerability
+                if (!newFilePath.toAbsolutePath().normalize().startsWith(destinationDir.toAbsolutePath().normalize())) {
+                    throw new IOException("Bad zip entry: " + zipEntry.getName());
                 }
-                zipIn.closeEntry();
-                entry = zipIn.getNextEntry();
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
-        }
-    }
 
-    private static void tryCreateDirectory(String directory) {
-        File destDir = new File(directory);
-        if (!destDir.exists()) {
-            if (!destDir.mkdirs()) {
-                throw new RuntimeException("Couldn't create directory : " + directory);
-            }
-        }
-    }
+                if (zipEntry.isDirectory()) {
+                    // If the entry is a directory, create it
+                    if (!isDirectory(newFilePath)) {
+                        createDirectories(newFilePath);
+                    }
+                } else {
+                    // If the entry is a file, write it out
+                    // Ensure parent directories exist
+                    Path parentDir = newFilePath.getParent();
+                    if (parentDir != null && !isDirectory(parentDir)) {
+                        createDirectories(parentDir);
+                    }
 
-    private static void tryExtractFile(ZipInputStream zipIn, String filePath) {
-        File file = new File(filePath);
-        File parent = file.getParentFile();
-        if (parent != null && !parent.exists()) {
-            tryCreateDirectory(parent.getAbsolutePath());
-        }
-
-        try (FileOutputStream fileOutputStream = new FileOutputStream(filePath);
-             BufferedOutputStream outStream = new BufferedOutputStream(fileOutputStream)) {
-            byte[] bytesIn = new byte[BUFFER_SIZE];
-            int read;
-            while ((read = zipIn.read(bytesIn)) != -1) {
-                outStream.write(bytesIn, 0, read);
+                    // Write the file content
+                    try (FileOutputStream fos = new FileOutputStream(newFilePath.toFile())) {
+                        int len;
+                        while ((len = zis.read(buffer)) > 0) {
+                            fos.write(buffer, 0, len);
+                        }
+                    }
+                }
+                zis.closeEntry();
+                zipEntry = zis.getNextEntry();
             }
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
         }
     }
 }
