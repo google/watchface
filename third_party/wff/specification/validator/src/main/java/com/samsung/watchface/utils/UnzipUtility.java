@@ -20,17 +20,17 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 public class UnzipUtility {
     private static final int BUFFER_SIZE = 4096;
 
-    public static void unzip(String zipFilePath, String destDirectory) {
+    public static void unzip(InputStream zipInputStream, String destDirectory) {
         tryCreateDirectory(destDirectory);
 
-        try (FileInputStream fileIn = new FileInputStream(zipFilePath);
-             ZipInputStream zipIn = new ZipInputStream(fileIn)) {
+        try (ZipInputStream zipIn = new ZipInputStream(zipInputStream)) {
             ZipEntry entry = zipIn.getNextEntry();
             while (entry != null) {
                 final String filePath = destDirectory + File.separator + entry.getName();
