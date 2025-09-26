@@ -1,0 +1,14 @@
+<WatchFace
+    width="450"
+    height="450"
+    clipShape="NONE">
+  <Metadata
+      key="CLOCK_TYPE"
+      value="ANALOG"/>
+  <Metadata
+      key="USE_NOTIFICATION"
+      value="TRUE"/>
+  <Metadata
+      key="STEP_GOAL"
+      value="10000"/>
+</WatchFace>

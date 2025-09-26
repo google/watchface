@@ -1,0 +1,7 @@
+<WatchFace width="450" height="450">
+  <Scene>
+    <Group name="group" x="0" y="0" width="450" height="450">
+        <InvalidChild />
+    </Group>
+  </Scene>
+</WatchFace>

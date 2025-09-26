@@ -1,0 +1,23 @@
+<WatchFace width="450" height="450" clipShape="CIRCLE">
+   <Scene>
+        <Group name="animationGroup" x="0" y="0" width="450" height="450">
+           <PartImage
+                        name="Steps Icon_33d6"
+                        height="72"
+                        pivotX="0.5"
+                        pivotY="0.5"
+                        width="41"
+                        x="0"
+                        y="0">
+                        <ImageFilters>
+                            <HsbFilter
+                                brightness="1"
+                                hueRotate="0"
+                                saturate="0"
+                                unexpected_attribute="value" />
+                        </ImageFilters>
+                        <Image resource="[COMPLICATION.MONOCHROMATIC_IMAGE]" />
+                    </PartImage>
+       </Group>
+   </Scene>
+</WatchFace>

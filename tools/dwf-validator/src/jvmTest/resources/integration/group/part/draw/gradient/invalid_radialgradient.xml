@@ -1,0 +1,14 @@
+<WatchFace width="450" height="450" clipShape="CIRCLE">
+  <Scene>
+    <Group name="drawingGroup" x="0" y="0" width="450" height="450">
+      <PartDraw x="75" y="75" width="300" height="300">
+        <Rectangle x="0" y="0" width="300" height="300">
+          <Fill color="#FFFF0000">
+            <RadialGradient centerX="150" centerY="150"
+                colors="#FFFF0000 #FF00FF00" positions="0.0 1.0" />
+          </Fill>
+        </Rectangle>
+      </PartDraw>
+    </Group>
+  </Scene>
+</WatchFace>

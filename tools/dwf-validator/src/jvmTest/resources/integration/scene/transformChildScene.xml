@@ -1,0 +1,5 @@
+<WatchFace width="450" height="450" clipShape="NONE">
+  <Scene>
+    <Transform target="backgroundColor" value="#FFFFFFFF" />
+  </Scene>
+</WatchFace>

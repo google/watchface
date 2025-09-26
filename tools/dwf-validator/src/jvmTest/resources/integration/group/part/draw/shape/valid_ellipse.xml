@@ -1,0 +1,11 @@
+<WatchFace width="450" height="450" clipShape="CIRCLE">
+   <Scene>
+       <Group name="drawingGroup" x="0" y="0" width="450" height="450">
+           <PartDraw x="75" y="75" width="300" height="300">
+               <Ellipse x="0" y="0" width="300" height="300">
+                   <Fill color="#FFFF0000" />
+               </Ellipse>
+           </PartDraw>
+       </Group>
+   </Scene>
+</WatchFace>

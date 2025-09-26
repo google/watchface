@@ -1,0 +1,13 @@
+<WatchFace width="450" height="450" clipShape="CIRCLE">
+   <Scene>
+       <Group name="emptyGroup" x="1" y="1" width="300" height="300">
+<PartText height="589" width="589" x="0" y="0">
+                    <Text maxLines="3">
+                        <Font family="SYNC_TO_DEVICE" size="107.86062">
+                            <Upper>Text</Upper>
+                        </Font>
+                    </Text>
+                </PartText>
+ </Group>
+    </Scene>
+</WatchFace>

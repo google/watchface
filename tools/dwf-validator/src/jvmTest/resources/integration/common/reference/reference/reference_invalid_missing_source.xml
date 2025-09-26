@@ -1,0 +1,5 @@
+<WatchFace width="450" height="450" clipShape="CIRCLE">
+    <Scene backgroundColor="#ff000033">
+        <Reference name="color" defaultValue="#ff000000"/>
+    </Scene>
+</WatchFace>

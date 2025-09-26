@@ -1,0 +1,8 @@
+<WatchFace width="450" height="450" clipShape="NONE">
+    <Scene backgroundColor="#ff000000">
+        <Group name="BatterySymbol_979b" x="111" y="289" width="36" height="29" pivotX="0.5"
+            pivotY="0.5" tintColor="#FFFFFFFF" alpha="255">
+            <Variant mode="AMBIENT" target="alpha" value="(x * y) / 3" />
+        </Group>
+    </Scene>
+</WatchFace>

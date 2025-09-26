@@ -1,0 +1,8 @@
+<WatchFace width="450" height="450" clipShape="CIRCLE">
+  <Scene backgroundColor="#ff000033">
+    <DigitalClock x="90" y="45" width="270" height="140">
+      <Localization locales="en-US" />
+      <TimeText format="hh:mm:ss" x="0" y="0" width="180" height="140" />
+    </DigitalClock>
+  </Scene>
+</WatchFace>
