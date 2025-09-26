@@ -1,0 +1,9 @@
+<WatchFace width="450" height="450" clipShape="CIRCLE">
+  <Scene backgroundColor="#ff000033">
+    <ComplicationSlot x="10" y="10" width="200" height="200" slotId="1" supportedTypes="SHORT_TEXT RANGED_VALUE">
+      <BoundingBox x="10" y="10" width="200" height="200"/>
+      <Complication type="SHORT_TEXT"/>
+      <Complication type="RANGED_VALUE"/>
+    </ComplicationSlot>
+  </Scene>
+</WatchFace>

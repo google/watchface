@@ -1,0 +1,5 @@
+<WatchFace width="450" height="450">
+  <Scene>
+    <Group name="group" x="10" y="20" width="100" height="150" pivotY="1.1" />
+  </Scene>
+</WatchFace>

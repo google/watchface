@@ -1,0 +1,11 @@
+<WatchFace width="450" height="450" clipShape="CIRCLE">
+   <Scene>
+       <Group name="drawingGroup" x="0" y="0" width="450" height="450">
+           <PartDraw tintColor="invalid-color" x="75" y="75" width="300" height="300">
+               <Rectangle x="0" y="0" width="300" height="300">
+                   <Stroke color="#FFFF0000" thickness="8" />
+               </Rectangle>
+           </PartDraw>
+       </Group>
+   </Scene>
+</WatchFace>

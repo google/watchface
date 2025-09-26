@@ -1,0 +1,12 @@
+<WatchFace width="450" height="450" clipShape="CIRCLE">
+  <Scene>
+    <Group name="animationGroup" x="0" y="0" width="450" height="450">
+      <PartAnimatedImage x="75" y="75" width="300" height="300">
+        <AnimationController play="ON_VISIBLE" />
+        <AnimatedImages>
+          <AnimatedImage resource="animation1" format="AGIF" />
+        </AnimatedImages>
+      </PartAnimatedImage>
+    </Group>
+  </Scene>
+</WatchFace>
