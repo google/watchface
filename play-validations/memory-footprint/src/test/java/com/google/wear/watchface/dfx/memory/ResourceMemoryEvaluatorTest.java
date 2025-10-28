@@ -1119,6 +1119,24 @@ public class ResourceMemoryEvaluatorTest {
         }
 
         @Test
+        public void evaluateWatchFaceForLayout_failsOnMissingConfigurationDeclaration()
+                throws Exception {
+            try (InputStream is =
+                    getClass().getResourceAsStream("/MissingConfigurationDeclaration.xml")) {
+                Document document =
+                        DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(is);
+
+                assertThrows(
+                        TestFailedException.class,
+                        () ->
+                                evaluateWatchFaceForLayout(
+                                        Collections.emptyMap(),
+                                        document,
+                                        getTestEvaluationSettings()));
+            }
+        }
+
+        @Test
         public void evaluateWatchFaceForLayout_greedyEvaluationCountsTTFs() throws Exception {
             // arrange
             try (InputStream is = getClass().getResourceAsStream("/TTFFont.xml")) {
