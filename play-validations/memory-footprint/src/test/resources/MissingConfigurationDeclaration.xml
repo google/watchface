@@ -1,0 +1,24 @@
+<WatchFace width="450" height="450" clipShape="CIRCLE">
+    <UserConfigurations>
+        <ColorConfiguration id="themeColor">
+            <ColorOption id="0" colors="#ffffffff #ffffffff #ffffffff" />
+            <ColorOption id="1" colors="#ffe7e9ec #ffe7e9ec #ffe7e9ec" />
+        </ColorConfiguration>
+    </UserConfigurations>
+    <Scene backgroundColor="#ff000000">
+        <Group x="0" y="0" width="450" height="450" name="Image2_c630" alpha="255">
+            <ListConfiguration id="c26cc07d_8aa0_47ea_8fed_db9ff00e2192">
+                <ListOption id="0">
+                    <PartImage x="0" y="0" width="450" height="450" name="Image2_c630">
+                        <Image resource="wfs_b2_b9574894_f99b_46ed_8bac_e77c72c1543b"/>
+                    </PartImage>
+                </ListOption>
+                <ListOption id="1">
+                    <PartImage x="0" y="0" width="450" height="450" name="Image2_c630">
+                        <Image resource="wfs_10_9e935b0e_0763_4121_a3d6_5a6e649c1947"/>
+                    </PartImage>
+                </ListOption>
+            </ListConfiguration>
+        </Group>
+    </Scene>
+</WatchFace>
