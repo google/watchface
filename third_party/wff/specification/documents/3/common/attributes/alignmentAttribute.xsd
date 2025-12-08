@@ -20,7 +20,7 @@
     <xs:annotation>
       <xs:documentation>
         Alignment of the tag.
-        Default is START.
+        Default is CENTER.
       </xs:documentation>
     </xs:annotation>
     <xs:simpleType>
