@@ -38,5 +38,7 @@ interface ImageProcessor {
      *
      * @param stream The input stream of the image data.
      */
-    fun createImageReader(stream: InputStream): ImageReader?
+    fun createImageReader(stream: InputStream, resName: String): ImageReader?
+
+    fun createImageReader(stream: InputStream): ImageReader? = createImageReader(stream, "N/A")
 }

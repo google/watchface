@@ -150,7 +150,7 @@ class DrawableResourceDetails {
         }
 
         ImageProcessor.ImageReader reader =
-                imageProcessor.createImageReader(new ByteArrayInputStream(resource.getData()));
+                imageProcessor.createImageReader(new ByteArrayInputStream(resource.getData()), resource.getResourceName());
 
         if (reader == null) {
             return Optional.empty();
