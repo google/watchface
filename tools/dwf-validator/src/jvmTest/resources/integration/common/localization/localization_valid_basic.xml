@@ -1,0 +1,8 @@
+<WatchFace width="450" height="450" clipShape="CIRCLE">
+  <Scene backgroundColor="#ff000033">
+    <DigitalClock x="10" y="10" width="300" height="300">
+      <Localization timeZone="SYNC_TO_DEVICE" calendar="GREGORIAN" />
+      <TimeText format="hh:mm:ss" x="10" y="10" width="50" height="50" />
+    </DigitalClock>
+  </Scene>
+</WatchFace>

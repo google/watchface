@@ -1,0 +1,8 @@
+<WatchFace width="450" height="450" clipShape="NONE">
+  <Metadata key="CLOCK_TYPE" value="ANALOG" />
+  <Metadata key="PREVIEW_TIME" value="22:10:00" />
+  <Metadata key="STEP_GOAL" value="invalid" />
+  <Scene>
+    <Group name="emptyGroup" x="1" y="1" width="300" height="300" />
+  </Scene>
+</WatchFace>

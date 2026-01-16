@@ -1,0 +1,9 @@
+<WatchFace width="450" height="450" clipShape="NONE">
+  <Scene>
+    <Group name="group" x="1" y="1" width="300" height="300" >
+      <DigitalClock x="10" y="10" width="300" height="300" >
+        <TimeText format="hh:mm" pivotY="1.1" x="10" y="10" width="300" height="300" />
+      </DigitalClock>
+    </Group>
+  </Scene>
+</WatchFace>

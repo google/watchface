@@ -1,0 +1,15 @@
+<WatchFace width="450" height="450" clipShape="CIRCLE">
+  <UserConfigurations>
+    <ColorConfiguration id="main_color_config" displayName="Accent Color"
+        defaultValue="white">
+      <ColorOption id="white" displayName="White" colors="#FFFFFFFF" />
+      <ColorOption id="red" displayName="Red" colors="#FFFF0000" />
+      <ColorOption id="green" displayName="Green" colors="#FF00FF00" />
+      <ColorOption id="blue" displayName="Blue" colors="#FF0000FF" />
+      <ColorOption id="yellow" displayName="Yellow" colors="#FFFFFF00" />
+    </ColorConfiguration>
+  </UserConfigurations>
+  <Scene>
+    <Group name="emptyGroup" x="1" y="1" width="300" height="300"></Group>
+  </Scene>
+</WatchFace>

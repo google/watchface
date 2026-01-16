@@ -1,0 +1,13 @@
+<WatchFace width="300" height="400" clipShape="CIRCLE" cornerRadiusX="3.5"
+    cornerRadiusY="3.5">
+  <Scene>
+    <Group name="Background" x="0" y="0" width="300" height="400" pivotX="0.5"
+        pivotY="0.5" tintColor="#FF000000" alpha="255">
+      <Image source="background.png" />
+    </Group>
+    <Group name="TimeDisplay" x="150" y="200" width="200" height="100"
+        pivotX="0.5" pivotY="0.5" tintColor="#FFFFFFFF" alpha="255">
+      <Text text="{time}" fontSize="24" />
+    </Group>
+  </Scene>
+</WatchFace>

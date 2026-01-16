@@ -1,0 +1,10 @@
+<WatchFace width="450" height="450" clipShape="CIRCLE">
+  <Scene>
+    <Group name="imageGroup" x="0" y="0" width="450" height="450">
+      <PartImage x="75" y="75" width="300" height="300">
+        <Photos source="some_source" defaultImageResource="default.png"
+            changeDirection="INVALID_VALUE"></Photos>
+      </PartImage>
+    </Group>
+  </Scene>
+</WatchFace>

@@ -1,0 +1,16 @@
+<WatchFace width="450" height="450" clipShape="CIRCLE">
+   <UserConfigurations>
+       <ListConfiguration id="color_style_config" displayName="Color Style" defaultValue="yellow">
+           <ListOption id="red" displayName="Red" />
+           <ListOption id="green" displayName="Green" />
+           <ListOption id="blue" displayName="Blue" />
+       </ListConfiguration>
+   </UserConfigurations>
+   <Scene>
+       <ListConfiguration id="color_style_config">
+           <ListOption id="red" />
+           <ListOption id="green" />
+           <ListOption id="blue" />
+       </ListConfiguration>
+   </Scene>
+</WatchFace>

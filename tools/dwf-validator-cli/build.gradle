@@ -1,0 +1,33 @@
+plugins {
+    id("org.jetbrains.kotlin.jvm")
+    id("application")
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'commons-cli:commons-cli:1.5.0'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    implementation project(':dwf-validator')
+    testImplementation 'junit:junit:4.13.2'
+}
+
+application {
+    mainClass = 'com.google.wear.watchface.validator.cli.AppKt'
+}
+
+jar {
+    duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
+
+    from {
+        configurations.runtimeClasspath.collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }
+
+    manifest {
+        attributes 'Main-Class': application.mainClass
+    }
+}

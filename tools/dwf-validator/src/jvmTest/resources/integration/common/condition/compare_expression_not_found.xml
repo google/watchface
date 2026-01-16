@@ -1,0 +1,15 @@
+<WatchFace width="450" height="450" clipShape="CIRCLE">
+  <Scene backgroundColor="#ff000033">
+    <Condition>
+      <Expressions>
+        <Expression name="testExpressionA">true</Expression>
+      </Expressions>
+      <Compare expression="nonExistentExpression">
+        <Group name="expA" width="450" height="450" x="0" y="0"/>
+      </Compare>
+      <Default>
+        <Group name="default" width="450" height="450" x="0" y="0" />
+      </Default>
+    </Condition>
+  </Scene>
+</WatchFace>

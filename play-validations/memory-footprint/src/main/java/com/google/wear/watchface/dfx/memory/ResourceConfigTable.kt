@@ -142,7 +142,14 @@ internal class ResourceConfigTable(
         // in this object's resourceNameToKeys, replace each reference to a user config key with the
         // top level user config definition, which contains all allowed values
         val resourceNameToTopLevelKeys = resourceNameToKeys.entries().asSequence()
-            .map { it.key!! to userConfigKeys[it.value.keyId]!! }
+            .map {
+                val configurationId = it.value.keyId!!
+                if (userConfigKeys.containsKey(configurationId)) {
+                    it.key!! to userConfigKeys[configurationId]!!
+                } else {
+                    throw TestFailedException("Configuration $configurationId is not declared in UserConfigurations.")
+                }
+            }
             .toMultimap()
 
         return ResourceConfigTable(resourceNameToTopLevelKeys)

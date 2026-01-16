@@ -1,0 +1,5 @@
+<WatchFace width="450" height="450" clipShape="CIRCLE">
+  <Scene backgroundColor="#ff000033">
+    <Variant mode="AMBIENT" target="backgroundColor" value="#ff000000" duration="1.1"/>
+  </Scene>
+</WatchFace>

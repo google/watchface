@@ -1,0 +1,8 @@
+<WatchFace width="450" height="450" clipShape="CIRCLE" version="4">
+  <UserConfigurations>
+    <PhotosConfiguration configType="SINGLE" />
+  </UserConfigurations>
+  <Scene>
+    <Group name="emptyGroup" x="1" y="1" width="300" height="300" />
+  </Scene>
+</WatchFace>

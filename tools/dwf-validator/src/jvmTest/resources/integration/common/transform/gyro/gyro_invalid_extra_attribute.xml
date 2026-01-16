@@ -1,0 +1,7 @@
+<WatchFace width="450" height="450" clipShape="CIRCLE">
+  <Scene backgroundColor="#ff000033">
+    <Group name="screen-reader-group" x="1" y="1" width="300" height="300">
+      <Gyro invalid="true"/>
+    </Group>
+  </Scene>
+</WatchFace>

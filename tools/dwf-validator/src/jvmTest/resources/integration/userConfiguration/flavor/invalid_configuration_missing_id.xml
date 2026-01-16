@@ -1,0 +1,12 @@
+<WatchFace width="450" height="450" clipShape="CIRCLE">
+   <UserConfigurations>
+       <Flavors defaultValue="modern_red">
+           <Flavor id="modern_red" displayName="Modern Red">
+               <Configuration optionId="red" />
+           </Flavor>
+       </Flavors>
+   </UserConfigurations>
+   <Scene>
+       <Group name="emptyGroup" x="1" y="1" width="300" height="300"></Group>
+   </Scene>
+</WatchFace>

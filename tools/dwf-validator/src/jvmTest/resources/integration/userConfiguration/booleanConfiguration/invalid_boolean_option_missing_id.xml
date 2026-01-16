@@ -1,0 +1,13 @@
+<WatchFace width="450" height="450" clipShape="CIRCLE">
+    <UserConfigurations>
+        <BooleanConfiguration id="test_boolean" displayName="Test Boolean" defaultValue="TRUE"/>
+    </UserConfigurations>
+    <Scene>
+        <Group name="emptyGroup" x="1" y="1" width="300" height="300">
+            <BooleanConfiguration id="test_boolean">
+                <BooleanOption />
+                <BooleanOption id="FALSE" />
+            </BooleanConfiguration>
+        </Group>
+    </Scene>
+</WatchFace>
