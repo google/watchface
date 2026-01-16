@@ -74,7 +74,7 @@ class AndroidManifest private constructor(
         private fun loadFromBinaryXml(inputStream: InputStream): AndroidManifest {
             // the axml loads into memory only the inputStream.available() bytes, so the manifest bytes must be fully
             // loaded into memory for parsing to work
-            val buffer = inputStream.readAllBytes()
+            val buffer = inputStream.readBytes()
             val doc = CompressedXmlParser().parseDOM(ByteArrayInputStream(buffer))
             return loadFromDocument(doc)
         }
