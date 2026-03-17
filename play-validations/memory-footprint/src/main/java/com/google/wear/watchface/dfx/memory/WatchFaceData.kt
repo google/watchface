@@ -20,9 +20,13 @@ import org.w3c.dom.Document
 import java.io.ByteArrayInputStream
 import java.util.stream.Stream
 import javax.xml.parsers.DocumentBuilderFactory
+import javax.xml.transform.TransformerFactory
+import javax.xml.transform.dom.DOMResult
+import javax.xml.transform.sax.SAXSource
 import javax.xml.xpath.XPathConstants
 import javax.xml.xpath.XPathFactory
 import kotlin.streams.asSequence
+import org.xml.sax.InputSource
 
 internal class WatchFaceData private constructor() {
 
@@ -78,8 +82,15 @@ internal class WatchFaceData private constructor() {
         const val SYSTEM_DEFAULT_FONT_SIZE: Long = 2371712
 
         private fun parseXmlResource(xmlData: ByteArray): Document {
+            // Parsing the document using a SAX source to better replicate the working of the real
+            // DWF Runtime. See b/493476140 for details.
             val docFactory = DocumentBuilderFactory.newInstance().apply { isNamespaceAware = true }
-            return docFactory.newDocumentBuilder().parse(ByteArrayInputStream(xmlData))
+            val doc = docFactory.newDocumentBuilder().newDocument()
+            val inputStream = InputSource(ByteArrayInputStream(xmlData))
+            val sax = SAXSource(inputStream)
+            val transformer = TransformerFactory.newInstance().newTransformer()
+            transformer.transform(sax, DOMResult(doc))
+            return doc
         }
 
         @JvmStatic
