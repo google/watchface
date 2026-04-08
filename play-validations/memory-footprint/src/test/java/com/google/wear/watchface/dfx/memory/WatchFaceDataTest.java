@@ -56,7 +56,8 @@ public class WatchFaceDataTest {
                             .setNumberOfImages(1)
                             .build());
 
-    private static final ImageProcessor imageProcessor = new JvmImageProcessor();
+    private static final ImageProcessor imageProcessor =
+            new JvmImageProcessor(TEST_EVALUATION_SETTINGS);
 
     @Test
     public void fromResourcesStream_createsPackageFromLinuxPaths() {

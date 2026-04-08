@@ -116,7 +116,7 @@ public class ResourceMemoryEvaluator {
                     WatchFaceData.fromResourcesStream(
                             inputPackage.getWatchFaceFiles(),
                             evaluationSettings,
-                            new JvmImageProcessor());
+                            new JvmImageProcessor(evaluationSettings));
 
             if (!evaluationSettings.isHoneyfaceMode()) {
                 String wffVersion =

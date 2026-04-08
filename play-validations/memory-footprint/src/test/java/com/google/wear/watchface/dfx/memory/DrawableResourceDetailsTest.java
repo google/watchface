@@ -37,7 +37,8 @@ public class DrawableResourceDetailsTest {
                     .setCanUseRGB565(true)
                     .build();
 
-    private static final ImageProcessor imageProcessor = new JvmImageProcessor();
+    private static final ImageProcessor imageProcessor =
+            new JvmImageProcessor(new EvaluationSettings(""));
 
     @Test
     public void fromPackageFile_parsesTtfWithExtension() throws Exception {
