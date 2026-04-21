@@ -16,5 +16,6 @@
 rootProject.name='play-validations'
 include ':memory-footprint'
 include ':memory-footprint:test-samples:sample-wf'
+include ':memory-footprint:test-samples:apk-splits'
 include ':validator'
 project(':validator').projectDir = new File('../third_party/wff/specification/validator')

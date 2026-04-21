@@ -87,30 +87,46 @@ public class ResourceMemoryEvaluatorTest {
         // TestParameters::toString method to pretty print the test name.
         @Parameters(name = "{0}")
         public static Collection<Object> data() {
+            String sampleWfPrefix = "test-samples/sample-wf/build/outputs/";
 
-            return Stream.of(
-                            "unpackedBundle/release",
-                            "resDirectory",
-                            "apk/release/sample-wf-release.apk",
-                            "apk/debug/sample-wf-debug.apk",
-                            "bundle/release/sample-wf-release.aab",
-                            "zipApk/com.google.wear.watchface.memory.sample.zip")
-                    .map(
-                            artifactRelativePath ->
-                                    new TestParams(
-                                            /* watchFace= */ Paths.get(
-                                                            SAMPLE_WF_BASE_ARTIFACTS_PATH,
-                                                            artifactRelativePath)
-                                                    .toString(),
-                                            /* expectedActiveFootprintBytes= */ 4712628
-                                                    + SYSTEM_DEFAULT_FONT_SIZE,
-                                            /* expectedAmbientFootprintBytes= */ 2687628,
-                                            /* expectedLayouts= */ 1,
-                                            /* cliSchemaVersion= */ artifactRelativePath.equals(
-                                                            "resDirectory")
-                                                    ? "1"
-                                                    : null))
-                    .collect(Collectors.toList());
+            Stream<TestParams> sampleWfParams =
+                    Stream.of(
+                                    sampleWfPrefix + "unpackedBundle/release",
+                                    sampleWfPrefix + "resDirectory",
+                                    sampleWfPrefix + "apk/release/sample-wf-release.apk",
+                                    sampleWfPrefix + "apk/debug/sample-wf-debug.apk",
+                                    sampleWfPrefix + "bundle/release/sample-wf-release.aab",
+                                    sampleWfPrefix
+                                            + "zipApk/com.google.wear.watchface.memory.sample.zip")
+                            .map(
+                                    path ->
+                                            new TestParams(
+                                                    path,
+                                                    /* expectedActiveFootprintBytes= */ 4712628
+                                                            + SYSTEM_DEFAULT_FONT_SIZE,
+                                                    /* expectedAmbientFootprintBytes= */ 2687628,
+                                                    /* expectedLayouts= */ 1,
+                                                    /* cliSchemaVersion= */ path.endsWith(
+                                                                    "resDirectory")
+                                                            ? "1"
+                                                            : null));
+
+            String apkSplitsPrefix = "test-samples/apk-splits/build/outputs/";
+            Stream<TestParams> apkSplitsParams =
+                    Stream.of(
+                                    apkSplitsPrefix + "zipSplits/apk-splits.zip",
+                                    apkSplitsPrefix + "bundle/release/apk-splits-release.aab")
+                            .map(
+                                    path ->
+                                            new TestParams(
+                                                    path,
+                                                    /* expectedActiveFootprintBytes= */ 4712628
+                                                            + SYSTEM_DEFAULT_FONT_SIZE,
+                                                    /* expectedAmbientFootprintBytes= */ 3092628,
+                                                    /* expectedLayouts= */ 1,
+                                                    /* cliSchemaVersion= */ null));
+
+            return Stream.concat(sampleWfParams, apkSplitsParams).collect(Collectors.toList());
         }
 
         @Test

@@ -1,0 +1,168 @@
+/*
+ * This sample is for demonstrating APK splits.
+ */
+/*
+ * Copyright 2023 Google LLC
+...
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+plugins {
+    id("com.android.application")
+}
+
+android {
+    namespace = "com.google.wear.watchface.memory.sample.apksplits"
+    compileSdk = 34
+
+    defaultConfig {
+        applicationId = "com.google.wear.watchface.memory.sample.apksplits"
+        minSdk = 33
+        targetSdk = 33
+        versionCode = 1
+        versionName = "1.0.0"
+    }
+
+    bundle {
+        density {
+            enableSplit = true
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled = true
+            shrinkResources = false
+            signingConfig = signingConfigs.getByName("debug")
+        }
+    }
+}
+
+configurations {
+    bundletool
+}
+
+dependencies {
+    bundletool("com.android.tools.build:bundletool:1.17.2")
+}
+
+afterEvaluate {
+    // create a directory containing an unpacked DWF bundle, used for tests
+    tasks.register('unpackBundle', Copy) {
+        into layout.buildDirectory.dir("outputs/unpackedBundle/release")
+
+        from(layout.projectDirectory.dir("src/main/res")) {
+            into("base/res")
+        }
+
+        from(layout.projectDirectory.dir("src/main/AndroidManifest.xml")) {
+            into("base/manifest")
+        }
+    }
+
+    // create a directory containing only a res sub-directory, used for tests
+    tasks.register("resDirectory", Copy) {
+        into layout.buildDirectory.dir("outputs/resDirectory/release")
+
+        from(layout.projectDirectory.dir("src/main/res")) {
+            into("res")
+        }
+    }
+
+    tasks.register('stageSplits') {
+        dependsOn 'bundleRelease'
+        def aabFile = layout.buildDirectory.file("outputs/bundle/release/apk-splits-release.aab")
+        def apksFile = layout.buildDirectory.file("outputs/apks/release/apk-splits.apks")
+        def tempExtractDir = layout.buildDirectory.dir("tmp/extractedApks")
+        def stagingDir = layout.buildDirectory.dir("tmp/stagingSplits")
+        
+        inputs.file(aabFile)
+        outputs.dir(stagingDir)
+        
+        doLast {
+            delete apksFile, tempExtractDir, stagingDir
+            
+            def aapt2Path = ""
+            try {
+                def sdkDir = android.sdkDirectory
+                def buildToolsVersion = android.buildToolsVersion
+                def aapt2File = new File(sdkDir, "build-tools/${buildToolsVersion}/aapt2")
+                if (aapt2File.exists()) {
+                    aapt2Path = aapt2File.absolutePath
+                }
+            } catch (Exception e) {
+                // Ignore and hope bundletool finds it or use a fallback
+            }
+
+            javaexec {
+                classpath configurations.bundletool
+                mainClass = 'com.android.tools.build.bundletool.BundleToolMain'
+                def bundleArgs = ['build-apks', "--bundle=${aabFile.get().asFile}", "--output=${apksFile.get().asFile}", "--mode=default"]
+                if (aapt2Path) {
+                    bundleArgs += ["--aapt2=${aapt2Path}"]
+                }
+                args bundleArgs
+            }
+            
+            copy {
+                from zipTree(apksFile)
+                into tempExtractDir
+            }
+            
+            mkdir stagingDir
+            def splitsDir = new File(tempExtractDir.get().asFile, "splits")
+            def baseApk = new File(splitsDir, "base-master.apk")
+            if (baseApk.exists()) {
+                copy {
+                    from baseApk
+                    into stagingDir
+                    rename { "apk-splits-base-split.apk" }
+                }
+            }
+            
+            int count = 1
+            splitsDir.listFiles().sort { it.name }.each { file ->
+                if (file.name != "base-master.apk" && file.name.endsWith(".apk")) {
+                    copy {
+                        from file
+                        into stagingDir
+                        rename { "apk-splits-${count++}.apk" }
+                    }
+                }
+            }
+        }
+    }
+
+    tasks.register('zipSplits', Zip) {
+        description = "Builds the AAB, extracts APKs using bundletool, renames them and zips them."
+        dependsOn 'stageSplits'
+        from layout.buildDirectory.dir("tmp/stagingSplits")
+        archiveFileName = "apk-splits.zip"
+        destinationDirectory = layout.buildDirectory.dir("outputs/zipSplits")
+    }
+
+    // keep the old zipApk but update it for the new namespace if needed
+    tasks.register('zipApk', Zip) {
+        duplicatesStrategy DuplicatesStrategy.INCLUDE
+        dependsOn 'assembleDebug'
+        from 'build/outputs/apk/debug'
+        include 'apk-splits-debug.apk'
+        dependsOn 'assembleRelease'
+        from 'build/outputs/apk/release'
+        include 'apk-splits-release.apk'
+        rename {
+            'com.google.wear.watchface.memory.sample.apksplits-base-split.apk'
+        }
+        archiveBaseName = "com.google.wear.watchface.memory.sample.apksplits"
+        destinationDirectory = layout.buildDirectory.dir("outputs/zipApk")
+    }
+}
