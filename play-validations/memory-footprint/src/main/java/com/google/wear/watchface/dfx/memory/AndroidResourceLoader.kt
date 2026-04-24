@@ -90,16 +90,19 @@ object AndroidResourceLoader {
         }
     }
 
-    fun streamFromMokkaZip(baseSplitZipStream: ZipInputStream): Sequence<AndroidResource> {
-        return sequence {
-                var next = baseSplitZipStream.nextEntry
+    fun streamFromMokkaZip(mokkaZip: ZipFile): Sequence<AndroidResource> {
+        return mokkaZip.entries().asSequence().flatMap {
+            val filesStream = ZipInputStream(mokkaZip.getInputStream(it))
+            val entries = sequence {
+                var next = filesStream.nextEntry
                 while (next != null) {
                     yield(next)
-                    next = baseSplitZipStream.nextEntry
+                    next = filesStream.nextEntry
                 }
-            }
-            .filter { AndroidResource.isValidResourcePath(it.name) }
-            .map { AndroidResource.fromPath(it.name, baseSplitZipStream.readBytes()) }
+            }.filter { AndroidResource.isValidResourcePath(it.name) }
+                .map { AndroidResource.fromPath(it.name, filesStream.readBytes()) }
+            entries.toList()
+        }
     }
 
     fun streamFromApkFile(apkFile: ZipFile): Sequence<AndroidResource> {

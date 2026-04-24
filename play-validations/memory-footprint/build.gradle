@@ -108,7 +108,8 @@ test {
             "test-samples:sample-wf:assembleRelease",
             "test-samples:sample-wf:unpackBundle",
             "test-samples:sample-wf:resDirectory",
-            "test-samples:sample-wf:zipApk"
+            "test-samples:sample-wf:zipApk",
+            "test-samples:apk-splits:zipSplits"
     )
 }
 

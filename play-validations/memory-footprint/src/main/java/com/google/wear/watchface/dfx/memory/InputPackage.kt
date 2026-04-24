@@ -129,8 +129,7 @@ interface InputPackage : AutoCloseable {
 
                 return object : InputPackage {
                     override fun getWatchFaceFiles(): Sequence<AndroidResource> {
-                        val baseSplitApkZip = ZipInputStream(mokkaZip.getInputStream(baseSplitApk))
-                        return AndroidResourceLoader.streamFromMokkaZip(baseSplitApkZip)
+                        return AndroidResourceLoader.streamFromMokkaZip(mokkaZip)
                     }
 
                     override fun getManifest(): AndroidManifest {
