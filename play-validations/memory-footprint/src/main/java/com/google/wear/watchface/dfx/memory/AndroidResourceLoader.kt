@@ -108,17 +108,7 @@ object AndroidResourceLoader {
     fun streamFromApkFile(apkFile: ZipFile): Sequence<AndroidResource> {
         val arscEntry = ZipEntry(RESOURCES_FILE_NAME)
 
-        val resources =
-            apkFile.getInputStream(arscEntry).use { BinaryResourceFile.fromInputStream(it) }
-
-        val chunks = resources.chunks
-        if (chunks.isEmpty()) {
-            throw IOException("no chunks")
-        }
-        if (chunks[0] !is ResourceTableChunk) {
-            throw IOException("no res table chunk")
-        }
-        val table = chunks[0] as ResourceTableChunk
+        val table = apkFile.getInputStream(arscEntry).use { loadResourceTable(it) }
         val stringPool = table.stringPool
 
         val typeChunks = table.packages.asSequence().flatMap { it.typeChunks }
@@ -138,6 +128,16 @@ object AndroidResourceLoader {
                     data
                 )
             }
+    }
+
+    @JvmStatic
+    fun loadResourceTable(inputStream: InputStream): ResourceTableChunk {
+        val resources = BinaryResourceFile.fromInputStream(inputStream)
+        val chunks = resources.chunks
+        if (chunks.isEmpty() || chunks[0] !is ResourceTableChunk) {
+            throw IOException("no res table chunk")
+        }
+        return chunks[0] as ResourceTableChunk
     }
 
     @JvmStatic
