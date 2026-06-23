@@ -72,6 +72,7 @@ public class InputPackageTest {
                         "base/res/font/open_sans_regular.ttf",
                         "base/res/raw/watchface.xml",
                         "base/res/values/strings.xml",
+                        "base/res/values/integers.xml",
                         "base/res/xml/watch_face_info.xml",
                         "base/manifest/AndroidManifest.xml");
 
