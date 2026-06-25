@@ -148,11 +148,11 @@ class UserConfigKey {
 
     private static SizedIterator<UserConfigSet> buildConfigSets(Iterator<UserConfigKey> configs) {
         if (!configs.hasNext()) {
-            return SizedIterator.fromIterator(emptyIterator(), 0);
+            return SizedIterator.Companion.fromIterator(emptyIterator(), 0);
         }
         UserConfigKey head = configs.next();
         SizedIterator<UserConfigSet> tailExpanded = buildConfigSets(configs);
-        return SizedIterator.combine(
+        return SizedIterator.Companion.combine(
                 tailExpanded,
                 head.getConfigurationValues(),
                 (configSet, configValue) -> configSet.plus(head, configValue),
