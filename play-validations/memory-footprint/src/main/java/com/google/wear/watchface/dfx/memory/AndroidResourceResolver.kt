@@ -17,8 +17,9 @@
 package com.google.wear.watchface.dfx.memory
 
 import com.android.aapt.Resources
-import com.google.devrel.gmscore.tools.apk.arsc.BinaryResourceValue
 import com.google.devrel.gmscore.tools.apk.arsc.ResourceTableChunk
+import com.google.devrel.gmscore.tools.apk.arsc.ResourceValue
+import java.lang.RuntimeException
 import java.nio.file.Path
 import javax.xml.parsers.DocumentBuilderFactory
 
@@ -70,18 +71,18 @@ object AndroidResourceResolver {
         visited: Set<Int>
     ): String {
         if (visited.contains(resourceId)) {
-            throw java.lang.RuntimeException("Cyclic resource reference detected for ID $resourceId")
+            throw RuntimeException("Cyclic resource reference detected for ID $resourceId")
         }
         val packageId = (resourceId ushr 24) and 0xFF
         val typeId = (resourceId ushr 16) and 0xFF
         val entryId = resourceId and 0xFFFF
 
         val pkg = resourceTable.packages.firstOrNull { it.id == packageId }
-            ?: throw java.lang.RuntimeException("Package not found for ID $packageId")
+            ?: throw RuntimeException("Package not found for ID $packageId")
 
         val typeChunks = pkg.typeChunks.filter { it.id == typeId }
         if (typeChunks.isEmpty()) {
-            throw java.lang.RuntimeException("Type not found for ID $typeId")
+            throw RuntimeException("Type not found for ID $typeId")
         }
 
         val newVisited = visited + resourceId
@@ -91,21 +92,21 @@ object AndroidResourceResolver {
             if (entry != null) {
                 val value = entry.value()
                 if (value != null) {
-                    if (value.type() == BinaryResourceValue.Type.INT_DEC ||
-                        value.type() == BinaryResourceValue.Type.INT_HEX) {
+                    if (value.type() == ResourceValue.Type.INT_DEC ||
+                        value.type() == ResourceValue.Type.INT_HEX) {
                         return value.data().toString()
-                    } else if (value.type() == BinaryResourceValue.Type.STRING) {
+                    } else if (value.type() == ResourceValue.Type.STRING) {
                         return resourceTable.stringPool.getString(value.data())
-                    } else if (value.type() == BinaryResourceValue.Type.REFERENCE ||
-                               value.type() == BinaryResourceValue.Type.DYNAMIC_REFERENCE) {
+                    } else if (value.type() == ResourceValue.Type.REFERENCE ||
+                               value.type() == ResourceValue.Type.DYNAMIC_REFERENCE) {
                         return resolveResourceValue(resourceTable, value.data(), newVisited)
                     } else {
-                        throw java.lang.RuntimeException("Unsupported resource value type: ${value.type()}")
+                        throw RuntimeException("Unsupported resource value type: ${value.type()}")
                     }
                 }
             }
         }
-        throw java.lang.RuntimeException("Entry not found for ID $entryId")
+        throw RuntimeException("Entry not found for ID $entryId")
     }
 
     @JvmStatic

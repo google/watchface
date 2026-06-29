@@ -17,9 +17,9 @@
 package com.google.wear.watchface.dfx.memory
 
 import com.google.common.io.Files
-import com.google.devrel.gmscore.tools.apk.arsc.BinaryResourceFile
-import com.google.devrel.gmscore.tools.apk.arsc.BinaryResourceValue
+import com.google.devrel.gmscore.tools.apk.arsc.ResourceFile
 import com.google.devrel.gmscore.tools.apk.arsc.ResourceTableChunk
+import com.google.devrel.gmscore.tools.apk.arsc.ResourceValue
 import java.io.IOException
 import java.io.InputStream
 import java.nio.file.Path
@@ -116,9 +116,9 @@ object AndroidResourceLoader {
         return typeChunks
             .flatMap { it.entries.values.asSequence() }
             .filter { RESOURCE_TYPES.contains(it.typeName()) }
-            .filter { it.value().type() == BinaryResourceValue.Type.STRING }
+            .filter { it.value()?.type() == ResourceValue.Type.STRING }
             .map { entry ->
-                val path = stringPool.getString(entry.value().data())
+                val path = stringPool.getString(entry.value()!!.data())
                 val data = apkFile.getInputStream(ZipEntry(path)).readBytes()
                 AndroidResource(
                     entry.parent().typeName,
@@ -132,7 +132,7 @@ object AndroidResourceLoader {
 
     @JvmStatic
     fun loadResourceTable(inputStream: InputStream): ResourceTableChunk {
-        val resources = BinaryResourceFile.fromInputStream(inputStream)
+        val resources = ResourceFile.fromInputStream(inputStream)
         val chunks = resources.chunks
         if (chunks.isEmpty() || chunks[0] !is ResourceTableChunk) {
             throw IOException("no res table chunk")
