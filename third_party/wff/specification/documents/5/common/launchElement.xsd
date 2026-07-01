@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright 2023 Samsung Electronics Co., Ltd All Rights Reserved
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:simpleType name="_systemShortcutType">
+    <xs:annotation>
+      <xs:documentation>
+        System shortcuts
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="ALARM"/>
+      <xs:enumeration value="BATTERY_STATUS"/>
+      <xs:enumeration value="CALENDAR"/>
+      <xs:enumeration value="MESSAGE"/>
+      <xs:enumeration value="MUSIC_PLAYER"/>
+      <xs:enumeration value="PHONE"/>
+      <xs:enumeration value="SETTINGS"/>
+      <xs:enumeration value="HEALTH_HEART_RATE"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="launchTargetType">
+    <xs:union memberTypes="_systemShortcutType xs:string"/>
+  </xs:simpleType>
+
+  <xs:element name="Launch">
+    <xs:complexType>
+      <xs:attribute name="target" type="launchTargetType" use="required"/>
+    </xs:complexType>
+  </xs:element>
+
+</xs:schema>

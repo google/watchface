@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright 2023 Samsung Electronics Co., Ltd All Rights Reserved
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:include schemaLocation="../group/part/partElementGroup.xsd"/>
+  <xs:include schemaLocation="../common/conditionElement.xsd"/>
+
+  <xs:simpleType name="complicationType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="SHORT_TEXT"/>
+      <xs:enumeration value="LONG_TEXT"/>
+      <xs:enumeration value="MONOCHROMATIC_IMAGE"/>
+      <xs:enumeration value="SMALL_IMAGE"/>
+      <xs:enumeration value="PHOTO_IMAGE"/>
+      <xs:enumeration value="RANGED_VALUE"/>
+      <xs:enumeration value="GOAL_PROGRESS"/>
+      <xs:enumeration value="WEIGHTED_ELEMENTS"/>
+      <xs:enumeration value="EMPTY"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:element name="Complication">
+    <xs:complexType>
+      <xs:choice maxOccurs="unbounded">
+        <xs:group ref="PartElementGroup" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element ref="Group" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element ref="Condition" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:choice>
+      <xs:attribute name="type" type="complicationType" use="required"/>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

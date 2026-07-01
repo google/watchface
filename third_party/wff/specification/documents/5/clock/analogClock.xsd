@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright 2023 Samsung Electronics Co., Ltd All Rights Reserved
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:include schemaLocation="../group/renderModeType.xsd"/>
+  <xs:include schemaLocation="../common/attributes/geometricAttributes.xsd"/>
+  <xs:include schemaLocation="../common/transform/pivotType.xsd"/>
+  <xs:include schemaLocation="../common/variant/variantElements.xsd" />
+  <xs:include schemaLocation="hourHand.xsd"/>
+  <xs:include schemaLocation="minuteHand.xsd"/>
+  <xs:include schemaLocation="secondHand.xsd"/>
+
+  <xs:element name="AnalogClock">
+    <xs:annotation>
+      <xs:documentation>
+        AnalogClock is a container that represents a traditional clock with
+        rotating hands.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:all>
+        <xs:element ref="HourHand" minOccurs="0" maxOccurs="2"/>
+        <xs:element ref="MinuteHand" minOccurs="0" maxOccurs="2"/>
+        <xs:element ref="SecondHand" minOccurs="0" maxOccurs="2"/>
+        <xs:element ref="Localization" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Variant" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:all>
+
+      <xs:attributeGroup ref="geometricAttributesRequired"/>
+      <xs:attributeGroup ref="pivot2D"/>
+      <xs:attribute name="angle" type="angleType"/>
+      <xs:attribute ref="alpha"/>
+      <xs:attribute name="scaleX" type='xs:float'/>
+      <xs:attribute name="scaleY" type='xs:float'/>
+      <xs:attribute name="renderMode" type="renderModeType" default="SOURCE"/>
+      <xs:attribute name="tintColor" type='colorAttributeType'/>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
