@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright 2024 Samsung Electronics Co., Ltd All Rights Reserved
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:include schemaLocation="../simpleTypes/colorType.xsd"/>
+  <xs:include schemaLocation="../simpleTypes/variousFloatType.xsd"/>
+  <xs:element name="Reference">
+    <xs:annotation>
+      <xs:documentation>
+        Reference is a new element which can be placed under any scene object supporting Transform.
+        Reference allows you to publish Transformable attributes from a source element,
+        which can be consumed as a DataSource in other expressions within your Scene.
+        The element has three attributes: name, source attribute's name and default value.
+
+        "Reference" can be referenced in other expressions, such as DataSource, and 'REFERENCE' prefix and name are used.
+        e.g., To consume a Reference, use [REFERENCE.reference_name] in your expressions.
+        The result of this equals to the value of the source attribute of the referenced object.
+
+        NOTE.
+        The reference name is the identifier of the reference, and it should be unique within the
+        scope of the document.
+        Do not use references as cross references or circular references. If so, it is updated only once for the first time
+        and is not updated after.
+
+        SINCE.
+        Watch Face Format 4
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:attribute name="name" type="xs:string" use="required"/>
+      <xs:attribute name="source" type="xs:string" use="required"/>
+      <xs:attribute name="defaultValue" type="_defaultValueType"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:simpleType name="_defaultValueType">
+    <xs:union
+        memberTypes="argbHexadecimalType xs:integer xs:float xs:double"/>
+  </xs:simpleType>
+</xs:schema>

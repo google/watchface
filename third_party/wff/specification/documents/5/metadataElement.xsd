@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright 2023 Samsung Electronics Co., Ltd All Rights Reserved
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <!-- preserved keys for meta data -->
+  <xs:simpleType name="_predefinedMetadataKeys">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="PREVIEW_TIME">
+        <xs:annotation>
+          <xs:documentation>
+            Specifies time for preview with format HH:MM:SS. e.g., 10:08:30
+            If this is not specified or is not an appropriate value, the system value is used.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="CLOCK_TYPE">
+        <xs:annotation>
+          <xs:documentation>
+            Specifies type of Clock.
+            The value must be either DIGITAL or ANALOG.
+            Even if your watch face contains both, you must specify a main type.
+            If this is not specified or is not an appropriate value, ANALOG is used.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="STEP_GOAL">
+        <xs:annotation>
+          <xs:documentation>
+            Set the daily goal of steps. Must be a positive integer.
+            If this is not specified or is not an appropriate value, the system value is used.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="_predefinedMetadataValues">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="DIGITAL"/>
+      <xs:enumeration value="ANALOG"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:element name="Metadata">
+    <xs:complexType>
+      <xs:annotation>
+        <xs:documentation>
+          Any pair of key-value can be added by user.
+        </xs:documentation>
+      </xs:annotation>
+
+      <!-- any key -->
+      <xs:attribute name="key" use="required">
+        <xs:annotation>
+          <xs:documentation>
+            Any unique key
+          </xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:union memberTypes="_predefinedMetadataKeys xs:string"/>
+        </xs:simpleType>
+      </xs:attribute>
+
+      <!-- any value -->
+      <xs:attribute name="value" use="required">
+        <xs:annotation>
+          <xs:documentation>
+            Any value
+          </xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:union memberTypes="_predefinedMetadataValues xs:string"/>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

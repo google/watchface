@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright 2023 Samsung Electronics Co., Ltd All Rights Reserved
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:include schemaLocation="../abstractPartType.xsd"/>
+  <xs:include schemaLocation="../image/thumbnailElement.xsd"/>
+  <xs:include schemaLocation="animatedImageElement.xsd"/>
+  <xs:include schemaLocation="animatedImagesElement.xsd"/>
+  <xs:include schemaLocation="animationControllerElement.xsd"/>
+  <xs:include schemaLocation="sequenceImageElement.xsd"/>
+
+  <xs:element name="AnimatableImageElement" abstract="true"/>
+
+  <xs:element name="PartAnimatedImage">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="AbstractPartType">
+          <xs:all>
+            <xs:element ref="Thumbnail" minOccurs="0" maxOccurs="1"/>
+            <xs:element ref="AnimationController" minOccurs="1" maxOccurs="1"/>
+            <xs:element ref="AnimatableImageElement" minOccurs="1" maxOccurs="1"/>
+          </xs:all>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

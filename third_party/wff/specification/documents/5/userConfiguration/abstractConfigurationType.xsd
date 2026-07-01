@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright 2023 Samsung Electronics Co., Ltd All Rights Reserved
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:include schemaLocation="../common/attributes/geometricAttributes.xsd"/>
+
+  <xs:complexType name="AbstractConfigurationType">
+    <xs:attribute name="id" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>
+          Identifier of the configuration, this must be an unique value.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="displayName" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>
+          Title of the configuration. This text will be shown in the configuration activity. It is
+          recommended to use string resource id for localization.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="icon" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>
+          Icon of the configuration, this will be used as an item of option list in the
+          configuration activity.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="screenReaderText" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>
+          Description text to be read by screen reader for accessibility. It is recommended to use
+          string resource id for localization.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="defaultValue" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>
+          Default configuration. Used if the user has not changed the value.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="highlight" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>
+          Highlight image indicating where this configuration changes. Since it will be laid on the
+          watch face preview, some restrictions should be considered:
+          1. Background MUST be transparent.
+          2. It SHOULD be tint-able.
+          3. The content SHOULD show the boundary of a part where will be changed by user style
+             selection.
+          4. Aspect ratio of the image SHOULD be matched to width and height of the "WatchFace"
+             element. This will be stretched as fit as the preview screen.
+          It is recommended to use an image considered to look the same as other watch face
+          configuration screens in the watch face editor of the representative product to be
+          targeted.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+</xs:schema>

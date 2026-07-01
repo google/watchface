@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright 2023 Samsung Electronics Co., Ltd All Rights Reserved
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:simpleType name="blendModeType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="CLEAR"/>
+            <xs:enumeration value="COLOR"/>
+            <xs:enumeration value="COLOR_BURN"/>
+            <xs:enumeration value="COLOR_DODGE"/>
+            <xs:enumeration value="DARKEN"/>
+            <xs:enumeration value="DIFFERENCE"/>
+            <xs:enumeration value="DST"/>
+            <xs:enumeration value="DST_ATOP"/>
+            <xs:enumeration value="DST_IN"/>
+            <xs:enumeration value="DST_OUT"/>
+            <xs:enumeration value="DST_OVER"/>
+            <xs:enumeration value="EXCLUSION"/>
+            <xs:enumeration value="HARD_LIGHT"/>
+            <xs:enumeration value="HUE"/>
+            <xs:enumeration value="LIGHTEN"/>
+            <xs:enumeration value="LUMINOSITY"/>
+            <xs:enumeration value="MODULATE"/>
+            <xs:enumeration value="MULTIPLY"/>
+            <xs:enumeration value="OVERLAY"/>
+            <xs:enumeration value="PLUS"/>
+            <xs:enumeration value="SATURATION"/>
+            <xs:enumeration value="SCREEN"/>
+            <xs:enumeration value="SOFT_LIGHT"/>
+            <xs:enumeration value="SRC"/>
+            <xs:enumeration value="SRC_ATOP"/>
+            <xs:enumeration value="SRC_IN"/>
+            <xs:enumeration value="SRC_OUT"/>
+            <xs:enumeration value="SRC_OVER"/>
+            <xs:enumeration value="XOR"/>
+        </xs:restriction>
+    </xs:simpleType>
+</xs:schema>

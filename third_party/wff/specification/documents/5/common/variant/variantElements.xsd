@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright 2023 Samsung Electronics Co., Ltd All Rights Reserved
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:include schemaLocation="../simpleTypes/arithmeticExpressionType.xsd" />
+  <xs:include schemaLocation="../simpleTypes/primitiveListTypes.xsd"/>
+  <xs:element name="Variant">
+    <xs:complexType>
+      <xs:attribute name="target" type="xs:string" use="required" />
+      <xs:attribute name="value" type="arithmeticExpressionType" use="required" />
+      <xs:attribute name="mode" use="required">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="AMBIENT" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="duration" default="1.0">
+        <xs:annotation>
+          <xs:documentation>
+            Normalized duration value to [0.0, 1.0]
+            The duration is the effect time when switching between the interactive and ambient mode.
+            It is dependent on each vendor's ambient transition time.
+            The actual effect duration is determined as a normalized value, scaled proportionally based on the ambient transition time set by the vendor.
+          </xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:float">
+              <xs:minInclusive value="0.0"/>
+              <xs:maxInclusive value="1.0"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="startOffset" default="0.0">
+        <xs:annotation>
+          <xs:documentation>
+            Normalized delay value to [0.0, 1.0]
+            If the sum of duration and startOffset is greater than 1.0, startOffset will be ignored.
+          </xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:float">
+              <xs:minInclusive value="0.0"/>
+              <xs:maxInclusive value="1.0"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="interpolation" default="LINEAR">
+        <xs:annotation>
+          <xs:documentation>
+            Interpolation method. Default is linear.
+          </xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="LINEAR"/>
+            <xs:enumeration value="EASE_IN"/>
+            <xs:enumeration value="EASE_OUT"/>
+            <xs:enumeration value="EASE_IN_OUT"/>
+            <xs:enumeration value="OVERSHOOT"/>
+            <xs:enumeration value="CUBIC_BEZIER"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <!-- Controls attribute is meaningful only when interpolation type is CUBIC_BEZIER -->
+      <xs:attribute name="controls" default="0.5 0.5 0.5 0.5" type="vector4fType">
+        <xs:annotation>
+          <xs:documentation>
+            controls attribute is meaningful only when interpolation type is CUBIC_BEZIER.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="angleDirection" default="NONE">
+        <xs:annotation>
+          <xs:documentation>
+            The direction of animation while an element rotates.
+            It doesn't change the the final value of the animation.
+            It is affected only when the target is an angle.
+          </xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="NONE"/>
+            <xs:enumeration value="CLOCKWISE"/>
+            <xs:enumeration value="COUNTER_CLOCKWISE"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
