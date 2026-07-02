@@ -56,7 +56,7 @@ def libModules = List.of("validator", "memory-footprint")
 subprojects { project ->
     if (project.name in libModules) {
         afterEvaluate {
-            version = "1.6.0-SNAPSHOT"
+            version = "1.7.0"
             group = "com.google.watchface"
             publishing {
                 repositories {
