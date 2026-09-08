@@ -30,14 +30,19 @@ class JvmImageProcessor(private val evaluationSettings: EvaluationSettings) : Im
             override fun read(imageIndex: Int): ImageData {
                 val bufferedImage = try {
                     reader.read(imageIndex)
-                } catch (_: NullPointerException) {
-                    // The ImageIO WebP plug in throws a NPE when parsing a webp that is malformed,
-                    // but android can recover and render the image. In that case, we switch to an
-                    // overestimated ImageData object, representing a full white image
-                    if (evaluationSettings.verbose) {
-                        println("Failed parsing image resource $imageName. This may lead to an overestimated memory footprint.")
+                } catch (e: Exception) {
+                    when (e) {
+                        is NullPointerException, is ArrayIndexOutOfBoundsException -> {
+                            // The ImageIO WebP plug in throws a NPE when parsing a webp that is malformed,
+                            // but android can recover and render the image. In that case, we switch to an
+                            // overestimated ImageData object, representing a full white image
+                            if (evaluationSettings.verbose) {
+                                println("Failed parsing image resource $imageName. This may lead to an overestimated memory footprint.")
+                            }
+                            null
+                        }
+                        else -> throw e
                     }
-                    null
                 }
 
                 return object : ImageData {
