@@ -13,16 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package com.google.wear.watchface.dfx.memory;
+package com.google.wear.watchface.dfx.memory
 
 /**
  * Exception thrown when the memory footprint test fails for an expected reason and the watch face
  * must be rejected from the store.
  */
-public class TestFailedException extends RuntimeException {
-
-    public TestFailedException(String message) {
-        super(message);
-    }
-}
+class TestFailedException(message: String?) : RuntimeException(message)
