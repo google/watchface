@@ -153,6 +153,19 @@ public class WatchFaceResourceCollectorTest {
         assertThat(analogClockResources).containsExactly("hour-hand", "minute-hand");
     }
 
+    @Test
+    public void collectResources_normalizesAndroidResourceReferences() throws Exception {
+        Document watchFaceDocument = readDocument("/AndroidResourceReferences.xml");
+        WatchFaceResourceCollector watchFaceResourceCollector =
+                new WatchFaceResourceCollector(
+                        watchFaceDocument, new HashMap<>(), getTestEvaluationSettings());
+        Node sceneNode = getNodeByXpath(watchFaceDocument, "/WatchFace/Scene");
+
+        Set<String> allResources = watchFaceResourceCollector.collectResources(sceneNode);
+
+        assertThat(allResources).containsExactly("ambient-only-image", "always-rendered-image");
+    }
+
     private Document readDocument(String documentPath) throws Exception {
         try (InputStream is = getClass().getResourceAsStream(documentPath)) {
             return DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(is);

@@ -281,6 +281,29 @@ public class ResourceMemoryEvaluatorTest {
                             .setExpectedTotalFootprint(3)
                             .build(),
                     new TestParams.Builder()
+                            .setLayoutPath("/AndroidResourceReferences.xml")
+                            .addImageFootprints(
+                                    (images) -> {
+                                        images.put(
+                                                "ambient-only-image",
+                                                DrawableResourceDetails.builder()
+                                                        .setName("ambient-only-image")
+                                                        .setNumberOfImages(1)
+                                                        .setBiggestFrameFootprintBytes(1)
+                                                        .build());
+                                        images.put(
+                                                "always-rendered-image",
+                                                DrawableResourceDetails.builder()
+                                                        .setName("always-rendered-image")
+                                                        .setNumberOfImages(1)
+                                                        .setBiggestFrameFootprintBytes(2)
+                                                        .build());
+                                    })
+                            .setExpectedActiveFootprint(2)
+                            .setExpectedAmbientFootprint(450 * 450 * 4)
+                            .setExpectedTotalFootprint(3)
+                            .build(),
+                    new TestParams.Builder()
                             .setLayoutPath("/ImageHiddenInAmbient.xml")
                             .addImageFootprints(
                                     (images) -> {
