@@ -16,7 +16,6 @@
 
 package com.google.wear.watchface.dfx.memory
 
-import org.w3c.dom.Document
 import java.io.ByteArrayInputStream
 import java.util.stream.Stream
 import javax.xml.parsers.DocumentBuilderFactory
@@ -26,6 +25,7 @@ import javax.xml.transform.sax.SAXSource
 import javax.xml.xpath.XPathConstants
 import javax.xml.xpath.XPathFactory
 import kotlin.streams.asSequence
+import org.w3c.dom.Document
 import org.xml.sax.InputSource
 
 internal class WatchFaceData private constructor() {
@@ -88,7 +88,18 @@ internal class WatchFaceData private constructor() {
             val doc = docFactory.newDocumentBuilder().newDocument()
             val inputStream = InputSource(ByteArrayInputStream(xmlData))
             val sax = SAXSource(inputStream)
-            val transformer = TransformerFactory.newInstance().newTransformer()
+            val transformer =
+                TransformerFactory.newInstance()
+                    .apply {
+                        try {
+                            setAttribute("jdk.xml.maxGeneralEntitySizeLimit", 0)
+                            setAttribute("jdk.xml.totalEntitySizeLimit", 0)
+                        } catch (_: IllegalArgumentException) {
+                            // Ignored on runtimes (e.g. Android) that do not support JDK XML limit
+                            // attributes.
+                        }
+                    }
+                    .newTransformer()
             transformer.transform(sax, DOMResult(doc))
             return doc
         }
