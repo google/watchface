@@ -18,7 +18,6 @@ package com.google.wear.watchface.dfx.memory
 
 import java.io.ByteArrayInputStream
 import java.util.stream.Stream
-import javax.xml.XMLConstants
 import javax.xml.parsers.DocumentBuilderFactory
 import javax.xml.parsers.SAXParserFactory
 import javax.xml.transform.TransformerFactory
@@ -111,20 +110,7 @@ internal class WatchFaceData private constructor() {
                 }
             val inputStream = InputSource(ByteArrayInputStream(xmlData))
             val sax = SAXSource(xmlReader, inputStream)
-            val transformer =
-                TransformerFactory.newInstance()
-                    .apply {
-                        try {
-                            setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "")
-                            setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "")
-                            setAttribute("jdk.xml.maxGeneralEntitySizeLimit", 0)
-                            setAttribute("jdk.xml.totalEntitySizeLimit", 0)
-                        } catch (_: IllegalArgumentException) {
-                            // Ignored on runtimes (e.g. Android) that do not support JDK XML limit
-                            // attributes.
-                        }
-                    }
-                    .newTransformer()
+            val transformer = TransformerFactory.newInstance().newTransformer()
             transformer.transform(sax, DOMResult(doc))
             return doc
         }
