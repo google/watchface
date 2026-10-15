@@ -94,7 +94,8 @@ internal class WatchFaceData private constructor() {
                 } catch (_: NoSuchMethodError) {
                     SAXParserFactory.newInstance()
                 }.apply {
-                    isNamespaceAware = true
+                    // Disable DTDs and external entities to prevent XML External Entity (XXE) and
+                    // recursive entity expansion (e.g. Billion Laughs) attacks on untrusted inputs.
                     setFeature("http://apache.org/xml/features/disallow-doctype-decl", true)
                     setFeature("http://xml.org/sax/features/external-general-entities", false)
                     setFeature("http://xml.org/sax/features/external-parameter-entities", false)
@@ -102,6 +103,9 @@ internal class WatchFaceData private constructor() {
             val xmlReader =
                 saxFactory.newSAXParser().xmlReader.apply {
                     try {
+                        // Once DTDs and custom entities are disabled above, recursive entity
+                        // expansion is impossible, so it is safe to disable these size limits to
+                        // allow watch faces with a large number of built-in entities (like &quot;).
                         setProperty("jdk.xml.maxGeneralEntitySizeLimit", 0)
                         setProperty("jdk.xml.totalEntitySizeLimit", 0)
                     } catch (_: SAXException) {
