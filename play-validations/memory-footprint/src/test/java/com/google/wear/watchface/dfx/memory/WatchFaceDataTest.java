@@ -1,6 +1,7 @@
 package com.google.wear.watchface.dfx.memory;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.junit.Assert.assertThrows;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -107,6 +108,23 @@ public class WatchFaceDataTest {
                         Stream.of(resource), TEST_EVALUATION_SETTINGS, imageProcessor);
 
         assertThat(watchFaceData.getWatchFaceDocuments()).hasSize(1);
+    }
+
+    @Test
+    public void fromResourcesStream_rejectsXmlWithDoctype() {
+        String xml =
+                "<!DOCTYPE lolz [ <!ENTITY lol \"lol\"> ]>"
+                        + "<WatchFace width=\"450\" height=\"450\"><Scene/></WatchFace>";
+        AndroidResource resource =
+                AndroidResource.fromPath(
+                        Paths.get("base/res/raw/watchface.xml"),
+                        xml.getBytes(StandardCharsets.UTF_8));
+
+        assertThrows(
+                Exception.class,
+                () ->
+                        WatchFaceData.fromResourcesStream(
+                                Stream.of(resource), TEST_EVALUATION_SETTINGS, imageProcessor));
     }
 
     private AndroidResource readPackageFile(String path) throws RuntimeException {
