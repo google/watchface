@@ -16,17 +16,19 @@
 
 package com.google.wear.watchface.dfx.memory
 
-import org.w3c.dom.Document
 import java.io.ByteArrayInputStream
 import java.util.stream.Stream
 import javax.xml.parsers.DocumentBuilderFactory
+import javax.xml.parsers.SAXParserFactory
 import javax.xml.transform.TransformerFactory
 import javax.xml.transform.dom.DOMResult
 import javax.xml.transform.sax.SAXSource
 import javax.xml.xpath.XPathConstants
 import javax.xml.xpath.XPathFactory
 import kotlin.streams.asSequence
+import org.w3c.dom.Document
 import org.xml.sax.InputSource
+import org.xml.sax.SAXException
 
 internal class WatchFaceData private constructor() {
 
@@ -86,8 +88,32 @@ internal class WatchFaceData private constructor() {
             // DWF Runtime. See b/493476140 for details.
             val docFactory = DocumentBuilderFactory.newInstance().apply { isNamespaceAware = true }
             val doc = docFactory.newDocumentBuilder().newDocument()
+            val saxFactory =
+                try {
+                    SAXParserFactory.newDefaultInstance()
+                } catch (_: NoSuchMethodError) {
+                    SAXParserFactory.newInstance()
+                }.apply {
+                    // Disable DTDs and external entities to prevent XML External Entity (XXE) and
+                    // recursive entity expansion (e.g. Billion Laughs) attacks on untrusted inputs.
+                    setFeature("http://apache.org/xml/features/disallow-doctype-decl", true)
+                    setFeature("http://xml.org/sax/features/external-general-entities", false)
+                    setFeature("http://xml.org/sax/features/external-parameter-entities", false)
+                }
+            val xmlReader =
+                saxFactory.newSAXParser().xmlReader.apply {
+                    try {
+                        // Once DTDs and custom entities are disabled above, recursive entity
+                        // expansion is impossible, so it is safe to disable these size limits to
+                        // allow watch faces with a large number of built-in entities (like &quot;).
+                        setProperty("jdk.xml.maxGeneralEntitySizeLimit", 0)
+                        setProperty("jdk.xml.totalEntitySizeLimit", 0)
+                    } catch (_: SAXException) {
+                        // Ignored on parsers that do not support JDK XML limit properties.
+                    }
+                }
             val inputStream = InputSource(ByteArrayInputStream(xmlData))
-            val sax = SAXSource(inputStream)
+            val sax = SAXSource(xmlReader, inputStream)
             val transformer = TransformerFactory.newInstance().newTransformer()
             transformer.transform(sax, DOMResult(doc))
             return doc

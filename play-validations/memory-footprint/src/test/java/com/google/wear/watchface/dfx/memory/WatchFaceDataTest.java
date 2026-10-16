@@ -1,17 +1,20 @@
 package com.google.wear.watchface.dfx.memory;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.junit.Assert.assertThrows;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.jimfs.Configuration;
 import com.google.common.jimfs.Jimfs;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 import org.junit.Test;
@@ -84,6 +87,44 @@ public class WatchFaceDataTest {
             assertThat(watchFaceData.getWatchFaceDocuments()).hasSize(1);
             assertThat(watchFaceData.getResourceDetailsMap()).isEqualTo(expectedDetails);
         }
+    }
+
+    @Test
+    public void fromResourcesStream_parsesWatchFaceWithOver100kEntityReferences() {
+        String repeatedEntities = String.join("", Collections.nCopies(60000, "&quot;a&quot; "));
+        String xml =
+                "<WatchFace width=\"450\" height=\"450\">"
+                        + "<Scene><Group name=\""
+                        + repeatedEntities
+                        + "\"/></Scene>"
+                        + "</WatchFace>";
+        AndroidResource resource =
+                AndroidResource.fromPath(
+                        Paths.get("base/res/raw/watchface.xml"),
+                        xml.getBytes(StandardCharsets.UTF_8));
+
+        WatchFaceData watchFaceData =
+                WatchFaceData.fromResourcesStream(
+                        Stream.of(resource), TEST_EVALUATION_SETTINGS, imageProcessor);
+
+        assertThat(watchFaceData.getWatchFaceDocuments()).hasSize(1);
+    }
+
+    @Test
+    public void fromResourcesStream_rejectsXmlWithDoctype() {
+        String xml =
+                "<!DOCTYPE lolz [ <!ENTITY lol \"lol\"> ]>"
+                        + "<WatchFace width=\"450\" height=\"450\"><Scene/></WatchFace>";
+        AndroidResource resource =
+                AndroidResource.fromPath(
+                        Paths.get("base/res/raw/watchface.xml"),
+                        xml.getBytes(StandardCharsets.UTF_8));
+
+        assertThrows(
+                Exception.class,
+                () ->
+                        WatchFaceData.fromResourcesStream(
+                                Stream.of(resource), TEST_EVALUATION_SETTINGS, imageProcessor));
     }
 
     private AndroidResource readPackageFile(String path) throws RuntimeException {
