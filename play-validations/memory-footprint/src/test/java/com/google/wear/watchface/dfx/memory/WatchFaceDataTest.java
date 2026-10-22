@@ -127,6 +127,32 @@ public class WatchFaceDataTest {
                                 Stream.of(resource), TEST_EVALUATION_SETTINGS, imageProcessor));
     }
 
+    @Test
+    public void fromResourcesStream_parsesWatchFaceWithXmlnsDeclarations() {
+        String defaultXmlns =
+                "<WatchFace xmlns=\"http://schemas.android.com/wear/watchface\" width=\"450\""
+                        + " height=\"450\"><Scene/></WatchFace>";
+        String prefixedXmlns =
+                "<WatchFace xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" width=\"450\""
+                        + " height=\"450\"><Scene/></WatchFace>";
+        AndroidResource defaultXmlnsResource =
+                AndroidResource.fromPath(
+                        Paths.get("base/res/raw/watchface.xml"),
+                        defaultXmlns.getBytes(StandardCharsets.UTF_8));
+        AndroidResource prefixedXmlnsResource =
+                AndroidResource.fromPath(
+                        Paths.get("base/res/raw/watchface_round.xml"),
+                        prefixedXmlns.getBytes(StandardCharsets.UTF_8));
+
+        WatchFaceData watchFaceData =
+                WatchFaceData.fromResourcesStream(
+                        Stream.of(defaultXmlnsResource, prefixedXmlnsResource),
+                        TEST_EVALUATION_SETTINGS,
+                        imageProcessor);
+
+        assertThat(watchFaceData.getWatchFaceDocuments()).hasSize(2);
+    }
+
     private AndroidResource readPackageFile(String path) throws RuntimeException {
         Path rootPath = Paths.get(TEST_PACKAGE_FILES_ROOT);
         Path filePath = Paths.get(TEST_PACKAGE_FILES_ROOT, path);

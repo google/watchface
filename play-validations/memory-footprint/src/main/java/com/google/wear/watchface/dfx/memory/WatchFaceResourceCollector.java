@@ -197,7 +197,7 @@ class WatchFaceResourceCollector {
                         .newXPath()
                         .compile(
                                 String.format(
-                                        "/%s/BitmapFonts/BitmapFont",
+                                        "/*[local-name()='%s']/*[local-name()='BitmapFonts']/*[local-name()='BitmapFont']",
                                         WatchFaceDocuments.getWatchFaceRootNode(
                                                 evaluationSettings)));
         NodeList nodeList = (NodeList) xpath.evaluate(document, XPathConstants.NODESET);

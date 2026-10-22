@@ -23,8 +23,6 @@ import javax.xml.parsers.SAXParserFactory
 import javax.xml.transform.TransformerFactory
 import javax.xml.transform.dom.DOMResult
 import javax.xml.transform.sax.SAXSource
-import javax.xml.xpath.XPathConstants
-import javax.xml.xpath.XPathFactory
 import kotlin.streams.asSequence
 import org.w3c.dom.Document
 import org.xml.sax.InputSource
@@ -94,6 +92,7 @@ internal class WatchFaceData private constructor() {
                 } catch (_: NoSuchMethodError) {
                     SAXParserFactory.newInstance()
                 }.apply {
+                    isNamespaceAware = true
                     // Disable DTDs and external entities to prevent XML External Entity (XXE) and
                     // recursive entity expansion (e.g. Billion Laughs) attacks on untrusted inputs.
                     setFeature("http://apache.org/xml/features/disallow-doctype-decl", true)
@@ -154,11 +153,8 @@ internal class WatchFaceData private constructor() {
         private fun isWatchFaceDocument(
             document: Document,
             evaluationSettings: EvaluationSettings
-        ): Boolean {
-            val rootNode = WatchFaceDocuments.getWatchFaceRootNode(evaluationSettings)
-            val xPath =
-                XPathFactory.newInstance().newXPath().compile(String.format("/%s", rootNode))
-            return xPath.evaluate(document, XPathConstants.BOOLEAN) as Boolean
-        }
+        ): Boolean =
+            document.documentElement?.localName ==
+                WatchFaceDocuments.getWatchFaceRootNode(evaluationSettings)
     }
 }
