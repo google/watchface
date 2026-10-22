@@ -86,4 +86,35 @@ object WatchFaceDocuments {
         val namedItem = attributes.getNamedItem(attribute) ?: return Optional.empty()
         return Optional.of(namedItem.nodeValue)
     }
+
+    /**
+     * Gets a resource reference attribute (such as `resource` or `thumbnail`) from the given node,
+     * normalized with [normalizeResourceReference].
+     */
+    @JvmStatic
+    fun getResourceReference(currentNode: Node, attribute: String): Optional<String> {
+        return getNodeAttribute(currentNode, attribute).map(::normalizeResourceReference)
+    }
+
+    /**
+     * Normalizes a resource reference to the bare resource name that is used as the key of the
+     * watch face package resources.
+     *
+     * Watch faces may reference a drawable either by its bare name (`name`) or with the Android
+     * resource reference syntax (`@drawable/name`). The Watch Face Format runtime resolves both to
+     * the same resource by dropping everything up to the last `/`, so the validator must do the
+     * same. Values that are not of the `@type/name` form, such as expressions (`[...]`) or bare
+     * names, are returned unchanged.
+     */
+    @JvmStatic
+    fun normalizeResourceReference(reference: String): String {
+        if (!reference.startsWith("@")) {
+            return reference
+        }
+        val separatorIndex = reference.lastIndexOf('/')
+        if (separatorIndex == -1 || separatorIndex == reference.length - 1) {
+            return reference
+        }
+        return reference.substring(separatorIndex + 1)
+    }
 }

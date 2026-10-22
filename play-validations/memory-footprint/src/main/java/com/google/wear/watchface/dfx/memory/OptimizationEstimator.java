@@ -19,6 +19,7 @@ package com.google.wear.watchface.dfx.memory;
 import static com.google.wear.watchface.dfx.memory.WatchFaceDocuments.findBitmapFontsNode;
 import static com.google.wear.watchface.dfx.memory.WatchFaceDocuments.findSceneNode;
 import static com.google.wear.watchface.dfx.memory.WatchFaceDocuments.getNodeAttribute;
+import static com.google.wear.watchface.dfx.memory.WatchFaceDocuments.getResourceReference;
 import static java.lang.Math.ceil;
 import static java.lang.Math.floor;
 import static java.lang.Math.max;
@@ -148,7 +149,7 @@ class OptimizationEstimator {
         for (int i = 0; i < children.getLength(); i++) {
             Node child = children.item(i);
             Optional<DrawableResourceDetails> maybeDrawable =
-                    getNodeAttribute(child, "resource").map(resourceMemoryMap::get);
+                    getResourceReference(child, "resource").map(resourceMemoryMap::get);
 
             if (!maybeDrawable.isPresent()) {
                 continue;
@@ -268,7 +269,9 @@ class OptimizationEstimator {
         for (int i = 0; i < children.getLength(); i++) {
             Node child = children.item(i);
             if (child.getNodeName().equals("Image")) {
-                return getNodeAttribute(child, "resource").map(resourceMemoryMap::get).orElse(null);
+                return getResourceReference(child, "resource")
+                        .map(resourceMemoryMap::get)
+                        .orElse(null);
             }
         }
         return null;

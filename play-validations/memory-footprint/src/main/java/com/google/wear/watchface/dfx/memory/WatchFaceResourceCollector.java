@@ -19,6 +19,7 @@ package com.google.wear.watchface.dfx.memory;
 import static com.google.wear.watchface.dfx.memory.WatchFaceData.SYSTEM_DEFAULT_FONT;
 import static com.google.wear.watchface.dfx.memory.WatchFaceDocuments.childrenStream;
 import static com.google.wear.watchface.dfx.memory.WatchFaceDocuments.getNodeAttribute;
+import static com.google.wear.watchface.dfx.memory.WatchFaceDocuments.getResourceReference;
 import static com.google.wear.watchface.dfx.memory.WatchFaceDocuments.isBitmapFont;
 import static com.google.wear.watchface.dfx.memory.WatchFaceDocuments.isFont;
 import static java.util.Collections.emptySet;
@@ -149,10 +150,10 @@ class WatchFaceResourceCollector {
     private Set<String> collectLeafNodeResourceReferences(Node currentNode) {
         Set<String> resourceReferences = new HashSet<>();
         // Collect resources, but ignore complication icon references.
-        getNodeAttribute(currentNode, "resource")
+        getResourceReference(currentNode, "resource")
                 .filter(this::resourceIsValid)
                 .ifPresent(resourceReferences::add);
-        getNodeAttribute(currentNode, "thumbnail")
+        getResourceReference(currentNode, "thumbnail")
                 .filter(this::resourceIsValid)
                 .ifPresent(resourceReferences::add);
         return resourceReferences;
