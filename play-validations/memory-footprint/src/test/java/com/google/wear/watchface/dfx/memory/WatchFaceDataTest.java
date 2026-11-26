@@ -153,6 +153,30 @@ public class WatchFaceDataTest {
         assertThat(watchFaceData.getWatchFaceDocuments()).hasSize(2);
     }
 
+    @Test
+    public void fromResourcesStream_parsesWatchFaceWithUtf8SurrogatePairsAcrossBufferBoundary() {
+        String xml =
+                "<?xml version=\"1.0\" encoding=\"utf-8\"?>"
+                        + "<WatchFace width=\"450\" height=\"450\"><Scene>"
+                        + "<PartText x=\"0\" y=\"0\" width=\"100\" height=\"100\">"
+                        + "<Text><Font family=\"SYNC_TO_DEVICE\" size=\"20\">"
+                        + "a".repeat(1911)
+                        + "\uD83D\uDD25"
+                        + "b".repeat(2040)
+                        + "\uD83D\uDD25"
+                        + "</Font></Text></PartText></Scene></WatchFace>";
+        AndroidResource resource =
+                AndroidResource.fromPath(
+                        Paths.get("base/res/raw/watchface.xml"),
+                        xml.getBytes(StandardCharsets.UTF_8));
+
+        WatchFaceData watchFaceData =
+                WatchFaceData.fromResourcesStream(
+                        Stream.of(resource), TEST_EVALUATION_SETTINGS, imageProcessor);
+
+        assertThat(watchFaceData.getWatchFaceDocuments()).hasSize(1);
+    }
+
     private AndroidResource readPackageFile(String path) throws RuntimeException {
         Path rootPath = Paths.get(TEST_PACKAGE_FILES_ROOT);
         Path filePath = Paths.get(TEST_PACKAGE_FILES_ROOT, path);
