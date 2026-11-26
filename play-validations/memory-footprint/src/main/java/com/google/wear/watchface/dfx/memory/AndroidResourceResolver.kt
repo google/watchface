@@ -21,7 +21,6 @@ import com.google.devrel.gmscore.tools.apk.arsc.ResourceTableChunk
 import com.google.devrel.gmscore.tools.apk.arsc.ResourceValue
 import java.lang.RuntimeException
 import java.nio.file.Path
-import javax.xml.parsers.DocumentBuilderFactory
 
 /**
  * Utility for resolving Android resource references across various package formats
@@ -158,9 +157,7 @@ object AndroidResourceResolver {
         val files = valuesDir.toFile().listFiles { f -> f.extension == "xml" } ?: return ref
         for (file in files) {
             try {
-                val factory = DocumentBuilderFactory.newInstance()
-                val builder = factory.newDocumentBuilder()
-                val doc = builder.parse(file)
+                val doc = XmlParsers.parseDocument(file.readBytes())
                 val nodes = doc.getElementsByTagName(resType)
                 for (i in 0 until nodes.length) {
                     val node = nodes.item(i) as org.w3c.dom.Element

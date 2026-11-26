@@ -12,7 +12,6 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 import java.util.zip.ZipInputStream
 import javax.xml.namespace.NamespaceContext
-import javax.xml.parsers.DocumentBuilderFactory
 import javax.xml.xpath.XPathConstants
 import javax.xml.xpath.XPathFactory
 
@@ -98,16 +97,8 @@ class AndroidManifest private constructor(
         }
 
         @JvmStatic
-        private fun loadFromPlainXml(bytes: ByteArray, resDir: Path? = null): AndroidManifest {
-            val factory = DocumentBuilderFactory.newInstance()
-            factory.isValidating = false
-            factory.isNamespaceAware = true
-            factory.isIgnoringComments = false
-            val docBuilder = factory.newDocumentBuilder()
-
-            val doc = docBuilder.parse(ByteArrayInputStream(bytes))
-            return loadFromDocument(doc, resDir = resDir)
-        }
+        private fun loadFromPlainXml(bytes: ByteArray, resDir: Path? = null): AndroidManifest =
+            loadFromDocument(XmlParsers.parseDocument(bytes), resDir = resDir)
 
         private fun getResolvedAttribute(
             doc: Document,

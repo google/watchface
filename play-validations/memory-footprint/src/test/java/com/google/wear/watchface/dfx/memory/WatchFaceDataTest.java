@@ -8,6 +8,8 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.jimfs.Configuration;
 import com.google.common.jimfs.Jimfs;
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.ServerSocket;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystem;
 import java.nio.file.Files;
@@ -16,6 +18,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Stream;
 import org.junit.Test;
 
@@ -175,6 +178,142 @@ public class WatchFaceDataTest {
                         Stream.of(resource), TEST_EVALUATION_SETTINGS, imageProcessor);
 
         assertThat(watchFaceData.getWatchFaceDocuments()).hasSize(1);
+    }
+
+    @Test
+    public void fromResourcesStream_rejectsXmlWithExternalParameterEntities() throws Exception {
+        Path tempFile = Files.createTempFile("watchface-param-test", ".txt");
+        Files.writeString(tempFile, "sample");
+        AtomicBoolean connected = new AtomicBoolean(false);
+        try (ServerSocket server = new ServerSocket(0, 1, InetAddress.getLoopbackAddress())) {
+            Thread listener =
+                    new Thread(
+                            () -> {
+                                try {
+                                    server.accept().close();
+                                    connected.set(true);
+                                } catch (Exception ignored) {
+                                }
+                            });
+            listener.setDaemon(true);
+            listener.start();
+
+            String xml =
+                    "<?xml version=\"1.0\"?>\n"
+                            + "<!DOCTYPE WatchFace [\n"
+                            + "  <!ENTITY % local SYSTEM \""
+                            + tempFile.toUri()
+                            + "\">\n"
+                            + "  <!ENTITY % remote SYSTEM \"http://127.0.0.1:"
+                            + server.getLocalPort()
+                            + "/sample.dtd\">\n"
+                            + "  %remote;\n"
+                            + "]>\n"
+                            + "<WatchFace width=\"450\" height=\"450\"><Scene/></WatchFace>";
+            AndroidResource resource =
+                    AndroidResource.fromPath(
+                            Paths.get("base/res/raw/watchface.xml"),
+                            xml.getBytes(StandardCharsets.UTF_8));
+
+            assertThrows(
+                    Exception.class,
+                    () ->
+                            WatchFaceData.fromResourcesStream(
+                                    Stream.of(resource), TEST_EVALUATION_SETTINGS, imageProcessor));
+            assertThat(connected.get()).isFalse();
+            server.close();
+            listener.join(1000);
+        } finally {
+            Files.deleteIfExists(tempFile);
+        }
+    }
+
+    @Test
+    public void fromResourcesStream_rejectsXmlWithExternalGeneralEntity() throws Exception {
+        Path tempFile = Files.createTempFile("watchface-general-test", ".txt");
+        Files.writeString(tempFile, "sample");
+        try {
+            String xml =
+                    "<?xml version=\"1.0\"?>\n"
+                            + "<!DOCTYPE WatchFace [\n"
+                            + "  <!ENTITY item SYSTEM \""
+                            + tempFile.toUri()
+                            + "\">\n"
+                            + "]>\n"
+                            + "<WatchFace width=\"450\" height=\"450\">"
+                            + "<Scene><Group name=\"&item;\"/></Scene>"
+                            + "</WatchFace>";
+            AndroidResource resource =
+                    AndroidResource.fromPath(
+                            Paths.get("base/res/raw/watchface.xml"),
+                            xml.getBytes(StandardCharsets.UTF_8));
+
+            assertThrows(
+                    Exception.class,
+                    () ->
+                            WatchFaceData.fromResourcesStream(
+                                    Stream.of(resource), TEST_EVALUATION_SETTINGS, imageProcessor));
+        } finally {
+            Files.deleteIfExists(tempFile);
+        }
+    }
+
+    @Test
+    public void fromResourcesStream_rejectsXmlWithNestedEntityDefinitions() {
+        String xml =
+                "<?xml version=\"1.0\"?>\n"
+                        + "<!DOCTYPE WatchFace [\n"
+                        + " <!ENTITY v1 \"aaaaaaaaaa\">\n"
+                        + " <!ENTITY v2 \"&v1;&v1;&v1;&v1;&v1;&v1;&v1;&v1;&v1;&v1;\">\n"
+                        + " <!ENTITY v3 \"&v2;&v2;&v2;&v2;&v2;&v2;&v2;&v2;&v2;&v2;\">\n"
+                        + " <!ENTITY v4 \"&v3;&v3;&v3;&v3;&v3;&v3;&v3;&v3;&v3;&v3;\">\n"
+                        + " <!ENTITY v5 \"&v4;&v4;&v4;&v4;&v4;&v4;&v4;&v4;&v4;&v4;\">\n"
+                        + " <!ENTITY v6 \"&v5;&v5;&v5;&v5;&v5;&v5;&v5;&v5;&v5;&v5;\">\n"
+                        + " <!ENTITY v7 \"&v6;&v6;&v6;&v6;&v6;&v6;&v6;&v6;&v6;&v6;\">\n"
+                        + " <!ENTITY v8 \"&v7;&v7;&v7;&v7;&v7;&v7;&v7;&v7;&v7;&v7;\">\n"
+                        + " <!ENTITY v9 \"&v8;&v8;&v8;&v8;&v8;&v8;&v8;&v8;&v8;&v8;\">\n"
+                        + "]>\n"
+                        + "<WatchFace width=\"450\" height=\"450\">"
+                        + "<Scene><Group name=\"&v9;\"/></Scene>"
+                        + "</WatchFace>";
+        AndroidResource resource =
+                AndroidResource.fromPath(
+                        Paths.get("base/res/raw/watchface.xml"),
+                        xml.getBytes(StandardCharsets.UTF_8));
+
+        assertThrows(
+                Exception.class,
+                () ->
+                        WatchFaceData.fromResourcesStream(
+                                Stream.of(resource), TEST_EVALUATION_SETTINGS, imageProcessor));
+    }
+
+    @Test
+    public void fromResourcesStream_rejectsXmlWithRepeatedCustomEntityDefinitions() {
+        String payload = String.join("", Collections.nCopies(800, "x"));
+        String refs = String.join("", Collections.nCopies(1000, "&block;"));
+        String xml =
+                "<?xml version=\"1.0\"?>\n"
+                        + "<!DOCTYPE WatchFace [\n"
+                        + "  <!ENTITY block \""
+                        + payload
+                        + "\">\n"
+                        + "]>\n"
+                        + "<WatchFace width=\"450\" height=\"450\">"
+                        + "<Scene><Group name=\""
+                        + refs
+                        + "\"/></Scene>"
+                        + "</WatchFace>";
+        AndroidResource resource =
+                AndroidResource.fromPath(
+                        Paths.get("base/res/raw/watchface.xml"),
+                        xml.getBytes(StandardCharsets.UTF_8));
+
+        assertThrows(
+                Exception.class,
+                () ->
+                        WatchFaceData.fromResourcesStream(
+                                Stream.of(resource), TEST_EVALUATION_SETTINGS, imageProcessor));
     }
 
     private AndroidResource readPackageFile(String path) throws RuntimeException {
