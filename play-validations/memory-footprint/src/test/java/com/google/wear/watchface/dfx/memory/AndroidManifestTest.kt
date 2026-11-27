@@ -1,13 +1,22 @@
 package com.google.wear.watchface.dfx.memory
 
 import com.google.common.truth.Truth.assertThat
-import org.junit.Test
-import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
+import com.google.devrel.gmscore.tools.apk.arsc.ResourceTableChunk
+import java.io.ByteArrayInputStream
+import java.net.InetAddress
+import java.net.ServerSocket
+import java.nio.file.Files
 import java.nio.file.Path
+import java.util.concurrent.atomic.AtomicBoolean
 import java.util.regex.Pattern
 import java.util.zip.ZipFile
 import java.util.zip.ZipInputStream
+import javax.xml.parsers.DocumentBuilderFactory
+import org.junit.Assert.assertThrows
+import org.junit.Assert.fail
+import org.junit.Test
+import org.junit.runner.RunWith
+import org.junit.runners.JUnit4
 
 @RunWith(JUnit4::class)
 class AndroidManifestTest {
@@ -88,12 +97,12 @@ class AndroidManifestTest {
         val apkZip = ZipFile(Path.of(SAMPLE_WF_BASE_ARTIFACTS_PATH, "apk/release/sample-wf-release.apk").toFile())
         val arscEntry = apkZip.getEntry("resources.arsc")
         val arscBytes = apkZip.getInputStream(arscEntry).use { it.readBytes() }
-        val resourceTable = AndroidResourceLoader.loadResourceTable(java.io.ByteArrayInputStream(arscBytes))
+        val resourceTable = AndroidResourceLoader.loadResourceTable(ByteArrayInputStream(arscBytes))
 
         val appNameResId = getResourceId(resourceTable, "string", "app_name")
         val appNameHex = "0x" + Integer.toHexString(appNameResId).uppercase()
 
-        val factory = javax.xml.parsers.DocumentBuilderFactory.newInstance()
+        val factory = DocumentBuilderFactory.newInstance()
         factory.isNamespaceAware = true
         val builder = factory.newDocumentBuilder()
         val doc = builder.newDocument()
@@ -117,13 +126,116 @@ class AndroidManifestTest {
         
         try {
             AndroidManifest.loadFromDocument(doc, resourceTable)
-            org.junit.Assert.fail("Expected NumberFormatException")
+            fail("Expected NumberFormatException")
         } catch (e: NumberFormatException) {
             assertThat(e.message).contains("Failed to parse wffVersion: 'MemorySample'")
         }
     }
 
-    private fun getResourceId(table: com.google.devrel.gmscore.tools.apk.arsc.ResourceTableChunk, typeName: String, entryName: String): Int {
+    @Test
+    fun loadFromAabDirectory_rejectsManifestWithDoctype() {
+        val tempDir = Files.createTempDirectory("manifest-doctype-test")
+        try {
+            val manifestDir = tempDir.resolve("base/manifest")
+            Files.createDirectories(manifestDir)
+            Files.writeString(
+                manifestDir.resolve("AndroidManifest.xml"),
+                "<!DOCTYPE manifest><manifest/>"
+            )
+
+            assertThrows(Exception::class.java) {
+                AndroidManifest.loadFromAabDirectory(tempDir)
+            }
+        } finally {
+            tempDir.toFile().deleteRecursively()
+        }
+    }
+
+    @Test
+    fun loadFromAabDirectory_rejectsManifestWithExternalEntities() {
+        val tempDir = Files.createTempDirectory("manifest-external-dtd-test")
+        val connected = AtomicBoolean(false)
+        ServerSocket(0, 1, InetAddress.getLoopbackAddress()).use { server ->
+            val listener = Thread {
+                try {
+                    server.accept().close()
+                    connected.set(true)
+                } catch (_: Exception) {}
+            }.apply {
+                isDaemon = true
+                start()
+            }
+
+            try {
+                val localFile = tempDir.resolve("local.txt")
+                Files.writeString(localFile, "sample")
+                val manifestDir = tempDir.resolve("base/manifest")
+                Files.createDirectories(manifestDir)
+                val xml = """
+                    <?xml version="1.0" encoding="utf-8"?>
+                    <!DOCTYPE manifest [
+                      <!ENTITY % local SYSTEM "${localFile.toUri()}">
+                      <!ENTITY % remote SYSTEM "http://127.0.0.1:${server.localPort}/schema.dtd">
+                      %remote;
+                    ]>
+                    <manifest/>
+                """.trimIndent()
+                Files.writeString(manifestDir.resolve("AndroidManifest.xml"), xml)
+
+                assertThrows(Exception::class.java) {
+                    AndroidManifest.loadFromAabDirectory(tempDir)
+                }
+                assertThat(connected.get()).isFalse()
+            } finally {
+                server.close()
+                listener.join(1000)
+                tempDir.toFile().deleteRecursively()
+            }
+        }
+    }
+
+    @Test
+    fun resolvePlainXmlResource_ignoresValuesXmlWithDoctype() {
+        val tempDir = Files.createTempDirectory("values-doctype-test")
+        val connected = AtomicBoolean(false)
+        ServerSocket(0, 1, InetAddress.getLoopbackAddress()).use { server ->
+            val listener = Thread {
+                try {
+                    server.accept().close()
+                    connected.set(true)
+                } catch (_: Exception) {}
+            }.apply {
+                isDaemon = true
+                start()
+            }
+
+            try {
+                val valuesDir = tempDir.resolve("values")
+                Files.createDirectories(valuesDir)
+                val xml = """
+                    <?xml version="1.0" encoding="utf-8"?>
+                    <!DOCTYPE resources [
+                      <!ENTITY ext SYSTEM "http://127.0.0.1:${server.localPort}/strings.dtd">
+                    ]>
+                    <resources>
+                      <string name="wff_version">&ext;</string>
+                    </resources>
+                """.trimIndent()
+                Files.writeString(valuesDir.resolve("strings.xml"), xml)
+
+                val resolved =
+                    AndroidResourceResolver.resolvePlainXmlResource(tempDir, "@string/wff_version")
+                assertThat(resolved).isEqualTo("@string/wff_version")
+                assertThat(connected.get()).isFalse()
+            } finally {
+                server.close()
+                listener.join(1000)
+                tempDir.toFile().deleteRecursively()
+            }
+        }
+    }
+
+    private fun getResourceId(table: ResourceTableChunk, typeName: String, entryName: String): Int {
         for (pkg in table.packages) {
             for (typeChunk in pkg.typeChunks) {
                 if (typeChunk.typeName == typeName) {
