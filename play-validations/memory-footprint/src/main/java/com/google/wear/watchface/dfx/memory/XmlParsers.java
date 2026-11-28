@@ -18,7 +18,6 @@ package com.google.wear.watchface.dfx.memory;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
@@ -26,7 +25,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
@@ -64,12 +62,16 @@ import org.xml.sax.SAXParseException;
  * </ol>
  */
 final class XmlParsers {
+    private static final String ANDROID_DOCUMENT_BUILDER_FACTORY_CLASS =
+            "org.apache.harmony.xml.parsers.DocumentBuilderFactoryImpl";
     private static final String DISALLOW_DOCTYPE_DECL_FEATURE =
             "http://apache.org/xml/features/disallow-doctype-decl";
     private static final String EXTERNAL_GENERAL_ENTITIES_FEATURE =
             "http://xml.org/sax/features/external-general-entities";
     private static final String EXTERNAL_PARAMETER_ENTITIES_FEATURE =
             "http://xml.org/sax/features/external-parameter-entities";
+    private static final String LOAD_EXTERNAL_DTD_FEATURE =
+            "http://apache.org/xml/features/nonvalidating/load-external-dtd";
     private static final String JDK_MAX_GENERAL_ENTITY_SIZE_LIMIT =
             "jdk.xml.maxGeneralEntitySizeLimit";
     private static final String JDK_TOTAL_ENTITY_SIZE_LIMIT = "jdk.xml.totalEntitySizeLimit";
@@ -94,12 +96,19 @@ final class XmlParsers {
         }
     }
 
-    private static boolean trySetFeature(
-            DocumentBuilderFactory factory, String name, boolean value) {
+    private static boolean isAndroidFactory(DocumentBuilderFactory factory) {
+        return ANDROID_DOCUMENT_BUILDER_FACTORY_CLASS.equals(factory.getClass().getName());
+    }
+
+    private static boolean trySetFeature(DocumentBuilderFactory factory, String name, boolean value)
+            throws ParserConfigurationException {
         try {
             factory.setFeature(name, value);
             return true;
-        } catch (ParserConfigurationException ignored) {
+        } catch (ParserConfigurationException e) {
+            if (!isAndroidFactory(factory)) {
+                throw e;
+            }
             return false;
         }
     }
@@ -115,8 +124,22 @@ final class XmlParsers {
      */
     static Document parseDocument(byte[] xmlBytes, boolean allowUnboundedBuiltinEntities)
             throws ParserConfigurationException, SAXException, IOException {
-        DocumentBuilderFactory factory = createDocumentBuilderFactory();
+        return parseDocument(
+                xmlBytes, allowUnboundedBuiltinEntities, createDocumentBuilderFactory());
+    }
+
+    static Document parseDocument(
+            byte[] xmlBytes, boolean allowUnboundedBuiltinEntities, DocumentBuilderFactory factory)
+            throws ParserConfigurationException, SAXException, IOException {
         factory.setNamespaceAware(true);
+        factory.setExpandEntityReferences(false);
+        try {
+            factory.setXIncludeAware(false);
+        } catch (UnsupportedOperationException e) {
+            if (!isAndroidFactory(factory)) {
+                throw e;
+            }
+        }
 
         boolean secureProcessing =
                 trySetFeature(factory, XMLConstants.FEATURE_SECURE_PROCESSING, true);
@@ -125,11 +148,13 @@ final class XmlParsers {
                 trySetFeature(factory, EXTERNAL_GENERAL_ENTITIES_FEATURE, false);
         boolean externalParameterDisabled =
                 trySetFeature(factory, EXTERNAL_PARAMETER_ENTITIES_FEATURE, false);
+        boolean loadExternalDtdDisabled = trySetFeature(factory, LOAD_EXTERNAL_DTD_FEATURE, false);
         boolean featuresConfigured =
                 secureProcessing
                         && doctypeDisallowed
                         && externalGeneralDisabled
-                        && externalParameterDisabled;
+                        && externalParameterDisabled
+                        && loadExternalDtdDisabled;
 
         if (allowUnboundedBuiltinEntities && featuresConfigured) {
             try {
@@ -144,7 +169,10 @@ final class XmlParsers {
         }
 
         DocumentBuilder builder = factory.newDocumentBuilder();
-        builder.setEntityResolver((publicId, systemId) -> new InputSource(new StringReader("")));
+        builder.setEntityResolver(
+                (publicId, systemId) -> {
+                    throw new SAXException("External entity resolution is disallowed");
+                });
         return parseWithBuilder(builder, xmlBytes);
     }
 

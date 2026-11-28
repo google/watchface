@@ -20,6 +20,7 @@ import com.google.common.truth.Truth.assertThat
 import java.nio.charset.StandardCharsets
 import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
+import javax.xml.parsers.ParserConfigurationException
 import org.junit.Assert.assertThrows
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -110,6 +111,121 @@ class XmlParsersTest {
 
         assertThat(doc.documentElement.tagName).isEqualTo("WatchFace")
         assertThat(doc.getElementsByTagName("Group").length).isEqualTo(1)
+    }
+
+    @Test
+    fun parseDocument_nonAndroidFactoryWithoutSecureFeatures_rethrowsParserConfigurationException() {
+        val unsupportedJvmFactory =
+            object : DocumentBuilderFactory() {
+                override fun newDocumentBuilder(): DocumentBuilder =
+                    newDefaultInstance().newDocumentBuilder()
+
+                override fun setAttribute(name: String, value: Any) {
+                    throw IllegalArgumentException(name)
+                }
+
+                override fun getAttribute(name: String): Any =
+                    throw IllegalArgumentException(name)
+
+                override fun setFeature(name: String, value: Boolean) {
+                    throw ParserConfigurationException(name)
+                }
+
+                override fun getFeature(name: String): Boolean =
+                    throw ParserConfigurationException(name)
+            }
+
+        assertThrows(ParserConfigurationException::class.java) {
+            XmlParsers.parseDocument("<WatchFace/>".toByteArray(), false, unsupportedJvmFactory)
+        }
+    }
+
+    @Test
+    fun parseDocument_nonAndroidFactoryThrowingOnSetXIncludeAware_rethrowsUnsupportedOperationException() {
+        val xIncludeUnsupportedFactory =
+            object : DocumentBuilderFactory() {
+                override fun newDocumentBuilder(): DocumentBuilder =
+                    newDefaultInstance().newDocumentBuilder()
+
+                override fun setAttribute(name: String, value: Any) {
+                    throw IllegalArgumentException(name)
+                }
+
+                override fun getAttribute(name: String): Any =
+                    throw IllegalArgumentException(name)
+
+                override fun setFeature(name: String, value: Boolean) {}
+
+                override fun getFeature(name: String): Boolean = false
+
+                override fun setXIncludeAware(state: Boolean) {
+                    throw UnsupportedOperationException("XInclude unsupported")
+                }
+            }
+
+        assertThrows(UnsupportedOperationException::class.java) {
+            XmlParsers.parseDocument("<WatchFace/>".toByteArray(), false, xIncludeUnsupportedFactory)
+        }
+    }
+
+    @Test
+    fun parseDocument_factoryIgnoringFeatures_disablesExpandEntitiesAndRejectsExternalEntityResolution() {
+        val domImpl = DocumentBuilderFactory.newDefaultInstance().newDocumentBuilder().domImplementation
+        val configuredFeatures = mutableMapOf<String, Boolean>()
+        var xIncludeAwareSet: Boolean? = null
+        val permissiveFactory =
+            object : DocumentBuilderFactory() {
+                override fun newDocumentBuilder(): DocumentBuilder =
+                    object : DocumentBuilder() {
+                        private var resolver: EntityResolver? = null
+
+                        override fun parse(inputSource: InputSource): Document {
+                            resolver!!.resolveEntity(null, "http://127.0.0.1:9/ext.dtd")
+                            return domImpl.createDocument(null, "WatchFace", null)
+                        }
+
+                        override fun isNamespaceAware(): Boolean = true
+
+                        override fun isValidating(): Boolean = false
+
+                        override fun setEntityResolver(er: EntityResolver?) {
+                            resolver = er
+                        }
+
+                        override fun setErrorHandler(eh: ErrorHandler?) {}
+
+                        override fun newDocument(): Document = throw UnsupportedOperationException()
+
+                        override fun getDOMImplementation(): DOMImplementation = domImpl
+                    }
+
+                override fun setAttribute(name: String, value: Any) {}
+
+                override fun getAttribute(name: String): Any =
+                    throw IllegalArgumentException(name)
+
+                override fun setFeature(name: String, value: Boolean) {
+                    configuredFeatures[name] = value
+                }
+
+                override fun getFeature(name: String): Boolean =
+                    configuredFeatures[name] ?: false
+
+                override fun setXIncludeAware(state: Boolean) {
+                    xIncludeAwareSet = state
+                }
+            }
+
+        val ex =
+            assertThrows(SAXException::class.java) {
+                XmlParsers.parseDocument("<WatchFace/>".toByteArray(), false, permissiveFactory)
+            }
+
+        assertThat(ex).hasMessageThat().isEqualTo("External entity resolution is disallowed")
+        assertThat(permissiveFactory.isExpandEntityReferences).isFalse()
+        assertThat(xIncludeAwareSet).isFalse()
+        assertThat(configuredFeatures["http://apache.org/xml/features/nonvalidating/load-external-dtd"])
+            .isFalse()
     }
 
     private fun stubDocumentBuilder(onParse: () -> Document): DocumentBuilder =
